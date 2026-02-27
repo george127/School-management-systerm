@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//////////////////////////
+// ENUMS
+//////////////////////////
+
+enum Role {
+  student
+  admin
+}
+
+enum Gender {
+  male
+  female
+  other
+}
+
+//////////////////////////
+// USER MODEL
+//////////////////////////
+
+model User {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String    @unique
+  password     String
+  studentId    String?   @unique
+  refreshToken String?
+  role         Role      @default(student)
+  isActive     Boolean   @default(true)
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  studentProfile Student?
+  payments       Payment[]
+}
+
+//////////////////////////
+// STUDENT PROFILE
+//////////////////////////
+
+model Student {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @unique
+  user            User     @relation(fields: [userId], references: [id])
+
+  fullName        String
+  email           String   @unique
+  phone           String
+  address         String
+  nationality     String
+  dob             DateTime
+  gender          Gender
+  profileImage    String
+
+  programName     String?
+  courseDetails   String?
+
+  qualification   String?
+  institution     String?
+  graduationYear  Int?
+  studyArea       String?
+  certifications  String?
+
+  guardianFullName   String?
+  relationship       String?
+  guardianPhone      String?
+  guardianEmail      String?
+  guardianOccupation String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+//////////////////////////
+// PAYMENT (Paystack Records)
+//////////////////////////
+
+model Payment {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id])
+
+  semester       String
+  installment    String
+  firstName      String?
+  lastName       String?
+  phoneNumber    String?
+  status         String?
+  amount         Float?
+  amountPaid     Float?
+  transactionId  String?
+
+  createdAt      DateTime @default(now())
+}
+
+//////////////////////////
+// TRAINING DETAILS
+//////////////////////////
+
+model TrainingDetails {
+  id               Int      @id @default(autoincrement())
+  email            String   @unique
+  modeOfTraining   String?
+  courseDate       String?
+  courseTime       String?
+  participants     Int?
+  sponsorship      String?
+  certificateName  String?
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
