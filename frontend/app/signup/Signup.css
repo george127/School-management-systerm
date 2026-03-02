@@ -1,0 +1,126 @@
+.signup-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+}
+
+.signup-container .signup-image {
+  width: 570px;
+  height: auto;
+  border-radius: 12px;
+}
+
+.signup-container .signup-wrapper {
+  width: 100%;
+  max-width: 450px;
+}
+
+.signup-container .signup-card {
+  padding: 40px;
+  background-color: #ffffff;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.signup-container .logo-container {
+  margin-bottom: 24px;
+}
+
+.signup-container .logo-container img {
+  width: 160px;
+  height: auto;
+}
+
+.signup-container .signup-title {
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  color: #333;
+  text-transform: capitalize;
+}
+
+.signup-container .signup-alert {
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.signup-container .signup-alert.error {
+  background-color: #fdecea;
+  color: #c62828;
+  font-weight: 500;
+  border: 1px solid #e57373;
+}
+
+.signup-container .signup-alert.success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #81c784;
+}
+
+.signup-container .signup-form .form-group {
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.signup-container .form-label {
+  display: block;
+  margin-bottom: 6px;
+  color: #555;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.signup-container .form-input {
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background: #ffe0cf;
+  color: #575454;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.signup-container .form-input:focus {
+  border-color: #e9691e;
+  outline: none;
+}
+
+.signup-container .password-group {
+  position: relative;
+}
+
+.signup-container .toggle-password {
+  position: absolute;
+  top: 70%;
+  right: 14px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.signup-container .btn-submit {
+    width: 100%;
+  padding: 9px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.signup-container .login-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 16px;
+}
+
+.signup-container .login-link a {
+  color: #e9691e;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.signup-container .login-link a:hover {
+  text-decoration: underline;
+}
