@@ -6,50 +6,69 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Signup.css";
+
 import signupImage from "../assets/signup.png";
 import logoImage from "../components/Header/appcode.png";
+
 import Header from "../components/Header/HeaderPage";
 import Navigation from "../components/Navigation/NavPage";
 import Footer from "../components/footer/Footer";
 
-
 const SignUpPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+
   const router = useRouter();
 
-  // Password visibility states
+  /* =====================
+     STATES
+  ===================== */
+
+  const [step, setStep] = useState<"register" | "verify">("register");
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [verificationCode, setVerificationCode] = useState("");
+
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const [loading, setLoading] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Validations
-  const isEmailValid = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  /* =====================
+     VALIDATIONS
+  ===================== */
 
-  // Function to validate strong password
+  const isEmailValid = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
   const isPasswordValid = (password: string) =>
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password);
+
+  /* =====================
+     REGISTER USER
+  ===================== */
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     setError(null);
     setSuccess(null);
     setLoading(true);
 
-    // Basic Validation
-    if (!email || !password || !name || !confirmPassword) {
+    if (!name || !email || !password || !confirmPassword) {
       setError("All fields are required.");
       setLoading(false);
       return;
     }
 
-    // Validate email
     if (!isEmailValid(email)) {
-      setError("Invalid email format. Please provide a valid email.");
+      setError("Invalid email format.");
       setLoading(false);
       return;
     }
@@ -60,58 +79,104 @@ const SignUpPage = () => {
       return;
     }
 
-    // Validate password
     if (!isPasswordValid(password)) {
       setError(
-        "Password must have at least one uppercase letter, one lowercase letter, one number, and one special character."
+        "Password must contain uppercase, lowercase, number and special character."
       );
       setLoading(false);
       return;
     }
 
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters long.');
-      setLoading(false);
-      return;
-    }
-
     try {
-      const response = await fetch("https://acg-7euk.onrender.com/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
+      const response = await fetch(
+        "http://localhost:5000/api/auth/signup",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: name.trim(),
+            email: email.toLowerCase().trim(),
+            password,
+          }),
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess("Sign-up successful! Redirecting to login...");
-        setTimeout(() => router.push("/login"), 1500);
+        setSuccess("Account created! Enter verification code sent to email.");
+        setStep("verify");
       } else {
-        setError(data.message || "Sign-up failed.");
+        setError(data.message || "Sign up failed.");
       }
-    } catch (error) {
-      setError("An error occurred. Please try again.");
-    } finally {
-      setLoading(false);
+
+    } catch {
+      setError("Server connection error.");
     }
+
+    setLoading(false);
   };
+
+  /* =====================
+     VERIFY EMAIL
+  ===================== */
+
+  const handleVerify = async () => {
+
+    if (verificationCode.length !== 6) {
+      setError("Enter 6 digit verification code.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+
+      const response = await fetch(
+        "http://localhost:5000/api/auth/confirm",
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: email.toLowerCase(),
+            code: verificationCode,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess("Verification successful! Redirecting...");
+        setTimeout(() => router.push("/login"), 2000);
+      } else {
+        setError(data.message || "Invalid verification code.");
+      }
+
+    } catch {
+      setError("Verification failed.");
+    }
+
+    setLoading(false);
+  };
+
+  /* ===================== */
 
   return (
     <>
       <Header />
       <Navigation />
-      
-      {/* Breadcrumb Navigation */}
+
       <div className="container navigate">
         <div className="items">
           <Link href="/">Home</Link>
-          <span className="material-symbols-outlined">arrow_and_edge</span>
+          <span className="material-symbols-outlined">
+            arrow_and_edge
+          </span>
         </div>
         <span>Sign Up</span>
       </div>
 
-      {/* Sign Up Section */}
       <div className="signup-container container">
         <div className="image-container">
           <Image
@@ -123,9 +188,10 @@ const SignUpPage = () => {
             priority
           />
         </div>
-        
+
         <div className="signup-wrapper">
           <div className="signup-card">
+
             <div className="logo-container">
               <Image
                 src={logoImage}
@@ -134,105 +200,147 @@ const SignUpPage = () => {
                 height={50}
               />
             </div>
-            <h2 className="signup-title">Create a New Account</h2>
 
-            {/* Error Alert */}
-            {error && <div className="signup-alert error">{error}</div>}
+            <h2 className="signup-title">
+              {step === "register"
+                ? "Create a New Account"
+                : "Verify Your Email"}
+            </h2>
 
-            {/* Success Alert */}
-            {success && <div className="signup-alert success">{success}</div>}
+            {error && (
+              <div className="signup-alert error">{error}</div>
+            )}
 
-            <form onSubmit={handleSubmit} className="signup-form">
-              {/* Name Field */}
-              <div className="form-group">
-                <label htmlFor="name" className="form-label">Name</label>
-                <input
-                  id="name"
-                  type="text"
-                  className="form-input"
-                  placeholder="Enter your name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
+            {success && (
+              <div className="signup-alert success">{success}</div>
+            )}
+
+            {/* ================= REGISTER FORM ================= */}
+
+            {step === "register" && (
+              <form onSubmit={handleSubmit} className="signup-form">
+
+                <div className="form-group">
+                  <label className="form-label">Name</label>
+                  <input
+                    className="form-input"
+                    value={name}
+                    placeholder="Enter your full name"
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Email</label>
+                  <input
+                    type="email"
+                    className="form-input"
+                    value={email}
+                    placeholder="Enter your email address"
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group password-group">
+                  <label className="form-label">Password</label>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    className="form-input"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <span
+                    className="toggle-password"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? "🙈" : "👁️"}
+                  </span>
+                </div>
+
+                <div className="form-group password-group">
+                  <label className="form-label">Confirm Password</label>
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="form-input"
+                    placeholder="Re-enter your password"
+                    value={confirmPassword}
+                    onChange={(e) =>
+                      setConfirmPassword(e.target.value)
+                    }
+                  />
+                  <span
+                    className="toggle-password"
+                    onClick={() =>
+                      setShowConfirmPassword(!showConfirmPassword)
+                    }
+                  >
+                    {showConfirmPassword ? "🙈" : "👁️"}
+                  </span>
+                </div>
+
+                <div className="btn-container">
+                  <button
+                    className="btn btn-submit"
+                    disabled={loading}
+                  >
+                    {loading ? "Creating Account..." : "Sign Up"}
+                    <span className="material-symbols-outlined">
+                      east
+                    </span>
+                  </button>
+                </div>
+
+              </form>
+            )}
+
+            {/* ================= VERIFY FORM ================= */}
+
+            {step === "verify" && (
+              <div className="signup-form">
+
+                <div className="form-group">
+                  <label className="form-label">
+                    Enter 6-digit verification code
+                  </label>
+
+                  <input
+                    className="form-input text-center"
+                    value={verificationCode}
+                    maxLength={6}
+                    placeholder="Enter verification code"
+                    onChange={(e) =>
+                      setVerificationCode(
+                        e.target.value.replace(/\D/g, "").slice(0, 6)
+                      )
+                    }
+                  />
+                </div>
+
+                <div className="btn-container">
+                  <button
+                    className="btn btn-submit"
+                    onClick={handleVerify}
+                    disabled={loading}
+                  >
+                    Verify Email
+                  </button>
+                </div>
+
               </div>
+            )}
 
-              {/* Email Field */}
-              <div className="form-group">
-                <label htmlFor="email" className="form-label">Email Address</label>
-                <input
-                  id="email"
-                  type="email"
-                  className="form-input"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-
-              {/* Password Field */}
-              <div className="form-group password-group">
-                <label htmlFor="password" className="form-label">Password</label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  className="form-input"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <span
-                  className="toggle-password"
-                  onClick={() => setShowPassword(!showPassword)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  {showPassword ? "🙈" : "👁️"}
-                </span>
-              </div>
-
-              {/* Confirm Password Field */}
-              <div className="form-group password-group">
-                <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  id="confirmPassword"
-                  className="form-input"
-                  placeholder="Confirm your password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
-                <span
-                  className="toggle-password"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  {showConfirmPassword ? "🙈" : "👁️"}
-                </span>
-              </div>
-
-              {/* Submit Button */}
-              <div className="btn-container">
-                <button type="submit" className="btn btn-submit" disabled={loading}>
-                  {loading ? "Creating Account..." : "Sign Up"}
-                  <span className="material-symbols-outlined">east</span>
-                </button>
-              </div>
-            </form>
-
-            {/* Login Link */}
             <div className="login-link">
               Already have an account?
-              <Link href="/login">Login into Account</Link>
+              <Link href="/login">
+                Login into Account
+              </Link>
             </div>
+
           </div>
         </div>
       </div>
-      
+
       <Footer />
     </>
   );

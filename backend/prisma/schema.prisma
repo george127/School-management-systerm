@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 //////////////////////////
@@ -26,20 +27,21 @@ enum Gender {
 //////////////////////////
 
 model User {
-  id           Int       @id @default(autoincrement())
-  name         String
-  email        String    @unique
-  password     String
-  studentId    String?   @unique
-  refreshToken String?
-  role         Role      @default(student)
-  isActive     Boolean   @default(true)
+  id            Int       @id @default(autoincrement())
+  cognitoId     String    @unique   // 👈 VERY IMPORTANT (Cognito user sub ID)
+  name          String
+  email         String    @unique
+  studentId     String?   @unique
+  role          Role      @default(student)
+  isActive      Boolean   @default(true)
 
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  refreshToken  String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   studentProfile Student?
-  payments       Payment[]
+  payments      Payment[]
 }
 
 //////////////////////////

@@ -7,13 +7,13 @@ CREATE TYPE "Gender" AS ENUM ('male', 'female', 'other');
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
+    "cognitoId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
     "studentId" TEXT,
-    "refreshToken" TEXT,
     "role" "Role" NOT NULL DEFAULT 'student',
     "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "refreshToken" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -83,6 +83,9 @@ CREATE TABLE "TrainingDetails" (
 
     CONSTRAINT "TrainingDetails_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_cognitoId_key" ON "User"("cognitoId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");

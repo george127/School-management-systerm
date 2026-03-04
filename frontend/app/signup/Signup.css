@@ -101,6 +101,58 @@
   font-size: 16px;
 }
 
+.signup-container .password-strength-wrapper {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.signup-container .password-strength-bar {
+  flex: 1;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.signup-container .password-strength-fill {
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+/* Strength Levels */
+
+.signup-container .strength-0 {
+  width: 0%;
+}
+
+.signup-container .strength-1 {
+  width: 25%;
+  background: #ef4444;
+}
+
+.signup-container .strength-2 {
+  width: 50%;
+  background: #f59e0b;
+}
+
+.signup-container .strength-3 {
+  width: 75%;
+  background: #3b82f6;
+}
+
+.signup-container .strength-4 {
+  width: 100%;
+  background: #22c55e;
+}
+
+.signup-container .password-strength-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
 .signup-container .btn-submit {
     width: 100%;
   padding: 9px;
