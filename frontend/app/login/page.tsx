@@ -55,41 +55,58 @@ const LoginPage = () => {
 
     setLoading(true);
     setErrorMessage("");
+    setSuccessMessage("");
 
     try {
       const response = await fetch(
-        "https://acg-7euk.onrender.com/api/auth/login",
+        "http://localhost:5000/api/auth/login", // Use your actual API URL
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-          credentials: "include",
+          body: JSON.stringify({ 
+            email: email.toLowerCase(), // Normalize email to lowercase
+            password 
+          }),
+          // Removed credentials: "include" since backend uses token-based auth
         },
       );
 
       const data = await response.json();
 
       if (!response.ok) {
+        // Handle specific error cases from backend
         setErrorMessage(data.message || "Invalid email or password.");
         setLoading(false);
         return;
       }
 
-      // Store user in localStorage
+      // Store user data and tokens in localStorage
       localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("token", data.token); // Store the JWT token
+      
+      // Optionally store Cognito tokens if needed for other services
+      if (data.accessToken) {
+        localStorage.setItem("accessToken", data.accessToken);
+      }
+      
+      // Store token expiry if needed
+      if (data.expiresIn) {
+        const expiryTime = new Date().getTime() + (data.expiresIn * 1000);
+        localStorage.setItem("tokenExpiry", expiryTime.toString());
+      }
 
       setSuccessMessage("Login successful! Redirecting...");
 
       // Determine redirect based on role
       const roleFromResponse = data?.user?.role;
-      const isAdmin =
-        roleFromResponse === "admin" ||
-        data?.user?.email === "admin@appcode.com";
+      const isAdmin = roleFromResponse === "admin";
       const destination = isAdmin ? "/AdminDashboard" : "/StudentPortal";
 
+      // Short timeout to show success message before redirect
       setTimeout(() => router.push(destination), 600);
     } catch (error) {
-      setErrorMessage("An error occurred. Please try again later.");
+      console.error("Login error:", error);
+      setErrorMessage("Unable to connect to server. Please check your internet connection and try again.");
       setLoading(false);
     }
   };
@@ -152,6 +169,7 @@ const LoginPage = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={loading}
                 />
               </div>
 
@@ -168,10 +186,11 @@ const LoginPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={loading}
                 />
                 <span
                   className="toggle-password"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => !loading && setShowPassword(!showPassword)}
                   role="button"
                   tabIndex={0}
                 >

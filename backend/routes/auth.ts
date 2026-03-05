@@ -246,7 +246,7 @@ router.post('/auth/login', async (req, res) => {
     res.status(500).json({ message: error.message || 'Login failed' });
   }
 });
-
+ 
 // Resend verification code
 router.post('/auth/resend-code', async (req, res) => {
   try {
