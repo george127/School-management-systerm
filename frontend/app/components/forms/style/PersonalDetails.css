@@ -1,0 +1,156 @@
+/* Personal Details Form Container */
+.form-container {
+    padding: 30px 100px;
+    position: relative;
+}
+
+/* Section Title */
+.form-container h3 {
+    text-align: center;
+    color: #333;
+    margin: 30px 0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+/* Input Fields */
+.form-container .form-control {
+    background-color: #fff;
+    border: none;
+    padding: 15px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+    color: #333;
+    font-size: 14px;
+    border-radius: 0px;
+}
+
+.form-container .form-control:focus {
+    outline: none;
+    border-color: #f8c12d;
+    box-shadow: 0 0 10px rgba(248, 193, 45, 0.5);
+}
+
+/* Form Labels */
+.form-container .form-label {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* Gender Select Dropdown */
+.form-container .form-select {
+    background-color: #fff;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.form-container .btn-container .btn{
+    padding: 12px 30px;
+    width: 150px;
+    height: 40px;
+    font-size: 12px;
+}
+
+.icons-container{
+    display: flex;
+    gap: 22px;
+}
+
+.icons-container .icons{
+    text-align: center;
+    border-right: 1px solid #ff6f61;
+    padding: 0 20px 0 0;
+}
+
+
+  .loading-container{
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.5); 
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 138vh; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .loading-spinner {
+    width: 45px;
+    height: 45px;
+    border: 5px solid #f8c12d;
+    border-top: 5px solid #ff4a3d;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-top: 10px;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  
+.error-message {
+    color: red;
+    margin-top: 8px;
+    font-size: 14px;
+  }
+
+  /* General Modal Styling */
+.modal-content {
+    background-color: #fff;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    position: relative;
+    animation: slide-in 0.4s ease-in-out;
+  }
+  .modal-backdrop {
+  z-index: 1040 !important;
+}
+
+.modal {
+  z-index: 1050 !important;
+}
+
+  
+  .modal-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  .modal-header img {
+    width: 260px;
+  }
+  
+  .modal-body {
+    padding: 30px;
+    text-align: center;
+    font-size: 1.1rem;
+    color: #333;
+  }
+  
+  .modal-body p:first-of-type {
+    font-weight: 500;
+    color: #4caf50;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+  }
+
+  .modal .btn-container .btn{
+    width: 100%;
+  }
+  
+  
