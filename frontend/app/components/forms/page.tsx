@@ -1,49 +1,253 @@
-"use client"; 
+// app/components/StudentForm.jsx
+"use client";
 
-import { useState } from "react";
-import PersonalDetails from "./PersonalDetails";
-import EducationalBackground from './EducationalBackground';
-import ProgramApplyingFor from './ProgramApplyingFor';
-import GuardianDetails from './GuardianDetails';
+import { useState, useEffect } from "react";
+import PersonalDetails from "../forms/PersonalDetails/page";
+import EducationalBackground from '../forms/EducationalBackground/page';
+import ProgramApplyingFor from '../forms/ProgramApplyingFor/page';
+import GuardianDetails from '../forms/GuardianDetails/page';
+import "../forms/style/forms.css";
+
+// Define TypeScript interfaces
+interface FormData {
+  personalDetails: any;
+  programDetails: any;
+  educationDetails: any;
+  guardianDetails: any;
+}
+
+interface StepKeys {
+  [key: number]: string;
+}
+
+interface StepLabels {
+  [key: number]: string;
+}
 
 export default function StudentForm() {
-  // State to control visibility of each form section
-  const [showProgramApplyingFor, setShowProgramApplyingFor] = useState(false);
-  const [showEducationalBackground, setShowEducationalBackground] = useState(false);
-  const [showGuardianDetails, setShowGuardianDetails] = useState(false);
+  // Track current step (1-4)
+  const [currentStep, setCurrentStep] = useState<number>(1);
+  
+  // Central state for all form data
+  const [formData, setFormData] = useState<FormData>({
+    personalDetails: {},
+    programDetails: {},
+    educationDetails: {},
+    guardianDetails: {}
+  });
 
-  // Function to show the next form section based on the current one
-  const handleShowNext = (currentSection) => {
-    if (currentSection === "personalDetails") {
-      setShowProgramApplyingFor(true);
-    } else if (currentSection === "programApplyingFor") {
-      setShowEducationalBackground(true);
-    } else if (currentSection === "educationalBackground") {
-      setShowGuardianDetails(true);
+  // Track submission states
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submitMessage, setSubmitMessage] = useState<string>("");
+  const [showSuccess, setShowSuccess] = useState<boolean>(false);
+
+  // Load saved data from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedData = localStorage.getItem('studentFormData');
+      if (savedData) {
+        const parsed = JSON.parse(savedData);
+        setFormData(parsed);
+        
+        // Determine current step based on saved data
+        if (parsed.personalDetails?.fullName) setCurrentStep(2);
+        if (parsed.programDetails?.programName) setCurrentStep(3);
+        if (parsed.educationDetails?.qualification) setCurrentStep(4);
+        if (parsed.guardianDetails?.guardianFullName) {
+          setCurrentStep(4);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading from localStorage:', error);
+    }
+  }, []);
+
+  // Save to localStorage whenever formData changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('studentFormData', JSON.stringify(formData));
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
+  }, [formData]);
+
+  // Handle completion of each step
+  const handleStepComplete = (stepData: any) => {
+    const stepKeys: StepKeys = {
+      1: 'personalDetails',
+      2: 'programDetails',
+      3: 'educationDetails',
+      4: 'guardianDetails'
+    };
+
+    console.log(`Step ${currentStep} completed with data:`, stepData);
+
+    // Update form data with the completed step
+    setFormData(prev => ({
+      ...prev,
+      [stepKeys[currentStep]]: stepData
+    }));
+
+    // Move to next step or submit if last step
+    if (currentStep < 4) {
+      setCurrentStep(prev => prev + 1);
+    } else {
+      // All steps completed, ready to submit
+      console.log('🎯 All steps completed, submitting to database...');
+      submitAllForms();
+    }
+  };
+
+  // Submit all forms to backend
+  const submitAllForms = async () => {
+    setIsSubmitting(true);
+    setSubmitMessage('Submitting your application...');
+    
+    try {
+      console.log('Submitting form data:', formData);
+      
+      const response = await fetch('http://localhost:5000/api/forms/submitApplication', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('✅ Database save successful:', data.message);
+        setSubmitMessage('Application submitted successfully!');
+        setShowSuccess(true);
+        
+        // Show countdown message
+        setSubmitMessage('Application submitted! Clearing local data in 15 seconds...');
+        
+        // Set a timer for 15 seconds before clearing localStorage
+        setTimeout(() => {
+          // Clear ALL localStorage items
+          localStorage.removeItem('studentFormData');
+          localStorage.removeItem('personalDetails');
+          localStorage.removeItem('programApplyingFor');
+          localStorage.removeItem('educationalBackground');
+          localStorage.removeItem('guardianDetails');
+          localStorage.removeItem('allFormsCompleted');
+          
+          console.log('✅ LocalStorage cleared - data saved to database');
+          setSubmitMessage('Redirecting to payment page...');
+          
+          // Redirect to payment page after 2 more seconds
+          setTimeout(() => {
+            window.location.href = '/fees-payment';
+          }, 2000);
+          
+        }, 15000); // 15 seconds delay
+        
+      } else {
+        console.error('❌ Server error:', data.message);
+        setSubmitMessage(`Error: ${data.message}`);
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      console.error('❌ Submission failed:', error);
+      setSubmitMessage('Network error. Please check if backend server is running.');
+      setIsSubmitting(false);
+    }
+  };
+
+  // Render current step
+  const renderStep = () => {
+    const commonProps = {
+      onComplete: handleStepComplete,
+      studentEmail: formData.personalDetails?.email || "",
+    };
+
+    switch(currentStep) {
+      case 1:
+        return <PersonalDetails {...commonProps} />;
+      case 2:
+        return <ProgramApplyingFor {...commonProps} />;
+      case 3:
+        return <EducationalBackground {...commonProps} />;
+      case 4:
+        return <GuardianDetails {...commonProps} />;
+      default:
+        return <PersonalDetails {...commonProps} />;
     }
   };
 
   return (
-    <div>
-      <div className="container">
-        <br />
-        
-        {/* Always show PersonalDetails */}
-        <PersonalDetails handleShowNext={() => handleShowNext("personalDetails")} />
-
-        {/* Conditionally render ProgramApplyingFor */}
-        {showProgramApplyingFor && (
-          <ProgramApplyingFor handleShowNext={() => handleShowNext("programApplyingFor")} />
-        )}
-
-        {/* Conditionally render EducationalBackground */}
-        {showEducationalBackground && (
-          <EducationalBackground handleShowNext={() => handleShowNext("educationalBackground")} />
-        )}
-
-        {/* Conditionally render GuardianDetails */}
-        {showGuardianDetails && <GuardianDetails />}
+    <div className="student-form">
+      {/* Progress Indicator */}
+      <div className="progress-container">
+        <div className="progress-steps">
+          {[1, 2, 3, 4].map((step: number) => (
+            <div 
+              key={step}
+              className={`step ${currentStep >= step ? 'active' : ''} ${getStepCompleted(step, formData) ? 'completed' : ''}`}
+            >
+              <div className="step-number">{step}</div>
+              <div className="step-label">{getStepLabel(step)}</div>
+            </div>
+          ))}
+        </div>
       </div>
+
+      {/* Form Render */}
+      {renderStep()}
+
+      {/* Submission Status Overlay */}
+      {isSubmitting && (
+        <div className="submission-overlay">
+          <div className="submission-modal">
+            <div className="spinner"></div>
+            <p>{submitMessage}</p>
+            {!showSuccess && <p className="timer-note">Please do not close this window</p>}
+            {showSuccess && (
+              <div className="success-check">
+                <span className="material-symbols-outlined">check_circle</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
+}
+
+// Helper function to check if a step is completed
+function getStepCompleted(step: number, formData: FormData): boolean {
+  const stepKeys: StepKeys = {
+    1: 'personalDetails',
+    2: 'programDetails',
+    3: 'educationDetails',
+    4: 'guardianDetails'
+  };
+  
+  const stepData = formData[stepKeys[step] as keyof FormData];
+  
+  switch(step) {
+    case 1:
+      return !!(stepData?.fullName);
+    case 2:
+      return !!(stepData?.programName);
+    case 3:
+      return !!(stepData?.qualification);
+    case 4:
+      return !!(stepData?.guardianFullName);
+    default:
+      return false;
+  }
+}
+
+// Helper function to get step label
+function getStepLabel(step: number): string {
+  const labels: StepLabels = {
+    1: 'Personal Details',
+    2: 'Program Details',
+    3: 'Education',
+    4: 'Guardian'
+  };
+  return labels[step];
 }

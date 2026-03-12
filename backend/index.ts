@@ -2,6 +2,9 @@ import dotenv from 'dotenv';
 dotenv.config(); 
 import express from 'express';import cors from "cors";
 import authRoute from "./routes/auth.ts";
+import s3UploadRoutes from './routes/s3_upload.ts';      
+import studentFormsRoutes from './routes/studentforms.ts'; // Import student forms routes
+
 const app = express();
 
 app.use(cors({
@@ -19,6 +22,8 @@ app.use(express.urlencoded({
 }));
 
 app.use("/api", authRoute);
+app.use("/api/upload", s3UploadRoutes);
+app.use("/api/forms", studentFormsRoutes); // Use student forms routes
 
 
 

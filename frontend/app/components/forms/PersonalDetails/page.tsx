@@ -1,16 +1,47 @@
-// app/components/PersonalDetails.jsx
+// app/components/forms/PersonalDetails.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Form, Row, Col, Container, Alert } from "react-bootstrap";
-import { useRouter } from "next/navigation";
-import "./style/PersonalDetails.css";
+import "../style/forms.css";
 
-function PersonalDetails({ handleShowNext }) {
+// Define props interface
+interface PersonalDetailsProps {
+  onComplete?: (data: any) => void;
+  studentEmail?: string;
+  handleShowNext?: () => void;
+}
+
+// Define form data interface
+interface FormData {
+  fullName: string;
+  email: string;
+  phone: string;
+  dob: string;
+  gender: string;
+  nationality: string;
+  address: string;
+  profileImage: string;
+}
+
+// Define errors interface
+interface FormErrors {
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  dob?: string;
+  gender?: string;
+  nationality?: string;
+  address?: string;
+  profileImage?: string;
+}
+
+function PersonalDetails({ onComplete, studentEmail, handleShowNext }: PersonalDetailsProps) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [loadingSaved, setLoadingSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     fullName: "",
     email: "",
     phone: "",
@@ -18,28 +49,87 @@ function PersonalDetails({ handleShowNext }) {
     gender: "",
     nationality: "",
     address: "",
-    profileImage: "", // Will store the image URL after upload
+    profileImage: "",
   });
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showNextButton, setShowNextButton] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null); // Track selected file
-  const [isUploading, setIsUploading] = useState(false); // Track upload status
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const router = useRouter();
+  // Load saved data from localStorage and API on mount
+  useEffect(() => {
+    const loadSavedData = async () => {
+      setLoadingSaved(true);
+      
+      try {
+        // First load from localStorage
+        const savedData = localStorage.getItem("personalDetails");
+        if (savedData) {
+          const parsed = JSON.parse(savedData);
+          setFormData(parsed);
+          if (parsed.fullName) {
+            setFormSubmitted(true);
+            setShowNextButton(true);
+          }
+        }
 
-  const handleChange = (e) => {
+        // Then try to load from API if email is available
+        const email = studentEmail || getEmailFromLocalStorage();
+        if (email) {
+          const response = await fetch(`http://localhost:5000/api/forms/personalDetails?email=${email}`);
+          if (response.ok) {
+            const data = await response.json();
+            setFormData(prev => ({ ...prev, ...data }));
+            if (data.fullName) {
+              setFormSubmitted(true);
+              setShowNextButton(true);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error loading saved data:", error);
+      } finally {
+        setLoadingSaved(false);
+      }
+    };
+
+    loadSavedData();
+  }, [studentEmail]);
+
+  // Helper to get email from localStorage
+  const getEmailFromLocalStorage = (): string => {
+    try {
+      const userData = localStorage.getItem("user");
+      if (userData) {
+        const user = JSON.parse(userData);
+        return user.email || "";
+      }
+    } catch (error) {
+      console.error("Error getting email from localStorage:", error);
+    }
+    return "";
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
     setSubmitError("");
   };
 
-  const validateForm = () => {
-    const newErrors = {};
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+    setSubmitError("");
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
     let isValid = true;
 
     if (!formData.fullName?.trim()) {
@@ -56,7 +146,7 @@ function PersonalDetails({ handleShowNext }) {
     if (!formData.phone?.trim()) {
       newErrors.phone = "Phone number is required.";
       isValid = false;
-    } else if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
+    } else if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ""))) {
       newErrors.phone = "Phone number must be 10 digits.";
       isValid = false;
     }
@@ -85,67 +175,63 @@ function PersonalDetails({ handleShowNext }) {
     return isValid;
   };
 
-  // Function to save data to localStorage
-  const saveToLocalStorage = (data) => {
+  const saveToLocalStorage = (data: FormData) => {
     try {
-      localStorage.setItem('personalDetails', JSON.stringify(data));
+      localStorage.setItem("personalDetails", JSON.stringify(data));
     } catch (error) {
-      console.error('Error saving to localStorage:', error);
+      console.error("Error saving to localStorage:", error);
     }
   };
 
-  // Function to upload file to your backend
-  const uploadFileToServer = async (file) => {
-    const formData = new FormData();
-    formData.append('profileImage', file);
-
+  const uploadFileToServer = async (file: File): Promise<string> => {
     try {
       setIsUploading(true);
-      const response = await fetch('/api/upload', {
-        method: 'POST',
+
+      const formData = new FormData();
+      formData.append("profileImage", file);
+
+      const response = await fetch("http://localhost:5000/api/forms/upload", {
+        method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('Failed to upload image');
+        throw new Error("Failed to upload image");
       }
 
       const data = await response.json();
-      return data.imageUrl; // Assuming your API returns the image URL
+      return data.imageUrl;
     } catch (error) {
-      console.error('Error uploading file:', error);
+      console.error("Error uploading file:", error);
       throw error;
     } finally {
       setIsUploading(false);
     }
   };
 
-  const handleSub = async (e) => {
+  const handleSub = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateForm()) {
       setLoading(true);
       setError(null);
-      
+
       try {
         let profileImageUrl = formData.profileImage;
 
-        // Upload file if selected and not already uploaded
         if (selectedFile && !profileImageUrl) {
           profileImageUrl = await uploadFileToServer(selectedFile);
         }
 
-        // Prepare data for submission
         const submissionData = {
           ...formData,
           profileImage: profileImageUrl,
         };
 
-        // Submit to your API
-        const response = await fetch('/api/personal-details', {
-          method: 'POST',
+        const response = await fetch("http://localhost:5000/api/forms/personalDetails", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(submissionData),
         });
@@ -153,23 +239,31 @@ function PersonalDetails({ handleShowNext }) {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || 'Failed to submit form');
+          throw new Error(data.message || "Failed to submit form");
         }
 
-        // Success case
-        setSuccessMessage("Form submitted successfully!");
+        setSuccessMessage("Personal details saved successfully!");
         setSubmitError("");
         setShowNextButton(true);
         setFormSubmitted(true);
-        setFormData(prev => ({ ...prev, profileImage: profileImageUrl }));
+        setFormData((prev) => ({ ...prev, profileImage: profileImageUrl }));
         
         // Save to localStorage
         saveToLocalStorage(submissionData);
         
+        // Call onComplete to notify parent component
+        if (onComplete) {
+          onComplete({ ...submissionData, completed: true });
+        }
+        
       } catch (error) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "An error occurred during form submission.";
         console.error("Error:", error);
-        setSubmitError(error.message || "An error occurred during form submission.");
-        setError(error.message);
+        setSubmitError(errorMessage);
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -179,26 +273,26 @@ function PersonalDetails({ handleShowNext }) {
   };
 
   const handleNextClick = () => {
-    if (handleShowNext) {
+    if (onComplete) {
+      onComplete({ ...formData, completed: true });
+    } else if (handleShowNext) {
       handleShowNext();
-    } else {
-      router.push("/Program");
     }
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
-      setSubmitError("Invalid file type. Only JPEG, PNG, JPG, and WEBP are allowed.");
+      setSubmitError(
+        "Invalid file type. Only JPEG, PNG, JPG, and WEBP are allowed.",
+      );
       return;
     }
 
-    // Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
       setSubmitError("File size too large. Maximum size is 5MB.");
       return;
@@ -206,65 +300,50 @@ function PersonalDetails({ handleShowNext }) {
 
     setSelectedFile(file);
     setSubmitError("");
-    setErrors(prev => ({ ...prev, profileImage: "" }));
-    
-    // Create a local preview URL
+    setErrors((prev) => ({ ...prev, profileImage: "" }));
+
     const previewUrl = URL.createObjectURL(file);
-    setFormData(prev => ({ ...prev, profileImage: previewUrl }));
+    setFormData((prev) => ({ ...prev, profileImage: previewUrl }));
   };
+
+  if (loadingSaved) {
+    return (
+      <div className="loading-container1">
+        <Container className="loeader">
+          <div className="text-center">
+            <div className="loading-spinner"></div>
+            <p>Loading saved data...</p>
+          </div>
+        </Container>
+      </div>
+    );
+  }
 
   return (
     <div className="layout">
-      <div className="icons-container">
-        <div className="icons">
-          <p>Personal Details</p>
-          <span
-            className="material-symbols-outlined"
-            style={{ color: formSubmitted ? "green" : "black" }}
-          >
-            {formSubmitted ? "task_alt" : "lock"}
-          </span>
-        </div>
-        <div className="icons">
-          <p>Program Applying For</p>
-          <span className="material-symbols-outlined">lock</span>
-        </div>
-        <div className="icons">
-          <p>Educational Background</p>
-          <span className="material-symbols-outlined">lock</span>
-        </div>
-        <div className="icons">
-          <p>Guardian Details</p>
-          <span className="material-symbols-outlined">lock</span>
-        </div>
-      </div>
-      
       <Container className="form-container">
-        <h3>Personal Details</h3>
-        
+        <h3>Personal Details (Step 1 of 4)</h3>
+
         {successMessage && <Alert variant="success">{successMessage}</Alert>}
         {submitError && <Alert variant="danger">{submitError}</Alert>}
-        
-        {/* Show upload status */}
+
         {isUploading && (
-          <Alert variant="info">
-            Uploading image... Please wait.
-          </Alert>
+          <Alert variant="info">Uploading image... Please wait.</Alert>
         )}
-        
+
         <Form onSubmit={handleSub}>
           <Row>
             <Col md={6}>
               <Form.Group controlId="formFullName" className="form-group">
-                <Form.Label>Full Name</Form.Label>
+                <Form.Label>Full Name <span className="text-danger">*</span></Form.Label>
                 <Form.Control
                   type="text"
                   name="fullName"
                   placeholder="Enter your full name"
                   value={formData.fullName}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   isInvalid={!!errors.fullName}
-                  disabled={loading || isUploading}
+                  disabled={loading || isUploading || formSubmitted}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.fullName}
@@ -274,15 +353,15 @@ function PersonalDetails({ handleShowNext }) {
 
             <Col md={6}>
               <Form.Group controlId="formBasicEmail" className="form-group">
-                <Form.Label>Email Address</Form.Label>
+                <Form.Label>Email Address <span className="text-danger">*</span></Form.Label>
                 <Form.Control
                   type="email"
                   name="email"
                   placeholder="Enter your email"
                   value={formData.email}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   isInvalid={!!errors.email}
-                  disabled={loading || isUploading}
+                  disabled={loading || isUploading || formSubmitted}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.email}
@@ -294,15 +373,15 @@ function PersonalDetails({ handleShowNext }) {
           <Row>
             <Col md={6}>
               <Form.Group controlId="formAddress" className="form-group">
-                <Form.Label>Address</Form.Label>
+                <Form.Label>Address <span className="text-danger">*</span></Form.Label>
                 <Form.Control
                   type="text"
                   name="address"
                   placeholder="Enter your address"
                   value={formData.address}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   isInvalid={!!errors.address}
-                  disabled={loading || isUploading}
+                  disabled={loading || isUploading || formSubmitted}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.address}
@@ -312,15 +391,15 @@ function PersonalDetails({ handleShowNext }) {
 
             <Col md={6}>
               <Form.Group controlId="formPhoneNumber" className="form-group">
-                <Form.Label>Phone Number</Form.Label>
+                <Form.Label>Phone Number <span className="text-danger">*</span></Form.Label>
                 <Form.Control
                   type="tel"
                   name="phone"
-                  placeholder="Enter phone number"
+                  placeholder="Enter 10-digit phone number"
                   value={formData.phone}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   isInvalid={!!errors.phone}
-                  disabled={loading || isUploading}
+                  disabled={loading || isUploading || formSubmitted}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.phone}
@@ -332,14 +411,14 @@ function PersonalDetails({ handleShowNext }) {
           <Row>
             <Col md={6}>
               <Form.Group controlId="formDateOfBirth" className="form-group">
-                <Form.Label>Date of Birth</Form.Label>
+                <Form.Label>Date of Birth <span className="text-danger">*</span></Form.Label>
                 <Form.Control
                   type="date"
                   name="dob"
                   value={formData.dob}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   isInvalid={!!errors.dob}
-                  disabled={loading || isUploading}
+                  disabled={loading || isUploading || formSubmitted}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.dob}
@@ -349,20 +428,19 @@ function PersonalDetails({ handleShowNext }) {
 
             <Col md={6}>
               <Form.Group controlId="formGender" className="form-group">
-                <Form.Label>Gender</Form.Label>
-                <Form.Control
-                  as="select"
+                <Form.Label>Gender <span className="text-danger">*</span></Form.Label>
+                <Form.Select
                   name="gender"
                   value={formData.gender}
-                  onChange={handleChange}
+                  onChange={handleSelectChange}
                   isInvalid={!!errors.gender}
-                  disabled={loading || isUploading}
+                  disabled={loading || isUploading || formSubmitted}
                 >
                   <option value="">Select Gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                   <option value="other">Other</option>
-                </Form.Control>
+                </Form.Select>
                 <Form.Control.Feedback type="invalid">
                   {errors.gender}
                 </Form.Control.Feedback>
@@ -373,15 +451,15 @@ function PersonalDetails({ handleShowNext }) {
           <Row>
             <Col md={6}>
               <Form.Group controlId="formNationality" className="form-group">
-                <Form.Label>Nationality</Form.Label>
+                <Form.Label>Nationality <span className="text-danger">*</span></Form.Label>
                 <Form.Control
                   type="text"
                   name="nationality"
                   placeholder="Enter your nationality"
                   value={formData.nationality}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   isInvalid={!!errors.nationality}
-                  disabled={loading || isUploading}
+                  disabled={loading || isUploading || formSubmitted}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.nationality}
@@ -391,14 +469,14 @@ function PersonalDetails({ handleShowNext }) {
 
             <Col md={6}>
               <Form.Group controlId="formProfileImage" className="form-group">
-                <Form.Label>Upload Profile Image</Form.Label>
+                <Form.Label>Profile Image <span className="text-danger">*</span></Form.Label>
                 <Form.Control
                   type="file"
                   name="profileImage"
                   accept="image/*"
                   onChange={handleFileChange}
                   isInvalid={!!errors.profileImage}
-                  disabled={loading || isUploading}
+                  disabled={loading || isUploading || formSubmitted}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.profileImage}
@@ -410,10 +488,10 @@ function PersonalDetails({ handleShowNext }) {
                 )}
                 {formData.profileImage && selectedFile && (
                   <div className="mt-2">
-                    <img 
-                      src={formData.profileImage} 
-                      alt="Preview" 
-                      style={{ maxWidth: '100px', maxHeight: '100px' }}
+                    <img
+                      src={formData.profileImage}
+                      alt="Preview"
+                      style={{ maxWidth: "100px", maxHeight: "100px" }}
                     />
                   </div>
                 )}
@@ -422,20 +500,23 @@ function PersonalDetails({ handleShowNext }) {
           </Row>
 
           <div className="btn-container">
-            <button 
-              type="submit" 
-              className="btn" 
-              disabled={loading || isUploading}
-            >
-              {loading ? "Submitting..." : isUploading ? "Uploading..." : "Submit"}
-              <span className="material-symbols-outlined">east</span>
-            </button>
-            
-            {showNextButton && (
+            {!formSubmitted ? (
+              <button
+                type="submit"
+                className="btn"
+                disabled={loading || isUploading}
+              >
+                {loading
+                  ? "Submitting..."
+                  : isUploading
+                    ? "Uploading..."
+                    : "Save"}
+                <span className="material-symbols-outlined">east</span>
+              </button>
+            ) : (
               <button
                 onClick={handleNextClick}
                 className="btn"
-                disabled={loading || isUploading}
               >
                 Next
                 <span className="material-symbols-outlined">east</span>
@@ -445,9 +526,9 @@ function PersonalDetails({ handleShowNext }) {
         </Form>
       </Container>
 
-      {/* Conditional loading spinner */}
-      {loading && (
-        <div className="loading-container">
+      {/* Form submission loading overlay */}
+        {loading && (
+        <div className="loading-container2">
           <div className="loading-spinner"></div>
         </div>
       )}
