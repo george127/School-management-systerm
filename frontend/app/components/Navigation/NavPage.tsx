@@ -46,8 +46,8 @@ const Navigation = () => {
               </p>
               <div className="dropdown-menu">
                 <Link
-                  href="/Aws"
-                  className={isActive("/Aws") ? "active" : ""}
+                  href="/aws"
+                  className={isActive("/aws") ? "active" : ""}
                   data-text="AWS"
                 >
                   <span role="img" aria-label="lightning">⚡️</span> AWS Certifications
@@ -57,8 +57,8 @@ const Navigation = () => {
                   </p>
                 </Link>
                 <Link
-                  href="/Azure"
-                  className={isActive("/Azure") ? "active" : ""}
+                  href="/azure"
+                  className={isActive("/azure") ? "active" : ""}
                   data-text="Azure"
                 >
                   <span role="img" aria-label="cloud">☁️</span> Microsoft Azure Certifications
@@ -82,12 +82,12 @@ const Navigation = () => {
             
             <p>
               <Link
-                href="/DataAnalytics"
-                className={isActive("/DataAnalytics") ? "active" : ""}
+                href="/dataAnalytics"
+                className={isActive("/dataAnalytics") ? "active" : ""}
                 data-text="Data Analytics"
               >
                 Data Analytics
-              </Link>
+              </Link>  
             </p>
             
             <div className="Link-dropdown">
@@ -99,8 +99,8 @@ const Navigation = () => {
               </p>
               <div className="dropdown-menu">
                 <Link
-                  href="/MicrosoftAz"
-                  className={isActive("/MicrosoftAz") ? "active" : ""}
+                  href="/microsoftAz500"
+                  className={isActive("/microsoftAz500") ? "active" : ""}
                   data-text="MicrosoftAZ"
                 >
                   <span role="img" aria-label="shield">🛡️</span> Microsoft AZ-500
@@ -110,8 +110,8 @@ const Navigation = () => {
                   </p>
                 </Link>
                 <Link
-                  href="/Oscp"
-                  className={isActive("/Oscp") ? "active" : ""}
+                  href="/oscp"
+                  className={isActive("/oscp") ? "active" : ""}
                   data-text="OSCP"
                 >
                   <span role="img" aria-label="hacker">💻</span> OSCP
