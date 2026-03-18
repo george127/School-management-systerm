@@ -47,15 +47,7 @@ export default function HomePage(): JSX.Element {
         <Header />
       </motion.div>
 
-      {/* Navigation */}
-      <motion.div
-        variants={sectionVariant}
-        initial="hidden"
-        animate="visible"
-        custom={0.2}
-      >
         <Navigation />
-      </motion.div>
 
       {/* Landing Page */}
       <motion.div

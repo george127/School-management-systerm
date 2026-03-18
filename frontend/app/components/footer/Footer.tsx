@@ -19,9 +19,6 @@ const Footer = () => {
           <Image 
             src={logo} 
             alt="AppCode logo" 
-            width={120} 
-            height={50}
-            priority={false}
           />
         </div>
         

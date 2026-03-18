@@ -247,7 +247,7 @@ const Software = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Software/frontDetails" className="btn">
+                    <Link href="/Software/1.frontDetails" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -280,7 +280,7 @@ const Software = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Software/backendDetails" className="btn">
+                    <Link href="/Software/2.backendDetails" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -312,7 +312,7 @@ const Software = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Software/mobileDetails" className="btn">
+                    <Link href="/Software/3.MobileDetails" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -344,7 +344,7 @@ const Software = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 3,500</p>
                   <div className="btn-container">
-                    <Link href="/Software/nextJsDetails" className="btn">
+                    <Link href="/Software/4.NextJsDetails" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -376,7 +376,7 @@ const Software = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Software/flutterDetails" className="btn">
+                    <Link href="/Software/5.FlutterDetails" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -408,7 +408,7 @@ const Software = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 3,000</p>
                   <div className="btn-container">
-                    <Link href="/Software/javascriptDetails" className="btn">
+                    <Link href="/Software/6.JavascriptDetails" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -441,7 +441,7 @@ const Software = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 3,000</p>
                   <div className="btn-container">
-                    <Link href="/Software/typescriptDetails" className="btn">
+                    <Link href="/Software/7.TypescriptDetails" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>

@@ -181,7 +181,7 @@ const CyberSecurity = () => {
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
                     {/* Fixed: Changed NavLink to Link */}
-                    <Link href="/CyberSecurity/Micro-AZ-500-Sec-Tra" className="btn">
+                    <Link href="/microsoftAz500/Micro-AZ-500-Sec-Tra" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>

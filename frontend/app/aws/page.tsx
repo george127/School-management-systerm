@@ -261,7 +261,7 @@ const Aws = () => {
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
                     {/* Fixed: Changed NavLink to Link */}
-                    <Link href="/Aws/AWS-SA-Pro-Details" className="btn">
+                    <Link href="/aws/1.AWS-SA-Pro-Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -293,7 +293,7 @@ const Aws = () => {
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
                     {/* Fixed: Changed NavLink to Link */}
-                    <Link href="/Aws/AWS-SA-Associate-Details" className="btn">
+                    <Link href="/aws/2.AWS-SA-Associate-Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -325,7 +325,7 @@ const Aws = () => {
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
                     {/* Fixed: Changed NavLink to Link */}
-                    <Link href="/Aws/AWS-Sys-Ops-Details" className="btn">
+                    <Link href="/aws/3.Aws-Sys-Ops-Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -356,7 +356,7 @@ const Aws = () => {
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
                     {/* Fixed: Changed NavLink to Link */}
-                    <Link href="/Aws/AWS-Dev-En-Pro-Details" className="btn">
+                    <Link href="/aws/4.AWS-Dev-En-Pro-Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -384,7 +384,7 @@ const Aws = () => {
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
                     {/* Fixed: Changed NavLink to Link */}
-                    <Link href="/Aws/AWS-Dev-Associate-Details" className="btn">
+                    <Link href="/aws/5.AWS-Dev-Associate-Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -413,7 +413,7 @@ const Aws = () => {
                   <p className="amount">Ghc 7,020</p>
                   <div className="btn-container">
                     {/* Fixed: Changed NavLink to Link */}
-                    <Link href="/Aws/AWS-SS-Details" className="btn">
+                    <Link href="/aws/6.AWS-SS-Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -445,7 +445,7 @@ const Aws = () => {
                   <p className="amount">Ghc 7,020</p>
                   <div className="btn-container">
                     {/* Fixed: Changed NavLink to Link */}
-                    <Link href="/Aws/AWS-Ad-Net-Details" className="btn">
+                    <Link href="/aws/7.Aws-Ad-Net-Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -473,7 +473,7 @@ const Aws = () => {
                   <p className="amount">Ghc 7,020</p>
                   <div className="btn-container">
                     {/* Fixed: Changed NavLink to Link */}
-                    <Link href="/Aws/AWS-Bi-Data-Details" className="btn">
+                    <Link href="/aws/8.AWS-Bi-Data-Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>

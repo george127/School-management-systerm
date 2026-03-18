@@ -192,7 +192,7 @@ const DataAnalytics = () => {
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
                     {/* Fixed: Changed NavLink to Link */}
-                    <Link href="/DataAnalytics/CloudDataAnalytics" className="btn">
+                    <Link href="/dataAnalytics/1.CloudDataAnalytics" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -224,7 +224,7 @@ const DataAnalytics = () => {
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
                     {/* Fixed: Changed NavLink to Link */}
-                    <Link href="/DataAnalytics/TraditionalDataAnalytics" className="btn">
+                    <Link href="/dataAnalytics/2.TraditionalDataAnalytics" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>

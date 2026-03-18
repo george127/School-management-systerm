@@ -18,7 +18,7 @@ const Navigation = () => {
 
   return (
     <>
-      <nav className={`navbar ${isMobileMenuOpen ? "open" : ""}`}>
+      <nav className={`nav-bar ${isMobileMenuOpen ? "open" : ""}`}>
         <div className="container">
           <div className="navbar-toggle" onClick={toggleMobileMenu}>
             <span className="hamburger"></span>

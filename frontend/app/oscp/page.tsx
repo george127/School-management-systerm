@@ -186,7 +186,7 @@ const Oscp = () => {
                   <p className="amount">Ghc 18,000</p>
                   <div className="btn-container">
                     {/* Fixed: Changed NavLink to Link */}
-                    <Link href="/CyberSecurity/Off-Secu-Certified-Pro" className="btn">
+                    <Link href="/oscp/Off-Secu-Certified-Pro" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>

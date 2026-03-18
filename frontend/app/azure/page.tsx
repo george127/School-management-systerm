@@ -341,7 +341,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/Azure-Fund-Details" className="btn">
+                    <Link href="/azure/9.Azure-Fund-Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -371,7 +371,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/Azure-A-Details" className="btn">
+                    <Link href="/azure/10.Azure-A-Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -402,7 +402,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/Azure-Se-Com-Fun-Details" className="btn">
+                    <Link href="/azure/11.Azure-Se-Com-Fun-Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -428,7 +428,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/Azure-Data-En-Details" className="btn">
+                    <Link href="/azure/12.Azure-Data-En-Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -459,7 +459,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/Azure-Data-S-S-Details" className="btn">
+                    <Link href="/azure/13.Azure-Designing-Data-S-S" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -488,7 +488,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/Azure-A-R-D-Micro-Details" className="btn">
+                    <Link href="/azure/14.Azure-A-R-D-Micro-Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -516,7 +516,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/Azure-D-S-Micro-Details" className="btn">
+                    <Link href="/azure/15.Azure-D-S-Micro-Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -548,7 +548,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/Azure-I-E-S-A-S-Power-BI-Details" className="btn">
+                    <Link href="/azure/16.Azure-I-E-S-A-S-Power-BI-Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -580,7 +580,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/Azure-Des-Imple-Micro-A-N-S-Details" className="btn">
+                    <Link href="/azure/17.Des-Imple-Micro-A-N-S.Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -609,7 +609,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/AzureMicro-Sec-Tech-Details" className="btn">
+                    <Link href="/azure/18.Micro-Azure-Sec-Tech.Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -637,7 +637,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/Micro-I-A-Ad-Details" className="btn">
+                    <Link href="/azure/19.Micro-I-A-Ad.Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -666,7 +666,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/Micro-Sec-Op-A-Details" className="btn">
+                    <Link href="/azure/20.Azure-Micro-Sec-Op-A.Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -697,7 +697,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/Ad-W-Se-Hy-Co-Inf-Details" className="btn">
+                    <Link href="/azure/21.Azure-Ad-W-Se-Hy-Co-Inf.Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -727,7 +727,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/C-Op-Micro-V-Desk.Details" className="btn">
+                    <Link href="/azure/22.Azure-C-Op-Micro-V-Desk.Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -755,7 +755,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/Des-Micro-A-I-S.Details" className="btn">
+                    <Link href="/azure/23.Des-Micro-A-I-S" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -780,7 +780,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/Micro-Cyber-Arch.Details" className="btn">
+                    <Link href="/azure/24.Azure-Micro-Cyber-Arch.Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -808,7 +808,7 @@ const Azure = () => {
                 <div className="button-container">
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
-                    <Link href="/Azure/Des-I-Micro-Dev-S.Details" className="btn">
+                    <Link href="/azure/25.Des-I-Micro-Dev-S.Details" className="btn">
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
