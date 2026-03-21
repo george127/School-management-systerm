@@ -20,10 +20,11 @@ const COGNITO_CONFIG = {
 };
 
 // Sign Up Route
+// Sign Up Route
 router.post('/auth/signup', async (req, res) => {
   try {
     const { name, email, password } = req.body;
- 
+    
     // Validation
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'All fields are required' });
@@ -67,23 +68,33 @@ router.post('/auth/signup', async (req, res) => {
       ]
     };
 
-    console.log('SignUp params:', { ...signUpParams, Password: '[REDACTED]' }); // Debug log (password redacted)
+    console.log('SignUp params:', { ...signUpParams, Password: '[REDACTED]' });
 
     const cognitoResponse = await cognito.signUp(signUpParams).promise();
 
-    // Save user to database with Cognito sub ID
+    // Generate a student ID (customize this logic as needed)
+    const generateStudentId = () => {
+      // Example: STU + year + random number
+      const year = new Date().getFullYear();
+      const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+      return `STU${year}${randomNum}`;
+    };
+
+    // Save user to database with Cognito sub ID and generated studentId
     const newUser = await prisma.user.create({
       data: {
         cognitoId: cognitoResponse.UserSub!, 
         name: name.trim(),
         email: email.toLowerCase(),
-        role: 'student' 
+        role: 'student',
+        studentId: generateStudentId() // Auto-generate student ID
       }
     });
 
     res.status(201).json({ 
       message: 'User registered successfully. Please check your email for verification code.',
-      userId: newUser.id 
+      userId: newUser.id,
+      studentId: newUser.studentId 
     });
 
   } catch (error: any) {
