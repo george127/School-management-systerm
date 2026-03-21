@@ -4,14 +4,14 @@ import express from 'express';import cors from "cors";
 import authRoute from "./routes/auth.ts";
 import s3UploadRoutes from './routes/s3_upload.ts';      
 import studentFormsRoutes from './routes/studentforms.ts'; // Import student forms routes
-
+   
 const app = express();
 
-app.use(cors({
-  origin: "http://localhost:3000",
+app.use(cors({  
+  origin: "http://localhost:3000",  
   credentials: true
 }));
-
+ 
 app.use(express.json({
   limit: "50mb"
 }));
