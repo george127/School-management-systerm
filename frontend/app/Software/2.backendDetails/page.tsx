@@ -14,14 +14,16 @@ import { useState } from "react";
 
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
-
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition =
-        section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset;
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -49,10 +51,7 @@ const Details = () => {
             <div className="item">
               <div className="image-container">
                 {/* Fixed: Changed img to Image */}
-                <Image 
-                  src={BackendImage} 
-                  alt="MERN Stack Development Course"
-                />
+                <Image src={BackendImage} alt="MERN Stack Development Course" />
               </div>
 
               <div className="concept-container">
@@ -240,10 +239,9 @@ const Details = () => {
                   Duration
                 </h4>
                 <p>
-                  The course is 13 weeks long, including hours of video
-                  lessons and hours of hands-on coding exercises. It also
-                  includes real-world project assignments and a final capstone
-                  project.
+                  The course is 13 weeks long, including hours of video lessons
+                  and hours of hands-on coding exercises. It also includes
+                  real-world project assignments and a final capstone project.
                 </p>
               </div>
 

@@ -11,14 +11,16 @@ import { useState } from "react";
 
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
-
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition =
-        section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset;
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -81,16 +83,33 @@ const Details = () => {
                     <div className="concept-data">
                       <h3>🚀 AWS Certified Solutions Architect Associate</h3>
                       <p>
-                        This course prepares you to design and deploy scalable AWS solutions:
+                        This course prepares you to design and deploy scalable
+                        AWS solutions:
                       </p>
-                      <div className="data-item">📌 1: AWS Global Infrastructure & Core Services</div>
-                      <div className="data-item">📌 2: Designing Highly Available Architectures</div>
-                      <div className="data-item">📌 3: AWS Security Best Practices</div>
-                      <div className="data-item">📌 4: Cost-Optimized Cloud Solutions</div>
-                      <div className="data-item">📌 5: Storage and Database Services</div>
-                      <div className="data-item">📌 6: Networking and Content Delivery</div>
-                      <div className="data-item">📌 7: Monitoring, Logging, and Optimization</div>
-                      <div className="data-item">📌 8: Disaster Recovery and Business Continuity</div>
+                      <div className="data-item">
+                        📌 1: AWS Global Infrastructure & Core Services
+                      </div>
+                      <div className="data-item">
+                        📌 2: Designing Highly Available Architectures
+                      </div>
+                      <div className="data-item">
+                        📌 3: AWS Security Best Practices
+                      </div>
+                      <div className="data-item">
+                        📌 4: Cost-Optimized Cloud Solutions
+                      </div>
+                      <div className="data-item">
+                        📌 5: Storage and Database Services
+                      </div>
+                      <div className="data-item">
+                        📌 6: Networking and Content Delivery
+                      </div>
+                      <div className="data-item">
+                        📌 7: Monitoring, Logging, and Optimization
+                      </div>
+                      <div className="data-item">
+                        📌 8: Disaster Recovery and Business Continuity
+                      </div>
                     </div>
                   </div>
 
@@ -102,18 +121,31 @@ const Details = () => {
                       <h3>🎯 Learning Goals</h3>
                       <ul>
                         <li>✅ Design resilient AWS architectures</li>
-                        <li>✅ Implement security and compliance best practices</li>
-                        <li>✅ Optimize AWS solutions for cost-effectiveness</li>
+                        <li>
+                          ✅ Implement security and compliance best practices
+                        </li>
+                        <li>
+                          ✅ Optimize AWS solutions for cost-effectiveness
+                        </li>
                         <li>✅ Understand networking fundamentals in AWS</li>
-                        <li>✅ Gain hands-on experience with AWS management tools</li>
+                        <li>
+                          ✅ Gain hands-on experience with AWS management tools
+                        </li>
                       </ul>
 
                       <h4>🔥 What You'll Build:</h4>
                       <p>Real-world AWS projects, such as:</p>
                       <ul>
-                        <li>🌐 Building a Secure and Scalable VPC Architecture</li>
-                        <li>📦 Deploying a Serverless Application with AWS Lambda</li>
-                        <li>⚡ Designing a Scalable Web App with Load Balancing & Auto Scaling</li>
+                        <li>
+                          🌐 Building a Secure and Scalable VPC Architecture
+                        </li>
+                        <li>
+                          📦 Deploying a Serverless Application with AWS Lambda
+                        </li>
+                        <li>
+                          ⚡ Designing a Scalable Web App with Load Balancing &
+                          Auto Scaling
+                        </li>
                       </ul>
                     </div>
                   </div>
@@ -124,19 +156,30 @@ const Details = () => {
                   >
                     <div className="Roles-container">
                       <h3>💼 Career Opportunities in AWS Cloud</h3>
-                      <p>
-                        This certification qualifies you for roles like:
-                      </p>
+                      <p>This certification qualifies you for roles like:</p>
                       <ul>
-                        <li>🔹 <strong>Cloud Solutions Architect</strong> - Design AWS-based solutions.</li>
-                        <li>🔹 <strong>Cloud Engineer</strong> - Implement and maintain AWS infrastructures.</li>
-                        <li>🔹 <strong>Systems Administrator</strong> - Manage AWS services and resources.</li>
-                        <li>🔹 <strong>DevOps Engineer</strong> - Automate and optimize AWS deployments.</li>
+                        <li>
+                          🔹 <strong>Cloud Solutions Architect</strong> - Design
+                          AWS-based solutions.
+                        </li>
+                        <li>
+                          🔹 <strong>Cloud Engineer</strong> - Implement and
+                          maintain AWS infrastructures.
+                        </li>
+                        <li>
+                          🔹 <strong>Systems Administrator</strong> - Manage AWS
+                          services and resources.
+                        </li>
+                        <li>
+                          🔹 <strong>DevOps Engineer</strong> - Automate and
+                          optimize AWS deployments.
+                        </li>
                       </ul>
 
                       <h4>🚀 Advance Your AWS Career</h4>
                       <p>
-                        By completing this course, you'll be equipped with the skills to architect AWS solutions efficiently!
+                        By completing this course, you'll be equipped with the
+                        skills to architect AWS solutions efficiently!
                       </p>
                     </div>
                   </div>
@@ -149,33 +192,43 @@ const Details = () => {
               <div className="text">
                 <h1>AWS Certified Solutions Architect Associate</h1>
                 <p>
-                  A foundational certification that covers AWS core services, architecture best practices, security, and cost optimization.
+                  A foundational certification that covers AWS core services,
+                  architecture best practices, security, and cost optimization.
                 </p>
               </div>
 
               <div className="text">
                 <h4>
-                  <span className="material-symbols-outlined">bottom_right_click</span>
+                  <span className="material-symbols-outlined">
+                    bottom_right_click
+                  </span>
                   Certification
                 </h4>
                 <p>
-                  The AWS Certified Solutions Architect Associate certification demonstrates expertise in designing secure and cost-effective cloud solutions.
+                  The AWS Certified Solutions Architect Associate certification
+                  demonstrates expertise in designing secure and cost-effective
+                  cloud solutions.
                 </p>
               </div>
 
               <div className="text">
                 <h4>
-                  <span className="material-symbols-outlined">bottom_right_click</span>
+                  <span className="material-symbols-outlined">
+                    bottom_right_click
+                  </span>
                   Duration
                 </h4>
                 <p>
-                  The course spans 10 weeks, including hands-on labs and case studies to prepare for the certification exam.
+                  The course spans 10 weeks, including hands-on labs and case
+                  studies to prepare for the certification exam.
                 </p>
               </div>
 
               <div className="text">
                 <h4>
-                  <span className="material-symbols-outlined">bottom_right_click</span>
+                  <span className="material-symbols-outlined">
+                    bottom_right_click
+                  </span>
                   Benefits
                 </h4>
                 <div>
@@ -184,18 +237,24 @@ const Details = () => {
                     <li>🔹 Enhance your cloud computing knowledge</li>
                     <li>🔹 Open doors to AWS-related job roles</li>
                     <li>🔹 Validate your expertise in AWS solutions</li>
-                    <li>🔹 Improve your skills in security, networking, and automation</li>
+                    <li>
+                      🔹 Improve your skills in security, networking, and
+                      automation
+                    </li>
                   </ul>
                 </div>
               </div>
 
               <div className="text">
                 <h4>
-                  <span className="material-symbols-outlined">bottom_right_click</span>
+                  <span className="material-symbols-outlined">
+                    bottom_right_click
+                  </span>
                   Technologies Covered
                 </h4>
                 <p>
-                  The course covers AWS Compute, Storage, Databases, Security, Networking, and Automation with Infrastructure as Code (IaC).
+                  The course covers AWS Compute, Storage, Databases, Security,
+                  Networking, and Automation with Infrastructure as Code (IaC).
                 </p>
               </div>
             </div>
