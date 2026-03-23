@@ -5,9 +5,9 @@ import Header from "../../components/Header/HeaderPage";
 import Navigation from "../../components/Navigation/NavPage";
 import Footer from "../../components/footer/Footer";
 import Link from "next/link";
-import LinkedInImage from "../images/Marketing/image3.png";
+import LinkedInImage from "../images/image3.png";
 import Image from "next/image";
-import { useState } from "react";
+import { useState } from "react"; 
 
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
