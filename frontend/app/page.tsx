@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, Variants, easeInOut, easeOut } from "framer-motion";
 
 import Header from "./components/Header/HeaderPage";
 import Navigation from "./components/Navigation/NavPage";
@@ -9,15 +9,18 @@ import Footer from "./components/footer/Footer";
 
 /* Animation Variants */
 
-const pageVariant = {
+const pageVariant: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { duration: 0.8, ease: "easeInOut" },
+    transition: {
+      duration: 0.8,
+      ease: easeInOut, // ✅ FIXED
+    },
   },
 };
 
-const sectionVariant = {
+const sectionVariant: Variants = {
   hidden: { opacity: 0, y: 40 },
   visible: (delay: number) => ({
     opacity: 1,
@@ -25,18 +28,14 @@ const sectionVariant = {
     transition: {
       duration: 0.6,
       delay,
-      ease: "easeOut",
+      ease: easeOut, // ✅ FIXED
     },
   }),
 };
 
 export default function HomePage() {
   return (
-    <motion.div
-      variants={pageVariant}
-      initial="hidden"
-      animate="visible"
-    >
+    <motion.div variants={pageVariant} initial="hidden" animate="visible">
       {/* Header */}
       <motion.div
         variants={sectionVariant}
@@ -47,7 +46,8 @@ export default function HomePage() {
         <Header />
       </motion.div>
 
-        <Navigation />
+      {/* Navigation */}
+      <Navigation />
 
       {/* Landing Page */}
       <motion.div
