@@ -19,15 +19,26 @@ import CourseGrade from "./CourseGrade";
 import CourseQuiz from "./CourseQuiz";
 import Settings from "./Settings";
 
+interface ProfileModalProps {
+  isOpen: boolean;
+  setIsOpen: (value: boolean) => void;
+  studentData: any;
+  fetchStudentData: () => void;
+}
 // Profile Modal Component
-const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
+const ProfileModal = ({
+  isOpen,
+  setIsOpen,
+  studentData,
+  fetchStudentData,
+}: ProfileModalProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   // Get user from localStorage instead of Redux
   const getUserFromStorage = () => {
-    if (typeof window !== 'undefined') {
-      const userStr = localStorage.getItem('user');
+    if (typeof window !== "undefined") {
+      const userStr = localStorage.getItem("user");
       return userStr ? JSON.parse(userStr) : null;
     }
     return null;
@@ -37,9 +48,9 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
 
   // Check URL params for modal open
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      if (params.get('modal') === 'profile') {
+      if (params.get("modal") === "profile") {
         setIsOpen(true);
       }
     }
@@ -50,14 +61,14 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
 
     const fetchStudentData = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         const response = await fetch(
           `http://localhost:5000/api/students/${user?.email}`,
           {
             headers: {
-              'Authorization': token ? `Bearer ${token}` : '',
-            }
-          }
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+          },
         );
         if (!response.ok) {
           throw new Error("Failed to fetch student data");
@@ -72,34 +83,34 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
     fetchStudentData();
   }, [user?.email]);
 
-  const [profileImage, setProfileImage] = useState('');
+  const [profileImage, setProfileImage] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
-  const [preview, setPreview] = useState('');
+  const [preview, setPreview] = useState("");
 
   // Phone number states
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [editPhone, setEditPhone] = useState(false);
-  const [newPhone, setNewPhone] = useState('');
+  const [newPhone, setNewPhone] = useState("");
 
   // User info states
-  const [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState("");
   const [editName, setEditName] = useState(false);
-  const [newName, setNewName] = useState('');
+  const [newName, setNewName] = useState("");
 
-  const [userEmail, setUserEmail] = useState('');
+  const [userEmail, setUserEmail] = useState("");
   const [editEmail, setEditEmail] = useState(false);
-  const [newEmail, setNewEmail] = useState('');
+  const [newEmail, setNewEmail] = useState("");
 
   const [editPassword, setEditPassword] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // General states
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
@@ -107,13 +118,16 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
     const checkUserData = () => {
       try {
         // Try different possible storage locations
-        const userEmail = localStorage.getItem('userEmail') ||
-          localStorage.getItem('email') ||
-          (localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).email);
+        const userEmail =
+          localStorage.getItem("userEmail") ||
+          localStorage.getItem("email") ||
+          (localStorage.getItem("user") &&
+            JSON.parse(localStorage.getItem("user")).email);
 
-        const userDataStr = localStorage.getItem('user') ||
-          localStorage.getItem('userData') ||
-          localStorage.getItem('studentData');
+        const userDataStr =
+          localStorage.getItem("user") ||
+          localStorage.getItem("userData") ||
+          localStorage.getItem("studentData");
 
         if (userDataStr) {
           try {
@@ -132,7 +146,7 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
               setNewPhone(userData.phone);
             }
           } catch (e) {
-            console.error('Error parsing user data:', e);
+            console.error("Error parsing user data:", e);
           }
         }
 
@@ -141,11 +155,13 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
           setNewEmail(userEmail);
           fetchProfileData(userEmail);
         } else {
-          setMessage('User email not found in storage. Please log in again.');
+          setMessage("User email not found in storage. Please log in again.");
         }
       } catch (error) {
-        console.error('Error accessing localStorage:', error);
-        setMessage('Error accessing browser storage. Please check if cookies are enabled.');
+        console.error("Error accessing localStorage:", error);
+        setMessage(
+          "Error accessing browser storage. Please check if cookies are enabled.",
+        );
       }
     };
 
@@ -154,13 +170,13 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
 
   const fetchProfileData = async (email) => {
     if (!email) {
-      setMessage('No email provided for fetching profile data');
+      setMessage("No email provided for fetching profile data");
       return;
     }
 
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
 
       // Fetch user profile data
       try {
@@ -168,11 +184,11 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
           `http://localhost:5000/api/profile/${email}`,
           {
             headers: {
-              'Authorization': token ? `Bearer ${token}` : '',
-            }
-          }
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+          },
         );
-        
+
         const userData = await userResponse.json();
 
         if (userData.success) {
@@ -184,18 +200,20 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
 
           // Update localStorage with fresh data
           try {
-            const existingData = localStorage.getItem('user') && JSON.parse(localStorage.getItem('user'));
+            const existingData =
+              localStorage.getItem("user") &&
+              JSON.parse(localStorage.getItem("user"));
             if (existingData) {
               existingData.name = userDataInfo.name;
               existingData.email = userDataInfo.email;
-              localStorage.setItem('user', JSON.stringify(existingData));
+              localStorage.setItem("user", JSON.stringify(existingData));
             }
           } catch (e) {
-            console.error('Error updating localStorage:', e);
+            console.error("Error updating localStorage:", e);
           }
         }
       } catch (userError) {
-        console.log('User endpoint might not be implemented yet:', userError);
+        console.log("User endpoint might not be implemented yet:", userError);
       }
 
       // Fetch profile image
@@ -204,18 +222,18 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
           `http://localhost:5000/api/profile/profile-image/${email}`,
           {
             headers: {
-              'Authorization': token ? `Bearer ${token}` : '',
-            }
-          }
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+          },
         );
-        
+
         const imageData = await imageResponse.json();
 
         if (imageData.success) {
           setProfileImage(imageData.profileImage);
         }
       } catch (imageError) {
-        console.log('Image endpoint might not be implemented yet:', imageError);
+        console.log("Image endpoint might not be implemented yet:", imageError);
       }
 
       // Fetch phone number
@@ -224,11 +242,11 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
           `http://localhost:5000/api/profile/phone/${email}`,
           {
             headers: {
-              'Authorization': token ? `Bearer ${token}` : '',
-            }
-          }
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+          },
         );
-        
+
         const phoneData = await phoneResponse.json();
 
         if (phoneData.success && phoneData.phone) {
@@ -236,16 +254,18 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
           setNewPhone(phoneData.phone);
         }
       } catch (phoneError) {
-        console.log('Phone endpoint might not be implemented yet:', phoneError);
+        console.log("Phone endpoint might not be implemented yet:", phoneError);
       }
 
-      setMessage('');
+      setMessage("");
     } catch (error) {
-      console.error('Error fetching profile data:', error);
-      if (error.message === 'Failed to fetch') {
-        setMessage('Cannot connect to server. Please make sure the backend is running on port 5000.');
+      console.error("Error fetching profile data:", error);
+      if (error.message === "Failed to fetch") {
+        setMessage(
+          "Cannot connect to server. Please make sure the backend is running on port 5000.",
+        );
       } else {
-        setMessage('Failed to fetch profile data: ' + error.message);
+        setMessage("Failed to fetch profile data: " + error.message);
       }
     } finally {
       setLoading(false);
@@ -257,18 +277,18 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
     if (file) {
       // Check file size (max 2MB)
       if (file.size > 2 * 1024 * 1024) {
-        setMessage('File size must be less than 2MB');
+        setMessage("File size must be less than 2MB");
         return;
       }
 
       // Check file type
-      if (!file.type.match('image.*')) {
-        setMessage('Please select an image file (JPEG, PNG, etc.)');
+      if (!file.type.match("image.*")) {
+        setMessage("Please select an image file (JPEG, PNG, etc.)");
         return;
       }
 
       setSelectedFile(file);
-      setMessage('');
+      setMessage("");
 
       // Create preview
       const reader = new FileReader();
@@ -281,57 +301,59 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
 
   const handleImageUpload = async () => {
     if (!userEmail) {
-      setMessage('User email not found. Please log in again.');
+      setMessage("User email not found. Please log in again.");
       return;
     }
 
     if (!selectedFile) {
-      setMessage('Please select an image first');
+      setMessage("Please select an image first");
       return;
     }
 
     try {
       setLoading(true);
-      setMessage('');
+      setMessage("");
 
       // Convert image to base64 for storage
       const reader = new FileReader();
       reader.readAsDataURL(selectedFile);
       reader.onloadend = async () => {
         const base64Image = reader.result;
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
 
         try {
           const response = await fetch(
             `http://localhost:5000/api/profile/profile-image/${userEmail}`,
             {
-              method: 'PUT',
+              method: "PUT",
               headers: {
-                'Content-Type': 'application/json',
-                'Authorization': token ? `Bearer ${token}` : '',
+                "Content-Type": "application/json",
+                Authorization: token ? `Bearer ${token}` : "",
               },
-              body: JSON.stringify({ profileImage: base64Image })
-            }
+              body: JSON.stringify({ profileImage: base64Image }),
+            },
           );
 
           const data = await response.json();
 
           if (data.success) {
             setProfileImage(data.profileImage);
-            setMessage('Profile image updated successfully!');
+            setMessage("Profile image updated successfully!");
             setSelectedFile(null);
-            setPreview('');
+            setPreview("");
             // Refresh parent data
             if (fetchStudentData) fetchStudentData();
           } else {
-            setMessage(data.message || 'Failed to update profile image');
+            setMessage(data.message || "Failed to update profile image");
           }
         } catch (error) {
-          console.error('Error updating profile image:', error);
-          if (error.message === 'Failed to fetch') {
-            setMessage('Cannot connect to server. Please make sure the backend is running.');
+          console.error("Error updating profile image:", error);
+          if (error.message === "Failed to fetch") {
+            setMessage(
+              "Cannot connect to server. Please make sure the backend is running.",
+            );
           } else {
-            setMessage('Failed to update profile image: ' + error.message);
+            setMessage("Failed to update profile image: " + error.message);
           }
         } finally {
           setLoading(false);
@@ -339,49 +361,49 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
       };
 
       reader.onerror = () => {
-        setMessage('Something went wrong while processing the image');
+        setMessage("Something went wrong while processing the image");
         setLoading(false);
       };
     } catch (error) {
-      console.error('Error in handleUpload:', error);
-      setMessage('An unexpected error occurred');
+      console.error("Error in handleUpload:", error);
+      setMessage("An unexpected error occurred");
       setLoading(false);
     }
   };
 
   const handlePhoneUpdate = async () => {
     if (!userEmail) {
-      setMessage('User email not found. Please log in again.');
+      setMessage("User email not found. Please log in again.");
       return;
     }
 
     if (!newPhone) {
-      setMessage('Please enter a valid phone number');
+      setMessage("Please enter a valid phone number");
       return;
     }
 
     // Basic phone validation
     const phoneRegex = /^[+]?[0-9]{10,15}$/;
-    if (!phoneRegex.test(newPhone.replace(/[\s()-]/g, ''))) {
-      setMessage('Please enter a valid phone number (10-15 digits)');
+    if (!phoneRegex.test(newPhone.replace(/[\s()-]/g, ""))) {
+      setMessage("Please enter a valid phone number (10-15 digits)");
       return;
     }
 
     try {
       setLoading(true);
-      setMessage('');
-      const token = localStorage.getItem('token');
+      setMessage("");
+      const token = localStorage.getItem("token");
 
       const response = await fetch(
         `http://localhost:5000/api/profile/phone/${userEmail}`,
         {
-          method: 'PUT',
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : '',
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ phone: newPhone })
-        }
+          body: JSON.stringify({ phone: newPhone }),
+        },
       );
 
       const data = await response.json();
@@ -389,32 +411,35 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
       if (data.success) {
         setPhoneNumber(newPhone);
         setEditPhone(false);
-        setMessage('Phone number updated successfully!');
+        setMessage("Phone number updated successfully!");
 
         // Update local storage if phone is stored there
         try {
-          const userDataStr = localStorage.getItem('user') ||
-            localStorage.getItem('userData') ||
-            localStorage.getItem('studentData');
+          const userDataStr =
+            localStorage.getItem("user") ||
+            localStorage.getItem("userData") ||
+            localStorage.getItem("studentData");
           if (userDataStr) {
             const userData = JSON.parse(userDataStr);
             userData.phone = newPhone;
-            localStorage.setItem('user', JSON.stringify(userData));
+            localStorage.setItem("user", JSON.stringify(userData));
           }
         } catch (e) {
-          console.error('Error updating local storage:', e);
+          console.error("Error updating local storage:", e);
         }
         // Refresh parent data
         if (fetchStudentData) fetchStudentData();
       } else {
-        setMessage(data.message || 'Failed to update phone number');
+        setMessage(data.message || "Failed to update phone number");
       }
     } catch (error) {
-      console.error('Error updating phone number:', error);
-      if (error.message === 'Failed to fetch') {
-        setMessage('Cannot connect to server. Please make sure the backend is running.');
+      console.error("Error updating phone number:", error);
+      if (error.message === "Failed to fetch") {
+        setMessage(
+          "Cannot connect to server. Please make sure the backend is running.",
+        );
       } else {
-        setMessage('Failed to update phone number: ' + error.message);
+        setMessage("Failed to update phone number: " + error.message);
       }
     } finally {
       setLoading(false);
@@ -423,30 +448,30 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
 
   const handleNameUpdate = async () => {
     if (!userEmail) {
-      setMessage('User email not found. Please log in again.');
+      setMessage("User email not found. Please log in again.");
       return;
     }
 
     if (!newName) {
-      setMessage('Please enter a valid name');
+      setMessage("Please enter a valid name");
       return;
     }
 
     try {
       setLoading(true);
-      setMessage('');
-      const token = localStorage.getItem('token');
+      setMessage("");
+      const token = localStorage.getItem("token");
 
       const response = await fetch(
         `http://localhost:5000/api/profile/name/${userEmail}`,
         {
-          method: 'PUT',
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : '',
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ name: newName })
-        }
+          body: JSON.stringify({ name: newName }),
+        },
       );
 
       const data = await response.json();
@@ -454,31 +479,33 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
       if (data.success) {
         setUserName(newName);
         setEditName(false);
-        setMessage('Name updated successfully!');
+        setMessage("Name updated successfully!");
 
         // Update local storage
         try {
-          const userDataStr = localStorage.getItem('user') ||
-            localStorage.getItem('userData');
+          const userDataStr =
+            localStorage.getItem("user") || localStorage.getItem("userData");
           if (userDataStr) {
             const userData = JSON.parse(userDataStr);
             userData.name = newName;
-            localStorage.setItem('user', JSON.stringify(userData));
+            localStorage.setItem("user", JSON.stringify(userData));
           }
         } catch (e) {
-          console.error('Error updating local storage:', e);
+          console.error("Error updating local storage:", e);
         }
         // Refresh parent data
         if (fetchStudentData) fetchStudentData();
       } else {
-        setMessage(data.message || 'Failed to update name');
+        setMessage(data.message || "Failed to update name");
       }
     } catch (error) {
-      console.error('Error updating name:', error);
-      if (error.message === 'Failed to fetch') {
-        setMessage('Cannot connect to server. Please make sure the backend is running.');
+      console.error("Error updating name:", error);
+      if (error.message === "Failed to fetch") {
+        setMessage(
+          "Cannot connect to server. Please make sure the backend is running.",
+        );
       } else {
-        setMessage('Failed to update name: ' + error.message);
+        setMessage("Failed to update name: " + error.message);
       }
     } finally {
       setLoading(false);
@@ -487,37 +514,37 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
 
   const handleEmailUpdate = async () => {
     if (!userEmail) {
-      setMessage('User email not found. Please log in again.');
+      setMessage("User email not found. Please log in again.");
       return;
     }
 
     if (!newEmail) {
-      setMessage('Please enter a valid email address');
+      setMessage("Please enter a valid email address");
       return;
     }
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newEmail)) {
-      setMessage('Please enter a valid email address');
+      setMessage("Please enter a valid email address");
       return;
     }
 
     try {
       setLoading(true);
-      setMessage('');
-      const token = localStorage.getItem('token');
+      setMessage("");
+      const token = localStorage.getItem("token");
 
       const response = await fetch(
         `http://localhost:5000/api/profile/email/${userEmail}`,
         {
-          method: 'PUT',
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : '',
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ newEmail })
-        }
+          body: JSON.stringify({ newEmail }),
+        },
       );
 
       const data = await response.json();
@@ -525,32 +552,34 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
       if (data.success) {
         setUserEmail(newEmail);
         setEditEmail(false);
-        setMessage('Email updated successfully!');
+        setMessage("Email updated successfully!");
 
         // Update local storage
         try {
-          const userDataStr = localStorage.getItem('user') ||
-            localStorage.getItem('userData');
+          const userDataStr =
+            localStorage.getItem("user") || localStorage.getItem("userData");
           if (userDataStr) {
             const userData = JSON.parse(userDataStr);
             userData.email = newEmail;
-            localStorage.setItem('user', JSON.stringify(userData));
+            localStorage.setItem("user", JSON.stringify(userData));
           }
-          localStorage.setItem('userEmail', newEmail);
+          localStorage.setItem("userEmail", newEmail);
         } catch (e) {
-          console.error('Error updating local storage:', e);
+          console.error("Error updating local storage:", e);
         }
         // Refresh parent data
         if (fetchStudentData) fetchStudentData();
       } else {
-        setMessage(data.message || 'Failed to update email');
+        setMessage(data.message || "Failed to update email");
       }
     } catch (error) {
-      console.error('Error updating email:', error);
-      if (error.message === 'Failed to fetch') {
-        setMessage('Cannot connect to server. Please make sure the backend is running.');
+      console.error("Error updating email:", error);
+      if (error.message === "Failed to fetch") {
+        setMessage(
+          "Cannot connect to server. Please make sure the backend is running.",
+        );
       } else {
-        setMessage('Failed to update email: ' + error.message);
+        setMessage("Failed to update email: " + error.message);
       }
     } finally {
       setLoading(false);
@@ -559,59 +588,61 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
 
   const handlePasswordUpdate = async () => {
     if (!userEmail) {
-      setMessage('User email not found. Please log in again.');
+      setMessage("User email not found. Please log in again.");
       return;
     }
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-      setMessage('Please fill in all password fields');
+      setMessage("Please fill in all password fields");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setMessage('New passwords do not match');
+      setMessage("New passwords do not match");
       return;
     }
 
     if (newPassword.length < 6) {
-      setMessage('Password must be at least 6 characters');
+      setMessage("Password must be at least 6 characters");
       return;
     }
 
     try {
       setLoading(true);
-      setMessage('');
-      const token = localStorage.getItem('token');
+      setMessage("");
+      const token = localStorage.getItem("token");
 
       const response = await fetch(
         `http://localhost:5000/api/profile/password/${userEmail}`,
         {
-          method: 'PUT',
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : '',
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ currentPassword, newPassword })
-        }
+          body: JSON.stringify({ currentPassword, newPassword }),
+        },
       );
 
       const data = await response.json();
 
       if (data.success) {
         setEditPassword(false);
-        setCurrentPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
-        setMessage('Password updated successfully!');
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setMessage("Password updated successfully!");
       } else {
-        setMessage(data.message || 'Failed to update password');
+        setMessage(data.message || "Failed to update password");
       }
     } catch (error) {
-      console.error('Error updating password:', error);
-      if (error.message === 'Failed to fetch') {
-        setMessage('Cannot connect to server. Please make sure the backend is running.');
+      console.error("Error updating password:", error);
+      if (error.message === "Failed to fetch") {
+        setMessage(
+          "Cannot connect to server. Please make sure the backend is running.",
+        );
       } else {
-        setMessage('Failed to update password: ' + error.message);
+        setMessage("Failed to update password: " + error.message);
       }
     } finally {
       setLoading(false);
@@ -620,21 +651,21 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
 
   const cancelEdit = (field) => {
     switch (field) {
-      case 'name':
+      case "name":
         setNewName(userName);
         setEditName(false);
         break;
-      case 'email':
+      case "email":
         setNewEmail(userEmail);
         setEditEmail(false);
         break;
-      case 'password':
-        setCurrentPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
+      case "password":
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
         setEditPassword(false);
         break;
-      case 'phone':
+      case "phone":
         setNewPhone(phoneNumber);
         setEditPhone(false);
         break;
@@ -646,14 +677,25 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
   if (!isOpen) return null;
 
   return (
-    <div className={`modal-overlay ${isOpen ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
-      <div className="modal-content profile-modal-content" onClick={(e) => e.stopPropagation()}>
+    <div
+      className={`modal-overlay ${isOpen ? "active" : ""}`}
+      onClick={() => setIsOpen(false)}
+    >
+      <div
+        className="modal-content profile-modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="profile-manager-container">
-
           {loading && <div className="loading">Loading...</div>}
 
           {message && (
-            <div className={message.includes('success') ? 'message success' : 'message error'}>
+            <div
+              className={
+                message.includes("success")
+                  ? "message success"
+                  : "message error"
+              }
+            >
               {message}
             </div>
           )}
@@ -661,7 +703,8 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
           {/* User Info Section */}
           <div className="user-info-section">
             <h3>Personal Information</h3>
-            <br /><br />
+            <br />
+            <br />
             {/* Profile Image Section */}
             <div className="profile-section">
               <div className="current-image">
@@ -672,8 +715,10 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
                     alt="Profile"
                     className="profile-img"
                     onError={(e) => {
-                      e.target.src = '/default-avatar.png';
-                      setMessage('Error loading profile image. Showing default avatar.');
+                      e.target.src = "/default-avatar.png";
+                      setMessage(
+                        "Error loading profile image. Showing default avatar.",
+                      );
                     }}
                   />
                 ) : (
@@ -700,7 +745,9 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
                     onChange={handleFileSelect}
                     disabled={loading || !userEmail}
                   />
-                  {selectedFile && <span className="file-name">{selectedFile.name}</span>}
+                  {selectedFile && (
+                    <span className="file-name">{selectedFile.name}</span>
+                  )}
                 </div>
 
                 {preview && (
@@ -716,7 +763,7 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
                     disabled={!selectedFile || loading || !userEmail}
                     className="btn"
                   >
-                    {loading ? 'Uploading...' : 'Upload Image'}
+                    {loading ? "Uploading..." : "Upload Image"}
                     <span className="material-symbols-outlined">east</span>
                   </button>
                 </div>
@@ -746,7 +793,7 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
                         <span className="material-symbols-outlined">east</span>
                       </button>
                       <button
-                        onClick={() => cancelEdit('name')}
+                        onClick={() => cancelEdit("name")}
                         disabled={loading}
                         className="btn"
                       >
@@ -758,13 +805,11 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
                 </div>
               ) : (
                 <div className="display-field">
-                  <span>{userName || 'Not set'}</span>
+                  <span>{userName || "Not set"}</span>
                   <div className="btn-container">
-                    <button
-                      onClick={() => setEditName(true)}
-                      className="btn"
-                    >
-                      Edit<span className="material-symbols-outlined">east</span>
+                    <button onClick={() => setEditName(true)} className="btn">
+                      Edit
+                      <span className="material-symbols-outlined">east</span>
                     </button>
                   </div>
                 </div>
@@ -794,7 +839,7 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
                         <span className="material-symbols-outlined">east</span>
                       </button>
                       <button
-                        onClick={() => cancelEdit('email')}
+                        onClick={() => cancelEdit("email")}
                         disabled={loading}
                         className="btn"
                       >
@@ -806,12 +851,9 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
                 </div>
               ) : (
                 <div className="display-field">
-                  <span>{userEmail || 'Not set'}</span>
+                  <span>{userEmail || "Not set"}</span>
                   <div className="btn-container">
-                    <button
-                      onClick={() => setEditEmail(true)}
-                      className="btn"
-                    >
+                    <button onClick={() => setEditEmail(true)} className="btn">
                       Edit
                       <span className="material-symbols-outlined">east</span>
                     </button>
@@ -836,7 +878,9 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
                     />
                     <span
                       className="password-toggle"
-                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      onClick={() =>
+                        setShowCurrentPassword(!showCurrentPassword)
+                      }
                     >
                       <span className="material-symbols-outlined">
                         {showCurrentPassword ? "visibility_off" : "visibility"}
@@ -874,7 +918,9 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
                     />
                     <span
                       className="password-toggle"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                     >
                       <span className="material-symbols-outlined">
                         {showConfirmPassword ? "visibility_off" : "visibility"}
@@ -893,7 +939,7 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
                         <span className="material-symbols-outlined">east</span>
                       </button>
                       <button
-                        onClick={() => cancelEdit('password')}
+                        onClick={() => cancelEdit("password")}
                         disabled={loading}
                         className="btn"
                       >
@@ -943,7 +989,7 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
                         <span className="material-symbols-outlined">east</span>
                       </button>
                       <button
-                        onClick={() => cancelEdit('phone')}
+                        onClick={() => cancelEdit("phone")}
                         disabled={loading}
                         className="btn"
                       >
@@ -955,12 +1001,11 @@ const ProfileModal = ({ isOpen, setIsOpen, studentData, fetchStudentData }) => {
                 </div>
               ) : (
                 <div className="phone-display">
-                  <p className="phone-number">{phoneNumber || 'No phone number set'}</p>
+                  <p className="phone-number">
+                    {phoneNumber || "No phone number set"}
+                  </p>
                   <div className="btn-container">
-                    <button
-                      onClick={() => setEditPhone(true)}
-                      className="btn"
-                    >
+                    <button onClick={() => setEditPhone(true)} className="btn">
                       Edit
                       <span className="material-symbols-outlined">east</span>
                     </button>
@@ -988,8 +1033,8 @@ const StudentPortal = () => {
 
   // Get user from localStorage instead of Redux
   const getUserFromStorage = () => {
-    if (typeof window !== 'undefined') {
-      const userStr = localStorage.getItem('user');
+    if (typeof window !== "undefined") {
+      const userStr = localStorage.getItem("user");
       return userStr ? JSON.parse(userStr) : null;
     }
     return null;
@@ -1000,9 +1045,9 @@ const StudentPortal = () => {
 
   // Check if user is authenticated
   const isAuthenticated = () => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
-      const user = localStorage.getItem('user');
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+      const user = localStorage.getItem("user");
       return !!token && !!user;
     }
     return false;
@@ -1020,14 +1065,14 @@ const StudentPortal = () => {
     if (!user?.email) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const response = await fetch(
         `http://localhost:5000/api/students/${user?.email}`,
         {
           headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-          }
-        }
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        },
       );
       if (!response.ok) {
         throw new Error("Failed to fetch student data");
@@ -1049,27 +1094,37 @@ const StudentPortal = () => {
 
   // Check authentication on mount and redirect if not authenticated
   useEffect(() => {
-    if (typeof window !== 'undefined' && !isAuthenticated()) {
-      router.push('/login');
+    if (typeof window !== "undefined" && !isAuthenticated()) {
+      router.push("/login");
     }
   }, [router]);
 
   const handleLogout = () => {
     // Clear all auth data from localStorage
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('tokenExpiry');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userData');
-    localStorage.removeItem('studentData');
-    
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("tokenExpiry");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userData");
+    localStorage.removeItem("studentData");
+
     // Redirect to login
-    router.push('/login');
+    router.push("/login");
   };
 
-  if (loading) return <div className="d-flex justify-content-center align-items-center vh-100"><p>Loading...</p></div>;
-  if (error) return <div className="d-flex justify-content-center align-items-center vh-100"><p>Error: {error}</p></div>;
+  if (loading)
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <p>Loading...</p>
+      </div>
+    );
+  if (error)
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <p>Error: {error}</p>
+      </div>
+    );
 
   return (
     <div className="d-flex">
@@ -1081,7 +1136,10 @@ const StudentPortal = () => {
             onClick={() => setIsProfileModalOpen(true)}
           >
             <img
-              src={studentData?.personalDetails?.profileImage || "/default-profile.png"}
+              src={
+                studentData?.personalDetails?.profileImage ||
+                "/default-profile.png"
+              }
               alt="Profile Icon"
               className="p-image"
               onError={(e) => {
@@ -1089,15 +1147,14 @@ const StudentPortal = () => {
               }}
             />
           </div>
-          <p className="name">
-            {user?.name}
-          </p>
+          <p className="name">{user?.name}</p>
         </div>
         <ul className="p-3 nav flex-column">
           <li className="mb-3 nav-item">
             <button
-              className={`nav-link ${activeSection === "dashboard" ? "active" : ""
-                }`}
+              className={`nav-link ${
+                activeSection === "dashboard" ? "active" : ""
+              }`}
               onClick={() => setActiveSection("dashboard")}
             >
               <i className="bi bi-speedometer2 me-2"></i>
@@ -1106,19 +1163,18 @@ const StudentPortal = () => {
           </li>
           <li className="mb-3 nav-item">
             <div className="sidebar-item">
-              <div
-                className="dropdown-header"
-                onClick={togglePaymentDropdown}
-              >
+              <div className="dropdown-header" onClick={togglePaymentDropdown}>
                 <button
-                  className={`nav-link ${isPaymentDropdownOpen ? "active" : ""
-                    }`}
+                  className={`nav-link ${
+                    isPaymentDropdownOpen ? "active" : ""
+                  }`}
                 >
                   <i className="bi bi-card-list me-2"></i>
                   Payment Info
                   <span
-                    className={`arrow-icon ${isPaymentDropdownOpen ? "open" : ""
-                      }`}
+                    className={`arrow-icon ${
+                      isPaymentDropdownOpen ? "open" : ""
+                    }`}
                   >
                     &#9662;
                   </span>
@@ -1127,15 +1183,17 @@ const StudentPortal = () => {
               {isPaymentDropdownOpen && (
                 <div className="dropdown-list">
                   <div
-                    className={`dropdown-item ${activeSection === "feespayment" ? "active" : ""
-                      }`}
+                    className={`dropdown-item ${
+                      activeSection === "feespayment" ? "active" : ""
+                    }`}
                     onClick={() => setActiveSection("feespayment")}
                   >
                     Fees Payment
                   </div>
                   <div
-                    className={`dropdown-item ${activeSection === "paymentdetails" ? "active" : ""
-                      }`}
+                    className={`dropdown-item ${
+                      activeSection === "paymentdetails" ? "active" : ""
+                    }`}
                     onClick={() => setActiveSection("paymentdetails")}
                   >
                     Payment Details
@@ -1146,19 +1204,18 @@ const StudentPortal = () => {
           </li>
           <li className="mb-3 nav-item">
             <div className="sidebar-item">
-              <div
-                className="dropdown-header"
-                onClick={toggleCoursesDropdown}
-              >
+              <div className="dropdown-header" onClick={toggleCoursesDropdown}>
                 <button
-                  className={`nav-link ${isCoursesDropdownOpen ? "active" : ""
-                    }`}
+                  className={`nav-link ${
+                    isCoursesDropdownOpen ? "active" : ""
+                  }`}
                 >
                   <i className="bi bi-book me-2"></i>
                   Courses
                   <span
-                    className={`arrow-icon ${isCoursesDropdownOpen ? "open" : ""
-                      }`}
+                    className={`arrow-icon ${
+                      isCoursesDropdownOpen ? "open" : ""
+                    }`}
                   >
                     &#9662;
                   </span>
@@ -1167,43 +1224,49 @@ const StudentPortal = () => {
               {isCoursesDropdownOpen && (
                 <div className="dropdown-list">
                   <div
-                    className={`dropdown-item ${activeSection === "course Module" ? "active" : ""
-                      }`}
+                    className={`dropdown-item ${
+                      activeSection === "course Module" ? "active" : ""
+                    }`}
                     onClick={() => setActiveSection("course Module")}
                   >
                     course Module
                   </div>
                   <div
-                    className={`dropdown-item ${activeSection === "course material" ? "active" : ""
-                      }`}
+                    className={`dropdown-item ${
+                      activeSection === "course material" ? "active" : ""
+                    }`}
                     onClick={() => setActiveSection("course material")}
                   >
                     course material
                   </div>
                   <div
-                    className={`dropdown-item ${activeSection === "Performance" ? "active" : ""
-                      }`}
+                    className={`dropdown-item ${
+                      activeSection === "Performance" ? "active" : ""
+                    }`}
                     onClick={() => setActiveSection("Performance")}
                   >
                     Performance
                   </div>
                   <div
-                    className={`dropdown-item ${activeSection === "Grade" ? "active" : ""
-                      }`}
+                    className={`dropdown-item ${
+                      activeSection === "Grade" ? "active" : ""
+                    }`}
                     onClick={() => setActiveSection("Grade")}
                   >
                     Grade
                   </div>
                   <div
-                    className={`dropdown-item ${activeSection === "Assignment" ? "active" : ""
-                      }`}
+                    className={`dropdown-item ${
+                      activeSection === "Assignment" ? "active" : ""
+                    }`}
                     onClick={() => setActiveSection("Assignment")}
                   >
                     Assignment
                   </div>
                   <div
-                    className={`dropdown-item ${activeSection === "quiz" ? "active" : ""
-                      }`}
+                    className={`dropdown-item ${
+                      activeSection === "quiz" ? "active" : ""
+                    }`}
                     onClick={() => setActiveSection("quiz")}
                   >
                     quiz
@@ -1215,8 +1278,9 @@ const StudentPortal = () => {
 
           <li className="mb-3 nav-item">
             <button
-              className={`nav-link ${activeSection === "settings" ? "active" : ""
-                }`}
+              className={`nav-link ${
+                activeSection === "settings" ? "active" : ""
+              }`}
               onClick={() => setActiveSection("settings")}
             >
               <i className="bi bi-gear me-2"></i>
@@ -1225,8 +1289,9 @@ const StudentPortal = () => {
           </li>
           <li className="mb-3 nav-item">
             <button
-              className={`nav-link ${activeSection === "logout" ? "active" : ""
-                }`}
+              className={`nav-link ${
+                activeSection === "logout" ? "active" : ""
+              }`}
               onClick={handleLogout}
             >
               <i className="bi bi-box-arrow-right me-2"></i>
@@ -1241,7 +1306,13 @@ const StudentPortal = () => {
         <div className="nav-container">
           <div className="navba">
             <div className="navbar-left">
-              <Image src={Logo} alt="AppCode Logo" className="logo" width={120} height={40} />
+              <Image
+                src={Logo}
+                alt="AppCode Logo"
+                className="logo"
+                width={120}
+                height={40}
+              />
             </div>
             <div className="navbar-center">
               <div className="search-bar">
@@ -1310,7 +1381,10 @@ const StudentPortal = () => {
         )}
         {/* Footer */}
         <div className="footer">
-          <p>&copy; {new Date().getFullYear()} AppCode Student Portal. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} AppCode Student Portal. All rights
+            reserved.
+          </p>
         </div>
       </div>
 
