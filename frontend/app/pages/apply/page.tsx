@@ -9,7 +9,7 @@ import Header from "../../components/Header/HeaderPage";
 import Navigation from "../../components/Navigation/NavPage";
 import Footer from "../../components/footer/Footer";
 
-export default function ApplyPage(): JSX.Element {
+export default function ApplyPage(){
   // Redirect user to Paystack payment page
   const handlePaystackPayment = (): void => {
     window.location.href = "https://paystack.shop/pay/t0lgdwrl6s";
