@@ -15,13 +15,16 @@ import { useState } from "react";
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition =
-        section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset; // Adjust with the offset value
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
   return (
@@ -48,10 +51,7 @@ const Details = () => {
             <div className="item">
               <div className="image-container">
                 {/* Fixed: Changed img to Image */}
-                <Image 
-                  src={FrontendImage} 
-                  alt="Front-end development course"
-                />
+                <Image src={FrontendImage} alt="Front-end development course" />
               </div>
 
               <div className="concept-container">
@@ -268,8 +268,8 @@ const Details = () => {
                   Duration
                 </h4>
                 <p>
-                  The course is 13 weeks long, covering hours of videos and hours
-                  of hands-on practice exercises.
+                  The course is 13 weeks long, covering hours of videos and
+                  hours of hands-on practice exercises.
                 </p>
               </div>
               <div className="text">
@@ -338,7 +338,6 @@ const Details = () => {
                 <div className="info">Ghc 5,920</div>
               </div>
 
-              
               <div className="course-info">
                 <h4>Course Information</h4>
                 <p>
@@ -444,7 +443,7 @@ const Details = () => {
           </button>
         </div>
       </div>
-            <Footer />
+      <Footer />
     </>
   );
 };
