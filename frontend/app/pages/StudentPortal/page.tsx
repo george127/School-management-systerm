@@ -115,162 +115,219 @@ const ProfileModal = ({
 
   useEffect(() => {
     // Check for user data in localStorage
-    const checkUserData = () => {
+const checkUserData = () => {
+  try {
+    // Safely get stored user
+    const userStr = localStorage.getItem("user");
+
+    let parsedUser: {
+      email?: string;
+      name?: string;
+      phone?: string;
+    } | null = null;
+
+    if (userStr) {
       try {
-        // Try different possible storage locations
-        const userEmail =
-          localStorage.getItem("userEmail") ||
-          localStorage.getItem("email") ||
-          (localStorage.getItem("user") &&
-            JSON.parse(localStorage.getItem("user")).email);
-
-        const userDataStr =
-          localStorage.getItem("user") ||
-          localStorage.getItem("userData") ||
-          localStorage.getItem("studentData");
-
-        if (userDataStr) {
-          try {
-            const userData = JSON.parse(userDataStr);
-            setUserData(userData);
-            if (userData.email) {
-              setUserEmail(userData.email);
-              setNewEmail(userData.email);
-            }
-            if (userData.name) {
-              setUserName(userData.name);
-              setNewName(userData.name);
-            }
-            if (userData.phone) {
-              setPhoneNumber(userData.phone);
-              setNewPhone(userData.phone);
-            }
-          } catch (e) {
-            console.error("Error parsing user data:", e);
-          }
-        }
-
-        if (userEmail) {
-          setUserEmail(userEmail);
-          setNewEmail(userEmail);
-          fetchProfileData(userEmail);
-        } else {
-          setMessage("User email not found in storage. Please log in again.");
-        }
-      } catch (error) {
-        console.error("Error accessing localStorage:", error);
-        setMessage(
-          "Error accessing browser storage. Please check if cookies are enabled.",
-        );
+        parsedUser = JSON.parse(userStr);
+      } catch (e) {
+        console.error("Invalid JSON in user:", e);
       }
-    };
+    }
+
+    // Get email safely
+    const userEmail: string | null =
+      localStorage.getItem("userEmail") ||
+      localStorage.getItem("email") ||
+      parsedUser?.email ||
+      null;
+
+    // Get any stored data
+    const userDataStr =
+      localStorage.getItem("user") ||
+      localStorage.getItem("userData") ||
+      localStorage.getItem("studentData");
+
+    if (userDataStr) {
+      try {
+        const userData: {
+          email?: string;
+          name?: string;
+          phone?: string;
+        } = JSON.parse(userDataStr);
+
+        setUserData(userData);
+
+        if (userData.email) {
+          setUserEmail(userData.email);
+          setNewEmail(userData.email);
+        }
+
+        if (userData.name) {
+          setUserName(userData.name);
+          setNewName(userData.name);
+        }
+
+        if (userData.phone) {
+          setPhoneNumber(userData.phone);
+          setNewPhone(userData.phone);
+        }
+      } catch (e) {
+        console.error("Error parsing user data:", e);
+      }
+    }
+
+    if (userEmail) {
+      setUserEmail(userEmail);
+      setNewEmail(userEmail);
+      fetchProfileData(userEmail); // ✅ now guaranteed string
+    } else {
+      setMessage("User email not found in storage. Please log in again.");
+    }
+  } catch (error: any) {
+    console.error("Error accessing localStorage:", error);
+    setMessage(
+      error?.message ||
+        "Error accessing browser storage. Please check if cookies are enabled."
+    );
+  }
+};
 
     checkUserData();
   }, []);
 
-  const fetchProfileData = async (email) => {
-    if (!email) {
-      setMessage("No email provided for fetching profile data");
-      return;
-    }
+const fetchProfileData = async (email: string) => {
+  if (!email) {
+    setMessage("No email provided for fetching profile data");
+    return;
+  }
+
+  try {
+    setLoading(true);
+    const token = localStorage.getItem("token");
+
+    /* ================= USER PROFILE ================= */
 
     try {
-      setLoading(true);
-      const token = localStorage.getItem("token");
-
-      // Fetch user profile data
-      try {
-        const userResponse = await fetch(
-          `http://localhost:5000/api/profile/${email}`,
-          {
-            headers: {
-              Authorization: token ? `Bearer ${token}` : "",
-            },
+      const userResponse = await fetch(
+        `http://localhost:5000/api/profile/${email}`,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
           },
-        );
+        }
+      );
 
-        const userData = await userResponse.json();
+      const userData: {
+        success: boolean;
+        user?: {
+          name?: string;
+          email?: string;
+        };
+      } = await userResponse.json();
 
-        if (userData.success) {
-          const userDataInfo = userData.user;
+      if (userData.success && userData.user) {
+        const userDataInfo = userData.user;
+
+        if (userDataInfo.name) {
           setUserName(userDataInfo.name);
           setNewName(userDataInfo.name);
+        }
+
+        if (userDataInfo.email) {
           setUserEmail(userDataInfo.email);
           setNewEmail(userDataInfo.email);
+        }
 
-          // Update localStorage with fresh data
-          try {
-            const existingData =
-              localStorage.getItem("user") &&
-              JSON.parse(localStorage.getItem("user"));
-            if (existingData) {
-              existingData.name = userDataInfo.name;
-              existingData.email = userDataInfo.email;
-              localStorage.setItem("user", JSON.stringify(existingData));
-            }
-          } catch (e) {
-            console.error("Error updating localStorage:", e);
+        // ✅ Safe localStorage update
+        try {
+          const existingStr = localStorage.getItem("user");
+
+          if (existingStr) {
+            const existingData: {
+              name?: string;
+              email?: string;
+            } = JSON.parse(existingStr);
+
+            existingData.name = userDataInfo.name;
+            existingData.email = userDataInfo.email;
+
+            localStorage.setItem("user", JSON.stringify(existingData));
           }
+        } catch (e) {
+          console.error("Error updating localStorage:", e);
         }
-      } catch (userError) {
-        console.log("User endpoint might not be implemented yet:", userError);
       }
-
-      // Fetch profile image
-      try {
-        const imageResponse = await fetch(
-          `http://localhost:5000/api/profile/profile-image/${email}`,
-          {
-            headers: {
-              Authorization: token ? `Bearer ${token}` : "",
-            },
-          },
-        );
-
-        const imageData = await imageResponse.json();
-
-        if (imageData.success) {
-          setProfileImage(imageData.profileImage);
-        }
-      } catch (imageError) {
-        console.log("Image endpoint might not be implemented yet:", imageError);
-      }
-
-      // Fetch phone number
-      try {
-        const phoneResponse = await fetch(
-          `http://localhost:5000/api/profile/phone/${email}`,
-          {
-            headers: {
-              Authorization: token ? `Bearer ${token}` : "",
-            },
-          },
-        );
-
-        const phoneData = await phoneResponse.json();
-
-        if (phoneData.success && phoneData.phone) {
-          setPhoneNumber(phoneData.phone);
-          setNewPhone(phoneData.phone);
-        }
-      } catch (phoneError) {
-        console.log("Phone endpoint might not be implemented yet:", phoneError);
-      }
-
-      setMessage("");
-    } catch (error) {
-      console.error("Error fetching profile data:", error);
-      if (error.message === "Failed to fetch") {
-        setMessage(
-          "Cannot connect to server. Please make sure the backend is running on port 5000.",
-        );
-      } else {
-        setMessage("Failed to fetch profile data: " + error.message);
-      }
-    } finally {
-      setLoading(false);
+    } catch (userError) {
+      console.log("User endpoint issue:", userError);
     }
-  };
+
+    /* ================= PROFILE IMAGE ================= */
+
+    try {
+      const imageResponse = await fetch(
+        `http://localhost:5000/api/profile/profile-image/${email}`,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+
+      const imageData: {
+        success: boolean;
+        profileImage?: string;
+      } = await imageResponse.json();
+
+      if (imageData.success && imageData.profileImage) {
+        setProfileImage(imageData.profileImage);
+      }
+    } catch (imageError) {
+      console.log("Image endpoint issue:", imageError);
+    }
+
+    /* ================= PHONE ================= */
+
+    try {
+      const phoneResponse = await fetch(
+        `http://localhost:5000/api/profile/phone/${email}`,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+
+      const phoneData: {
+        success: boolean;
+        phone?: string;
+      } = await phoneResponse.json();
+
+      if (phoneData.success && phoneData.phone) {
+        setPhoneNumber(phoneData.phone);
+        setNewPhone(phoneData.phone);
+      }
+    } catch (phoneError) {
+      console.log("Phone endpoint issue:", phoneError);
+    }
+
+    setMessage("");
+  } catch (error: any) {
+    console.error("Error fetching profile data:", error);
+
+    if (error?.message === "Failed to fetch") {
+      setMessage(
+        "Cannot connect to server. Make sure backend is running on port 5000."
+      );
+    } else {
+      setMessage(
+        "Failed to fetch profile data: " +
+          (error?.message || "Unknown error")
+      );
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
