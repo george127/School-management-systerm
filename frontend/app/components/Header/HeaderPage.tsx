@@ -28,7 +28,7 @@ interface CheckAuthResponse {
    Component
 ========================= */
 
-export default function Header(): JSX.Element {
+export default function Header() {
   const router = useRouter();
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
