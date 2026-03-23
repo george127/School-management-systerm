@@ -18,8 +18,8 @@ import { useState, useEffect, useRef } from "react";
 
 const DataAnalytics = () => {
   const [sidebarTop, setSidebarTop] = useState(0);
-  const [activeSection, setActiveSection] = useState(null);
-  const sectionRefs = useRef([]);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const sectionRefs = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
     sectionRefs.current = sectionRefs.current.slice(0, 2);
@@ -40,16 +40,21 @@ const DataAnalytics = () => {
       // Determine which section is in view
       const scrollPosition = window.scrollY + 100; // Adding some offset
 
-      sectionRefs.current.forEach((section, index) => {
-        if (section) {
-          const sectionTop = section.offsetTop;
-          const sectionHeight = section.offsetHeight;
+      sectionRefs.current.forEach(
+        (section: HTMLElement | null, index: number) => {
+          if (section) {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.offsetHeight;
 
-          if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-            setActiveSection(`section${index + 1}`);
+            if (
+              scrollPosition >= sectionTop &&
+              scrollPosition < sectionTop + sectionHeight
+            ) {
+              setActiveSection(`section${index + 1}`);
+            }
           }
-        }
-      });
+        },
+      );
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -58,10 +63,11 @@ const DataAnalytics = () => {
     };
   }, []);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
+      const sectionPosition =
+        section.getBoundingClientRect().top + window.scrollY;
       const scrollToPosition = sectionPosition + offset;
       window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
       setActiveSection(sectionId);
@@ -92,25 +98,33 @@ const DataAnalytics = () => {
               }}
             >
               <ul>
-                <li onClick={() => handleScrollToSection("section1", -75)}
-                  className={activeSection === "section1" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section1", -75)}
+                  className={activeSection === "section1" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     Cloud Data Analytics
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section2", -75)}
-                  className={activeSection === "section2" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section2", -75)}
+                  className={activeSection === "section2" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     Traditional Data Analytics
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
               </ul>
             </div>
@@ -123,10 +137,7 @@ const DataAnalytics = () => {
                 <h2 className="course-title">Data Analytics</h2>
                 <div className="image-container">
                   {/* Fixed: Changed from <img src={Image} ... /> to <Image src={DataImage} ... /> */}
-                  <Image 
-                    src={DataImage} 
-                    alt="Data Analytics"
-                  />
+                  <Image src={DataImage} alt="Data Analytics" />
                 </div>
                 <div className="course-description">
                   <div className="text">
@@ -167,15 +178,16 @@ const DataAnalytics = () => {
                 </div>
               </div>
 
-              <section id="section1" 
-              className={`section ${activeSection === "section1" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[0] = el}>
+              <section
+                id="section1"
+                className={`section ${activeSection === "section1" ? "section-active" : ""}`}
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[0] = el;
+                }}
+              >
                 <div className="image-container">
                   {/* Fixed: Changed img to Image */}
-                  <Image 
-                    src={image1} 
-                    alt="Cloud Data Analytics"
-                  />
+                  <Image src={image1} alt="Cloud Data Analytics" />
                 </div>
                 <div className="text-container">
                   <h2>Cloud Data Analytics</h2>
@@ -192,7 +204,10 @@ const DataAnalytics = () => {
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
                     {/* Fixed: Changed NavLink to Link */}
-                    <Link href="/dataAnalytics/1.CloudDataAnalytics" className="btn">
+                    <Link
+                      href="/dataAnalytics/1.CloudDataAnalytics"
+                      className="btn"
+                    >
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -200,15 +215,16 @@ const DataAnalytics = () => {
                 </div>
               </section>
 
-              <section id="section2" 
-              className={`section ${activeSection === "section2" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[1] = el}>
+              <section
+                id="section2"
+                className={`section ${activeSection === "section2" ? "section-active" : ""}`}
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[1] = el;
+                }}
+              >
                 <div className="image-container">
                   {/* Fixed: Changed img to Image */}
-                  <Image 
-                    src={image2} 
-                    alt="Traditional Data Analytics"
-                  />
+                  <Image src={image2} alt="Traditional Data Analytics" />
                 </div>
                 <div className="text-container">
                   <h2>Traditional Data Analytics</h2>
@@ -224,7 +240,10 @@ const DataAnalytics = () => {
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
                     {/* Fixed: Changed NavLink to Link */}
-                    <Link href="/dataAnalytics/2.TraditionalDataAnalytics" className="btn">
+                    <Link
+                      href="/dataAnalytics/2.TraditionalDataAnalytics"
+                      className="btn"
+                    >
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>

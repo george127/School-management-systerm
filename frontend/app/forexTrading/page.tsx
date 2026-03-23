@@ -15,8 +15,8 @@ import { useState, useEffect, useRef } from "react";
 
 const ForexTrading = () => {
   const [sidebarTop, setSidebarTop] = useState(0);
-  const [activeSection, setActiveSection] = useState(null);
-  const sectionRefs = useRef([]);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const sectionRefs = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
     sectionRefs.current = sectionRefs.current.slice(0, 1);
@@ -37,16 +37,21 @@ const ForexTrading = () => {
       // Determine which section is in view
       const scrollPosition = window.scrollY + 100; // Adding some offset
 
-      sectionRefs.current.forEach((section, index) => {
-        if (section) {
-          const sectionTop = section.offsetTop;
-          const sectionHeight = section.offsetHeight;
+      sectionRefs.current.forEach(
+        (section: HTMLElement | null, index: number) => {
+          if (section) {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.offsetHeight;
 
-          if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-            setActiveSection(`section${index + 1}`);
+            if (
+              scrollPosition >= sectionTop &&
+              scrollPosition < sectionTop + sectionHeight
+            ) {
+              setActiveSection(`section${index + 1}`);
+            }
           }
-        }
-      });
+        },
+      );
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -55,10 +60,11 @@ const ForexTrading = () => {
     };
   }, []);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
+      const sectionPosition =
+        section.getBoundingClientRect().top + window.scrollY;
       const scrollToPosition = sectionPosition + offset;
       window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
       setActiveSection(sectionId);
@@ -89,15 +95,19 @@ const ForexTrading = () => {
               }}
             >
               <ul>
-                <li onClick={() => handleScrollToSection("section1", -75)}
-                  className={activeSection === "section1" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section1", -75)}
+                  className={activeSection === "section1" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     Forex Trading
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
               </ul>
             </div>
@@ -112,10 +122,7 @@ const ForexTrading = () => {
                 </h2>
                 <div className="image-container">
                   {/* Fixed: Changed from <img src={Image} ... /> to <Image src={ForexImage} ... /> */}
-                  <Image 
-                    src={ForexImage} 
-                    alt="Forex Trading"
-                  />
+                  <Image src={ForexImage} alt="Forex Trading" />
                 </div>
                 <div className="course-description">
                   <div className="text">
@@ -155,15 +162,16 @@ const ForexTrading = () => {
                 </div>
               </div>
 
-              <section id="section1" 
-              className={`section ${activeSection === "section1" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[0] = el}>
+              <section
+                id="section1"
+                className={`section ${activeSection === "section1" ? "section-active" : ""}`}
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[0] = el;
+                }}
+              >
                 <div className="image-container">
                   {/* Fixed: Changed img to Image */}
-                  <Image 
-                    src={image1} 
-                    alt="Forex Trading Banner"
-                  />
+                  <Image src={image1} alt="Forex Trading Banner" />
                 </div>
                 <div className="text-container">
                   <h2>Forex Trading</h2>

@@ -21,8 +21,8 @@ import Image from "next/image";
 
 const Aws = () => {
   const [sidebarTop, setSidebarTop] = useState(0);
-  const [activeSection, setActiveSection] = useState(null);
-  const sectionRefs = useRef([]);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const sectionRefs = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
     sectionRefs.current = sectionRefs.current.slice(0, 8);
@@ -43,16 +43,21 @@ const Aws = () => {
       // Determine which section is in view
       const scrollPosition = window.scrollY + 100; // Adding some offset
 
-      sectionRefs.current.forEach((section, index) => {
-        if (section) {
-          const sectionTop = section.offsetTop;
-          const sectionHeight = section.offsetHeight;
+      sectionRefs.current.forEach(
+        (section: HTMLElement | null, index: number) => {
+          if (section) {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.offsetHeight;
 
-          if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-            setActiveSection(`section${index + 1}`);
+            if (
+              scrollPosition >= sectionTop &&
+              scrollPosition < sectionTop + sectionHeight
+            ) {
+              setActiveSection(`section${index + 1}`);
+            }
           }
-        }
-      });
+        },
+      );
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -61,10 +66,11 @@ const Aws = () => {
     };
   }, []);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
+      const sectionPosition =
+        section.getBoundingClientRect().top + window.scrollY;
       const scrollToPosition = sectionPosition + offset;
       window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
       setActiveSection(sectionId);
@@ -95,85 +101,117 @@ const Aws = () => {
               }}
             >
               <ul>
-                <li onClick={() => handleScrollToSection("section1", -75)}
-                  className={activeSection === "section1" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section1", -75)}
+                  className={activeSection === "section1" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     AWS CSAP
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section2", -75)}
-                  className={activeSection === "section2" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section2", -75)}
+                  className={activeSection === "section2" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     AWS CSAA
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section3", -75)}
-                  className={activeSection === "section3" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section3", -75)}
+                  className={activeSection === "section3" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     AWS CSAA
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section4", -75)}
-                  className={activeSection === "section4" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section4", -75)}
+                  className={activeSection === "section4" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     AWS CDEP
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section5", -75)}
-                  className={activeSection === "section5" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section5", -75)}
+                  className={activeSection === "section5" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     AWS CDA
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section6", -75)}
-                  className={activeSection === "section6" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section6", -75)}
+                  className={activeSection === "section6" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     AWS CSS
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section7", -75)}
-                  className={activeSection === "section7" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section7", -75)}
+                  className={activeSection === "section7" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
-                    format_indent_increase
-                  </span>
+                      format_indent_increase
+                    </span>
                     AWS CANS
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section8", -75)}
-                  className={activeSection === "section8" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section8", -75)}
+                  className={activeSection === "section8" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
-                    format_indent_increase
-                  </span>
+                      format_indent_increase
+                    </span>
                     AWS CBDS
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
               </ul>
             </div>
@@ -186,10 +224,7 @@ const Aws = () => {
                 <h2 className="course-title">Amazon Web Services</h2>
                 <div className="image-container">
                   {/* Fixed: Changed from <img src={Image} ... /> to <Image src={CloudImage} ... /> */}
-                  <Image 
-                    src={CloudImage} 
-                    alt="AWS Cloud"
-                  />
+                  <Image src={CloudImage} alt="AWS Cloud" />
                 </div>
                 <div className="course-description">
                   <div className="text">
@@ -235,9 +270,13 @@ const Aws = () => {
                 </div>
               </div>
 
-              <section id="section1" 
+              <section
+                id="section1"
                 className={`section ${activeSection === "section1" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[0] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[0] = el;
+                }}
+              >
                 <div className="image-container">
                   <Image
                     src={AWS1}
@@ -269,9 +308,13 @@ const Aws = () => {
                 </div>
               </section>
 
-              <section id="section2"
+              <section
+                id="section2"
                 className={`section ${activeSection === "section2" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[1] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[1] = el;
+                }}
+              >
                 <div className="image-container">
                   <Image
                     src={AWS2}
@@ -293,7 +336,10 @@ const Aws = () => {
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
                     {/* Fixed: Changed NavLink to Link */}
-                    <Link href="/aws/2.AWS-SA-Associate-Details" className="btn">
+                    <Link
+                      href="/aws/2.AWS-SA-Associate-Details"
+                      className="btn"
+                    >
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -301,9 +347,13 @@ const Aws = () => {
                 </div>
               </section>
 
-              <section id="section3" 
+              <section
+                id="section3"
                 className={`section ${activeSection === "section3" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[2] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[2] = el;
+                }}
+              >
                 <div className="image-container">
                   <Image
                     src={AWS3}
@@ -333,9 +383,13 @@ const Aws = () => {
                 </div>
               </section>
 
-              <section id="section4" 
+              <section
+                id="section4"
                 className={`section ${activeSection === "section4" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[3] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[3] = el;
+                }}
+              >
                 <div className="image-container">
                   <Image
                     src={AWS4}
@@ -364,9 +418,13 @@ const Aws = () => {
                 </div>
               </section>
 
-              <section id="section5" 
+              <section
+                id="section5"
                 className={`section ${activeSection === "section5" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[4] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[4] = el;
+                }}
+              >
                 <div className="image-container">
                   <Image src={AWS5} alt="AWS Certified Developer Associate" />
                 </div>
@@ -384,7 +442,10 @@ const Aws = () => {
                   <p className="amount">Ghc 5,920</p>
                   <div className="btn-container">
                     {/* Fixed: Changed NavLink to Link */}
-                    <Link href="/aws/5.AWS-Dev-Associate-Details" className="btn">
+                    <Link
+                      href="/aws/5.AWS-Dev-Associate-Details"
+                      className="btn"
+                    >
                       Learn More
                       <span className="material-symbols-outlined">east</span>
                     </Link>
@@ -392,9 +453,13 @@ const Aws = () => {
                 </div>
               </section>
 
-              <section id="section6" 
+              <section
+                id="section6"
                 className={`section ${activeSection === "section6" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[5] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[5] = el;
+                }}
+              >
                 <div className="image-container">
                   <Image src={AWS6} alt="AWS Certified Security Specialty" />
                 </div>
@@ -421,9 +486,13 @@ const Aws = () => {
                 </div>
               </section>
 
-              <section id="section7" 
+              <section
+                id="section7"
                 className={`section ${activeSection === "section7" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[6] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[6] = el;
+                }}
+              >
                 <div className="image-container">
                   <Image
                     src={AWS7}
@@ -453,9 +522,13 @@ const Aws = () => {
                 </div>
               </section>
 
-              <section id="section8" 
+              <section
+                id="section8"
                 className={`section ${activeSection === "section8" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[7] = el}>
+               ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[7] = el;
+                }}
+              >
                 <div className="image-container">
                   <Image src={AWS8} alt="AWS Certified Big Data Specialty" />
                 </div>

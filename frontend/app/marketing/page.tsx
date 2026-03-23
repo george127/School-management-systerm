@@ -23,8 +23,8 @@ import Image from "next/image";
 
 const DigitalMarketing = () => {
   const [sidebarTop, setSidebarTop] = useState(0);
-  const [activeSection, setActiveSection] = useState(null);
-  const sectionRefs = useRef([]);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const sectionRefs = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
     sectionRefs.current = sectionRefs.current.slice(0, 9);
@@ -45,16 +45,21 @@ const DigitalMarketing = () => {
       // Determine which section is in view
       const scrollPosition = window.scrollY + 100; // Adding some offset
 
-      sectionRefs.current.forEach((section, index) => {
-        if (section) {
-          const sectionTop = section.offsetTop;
-          const sectionHeight = section.offsetHeight;
+      sectionRefs.current.forEach(
+        (section: HTMLElement | null, index: number) => {
+          if (section) {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.offsetHeight;
 
-          if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-            setActiveSection(`section${index + 1}`);
+            if (
+              scrollPosition >= sectionTop &&
+              scrollPosition < sectionTop + sectionHeight
+            ) {
+              setActiveSection(`section${index + 1}`);
+            }
           }
-        }
-      });
+        },
+      );
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -63,10 +68,11 @@ const DigitalMarketing = () => {
     };
   }, []);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
+      const sectionPosition =
+        section.getBoundingClientRect().top + window.scrollY;
       const scrollToPosition = sectionPosition + offset;
       window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
       setActiveSection(sectionId);
@@ -97,95 +103,131 @@ const DigitalMarketing = () => {
               }}
             >
               <ul>
-                <li onClick={() => handleScrollToSection("section1", -75)}
-                  className={activeSection === "section1" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section1", -75)}
+                  className={activeSection === "section1" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     Full Program
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section2", -75)}
-                  className={activeSection === "section2" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section2", -75)}
+                  className={activeSection === "section2" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     Facebook
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section3", -75)}
-                  className={activeSection === "section3" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section3", -75)}
+                  className={activeSection === "section3" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     Instagram
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section4", -75)}
-                  className={activeSection === "section4" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section4", -75)}
+                  className={activeSection === "section4" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     LinkedIn
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section5", -75)}
-                  className={activeSection === "section5" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section5", -75)}
+                  className={activeSection === "section5" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     Twitter
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section6", -75)}
-                  className={activeSection === "section6" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section6", -75)}
+                  className={activeSection === "section6" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     YouTube
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section7", -75)}
-                  className={activeSection === "section7" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section7", -75)}
+                  className={activeSection === "section7" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     Google Ads
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section8", -75)}
-                  className={activeSection === "section8" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section8", -75)}
+                  className={activeSection === "section8" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     Pinterest
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section9", -75)}
-                  className={activeSection === "section9" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section9", -75)}
+                  className={activeSection === "section9" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     TikTok
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
               </ul>
             </div>
@@ -198,10 +240,7 @@ const DigitalMarketing = () => {
                 <h2 className="course-title">Digital Marketing</h2>
                 <div className="image-container">
                   {/* Fixed: Changed from <img src={Image} ... /> to <Image src={MarketingImage} ... /> */}
-                  <Image 
-                    src={MarketingImage} 
-                    alt="Digital Marketing"
-                  />
+                  <Image src={MarketingImage} alt="Digital Marketing" />
                 </div>
                 <div className="course-description">
                   <div className="text">
@@ -242,16 +281,17 @@ const DigitalMarketing = () => {
                   </div>
                 </div>
               </div>
-              
-              <section id="section1"
+
+              <section
+                id="section1"
                 className={`section ${activeSection === "section1" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[0] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[0] = el;
+                }}
+              >
                 <div className="image-container">
                   {/* Fixed: Changed img to Image */}
-                  <Image 
-                    src={image0} 
-                    alt="Full Digital Marketing Program"
-                  />
+                  <Image src={image0} alt="Full Digital Marketing Program" />
                 </div>
                 <div className="text-container">
                   <h2>Full Digital Marketing Program</h2>
@@ -274,16 +314,17 @@ const DigitalMarketing = () => {
                   </div>
                 </div>
               </section>
-              
-              <section id="section2"
+
+              <section
+                id="section2"
                 className={`section ${activeSection === "section2" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[1] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[1] = el;
+                }}
+              >
                 <div className="image-container">
                   {/* Fixed: Changed img to Image */}
-                  <Image 
-                    src={image1} 
-                    alt="Facebook Marketing"
-                  />
+                  <Image src={image1} alt="Facebook Marketing" />
                 </div>
                 <div className="text-container">
                   <h2>Facebook</h2>
@@ -307,15 +348,16 @@ const DigitalMarketing = () => {
                 </div>
               </section>
 
-              <section id="section3"
+              <section
+                id="section3"
                 className={`section ${activeSection === "section3" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[2] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[2] = el;
+                }}
+              >
                 <div className="image-container">
                   {/* Fixed: Changed img to Image */}
-                  <Image 
-                    src={image2} 
-                    alt="Instagram Marketing"
-                  />
+                  <Image src={image2} alt="Instagram Marketing" />
                 </div>
                 <div className="text-container">
                   <h2>Instagram</h2>
@@ -339,15 +381,16 @@ const DigitalMarketing = () => {
                 </div>
               </section>
 
-              <section id="section4"
+              <section
+                id="section4"
                 className={`section ${activeSection === "section4" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[3] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[3] = el;
+                }}
+              >
                 <div className="image-container">
                   {/* Fixed: Changed img to Image */}
-                  <Image 
-                    src={image3} 
-                    alt="LinkedIn Marketing"
-                  />
+                  <Image src={image3} alt="LinkedIn Marketing" />
                 </div>
                 <div className="text-container">
                   <h2>LinkedIn</h2>
@@ -370,15 +413,16 @@ const DigitalMarketing = () => {
                 </div>
               </section>
 
-              <section id="section5"
+              <section
+                id="section5"
                 className={`section ${activeSection === "section5" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[4] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[4] = el;
+                }}
+              >
                 <div className="image-container">
                   {/* Fixed: Changed img to Image */}
-                  <Image 
-                    src={image4} 
-                    alt="Twitter Marketing"
-                  />
+                  <Image src={image4} alt="Twitter Marketing" />
                 </div>
                 <div className="text-container">
                   <h2>Twitter</h2>
@@ -401,15 +445,16 @@ const DigitalMarketing = () => {
                 </div>
               </section>
 
-              <section id="section6" 
-              className={`section ${activeSection === "section6" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[5] = el}>
+              <section
+                id="section6"
+                className={`section ${activeSection === "section6" ? "section-active" : ""}`}
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[5] = el;
+                }}
+              >
                 <div className="image-container">
                   {/* Fixed: Changed img to Image */}
-                  <Image 
-                    src={image5} 
-                    alt="YouTube Marketing"
-                  />
+                  <Image src={image5} alt="YouTube Marketing" />
                 </div>
                 <div className="text-container">
                   <h2>YouTube</h2>
@@ -431,16 +476,17 @@ const DigitalMarketing = () => {
                   </div>
                 </div>
               </section>
-              
-              <section id="section7" 
-              className={`section ${activeSection === "section7" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[6] = el}>
+
+              <section
+                id="section7"
+                className={`section ${activeSection === "section7" ? "section-active" : ""}`}
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[6] = el;
+                }}
+              >
                 <div className="image-container">
                   {/* Fixed: Changed img to Image */}
-                  <Image 
-                    src={image6} 
-                    alt="Google Ads"
-                  />
+                  <Image src={image6} alt="Google Ads" />
                 </div>
                 <div className="text-container">
                   <h2>Google Ads</h2>
@@ -463,15 +509,16 @@ const DigitalMarketing = () => {
                 </div>
               </section>
 
-              <section id="section8" 
-              className={`section ${activeSection === "section8" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[7] = el}>
+              <section
+                id="section8"
+                className={`section ${activeSection === "section8" ? "section-active" : ""}`}
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[7] = el;
+                }}
+              >
                 <div className="image-container">
                   {/* Fixed: Changed img to Image */}
-                  <Image 
-                    src={image7} 
-                    alt="Pinterest"
-                  />
+                  <Image src={image7} alt="Pinterest" />
                 </div>
                 <div className="text-container">
                   <h2>Pinterest</h2>
@@ -495,15 +542,16 @@ const DigitalMarketing = () => {
                 </div>
               </section>
 
-              <section id="section9" 
-              className={`section ${activeSection === "section9" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[8] = el}>
+              <section
+                id="section9"
+                className={`section ${activeSection === "section9" ? "section-active" : ""}`}
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[8] = el;
+                }}
+              >
                 <div className="image-container">
                   {/* Fixed: Changed img to Image */}
-                  <Image 
-                    src={image8} 
-                    alt="TikTok"
-                  />
+                  <Image src={image8} alt="TikTok" />
                 </div>
                 <div className="text-container">
                   <h2>TikTok</h2>

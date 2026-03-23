@@ -22,8 +22,8 @@ import { useState, useEffect, useRef } from "react";
 
 const Software = () => {
   const [sidebarTop, setSidebarTop] = useState(0);
-  const [activeSection, setActiveSection] = useState(null);
-  const sectionRefs = useRef([]);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const sectionRefs = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
     sectionRefs.current = sectionRefs.current.slice(0, 7);
@@ -44,16 +44,21 @@ const Software = () => {
       // Determine which section is in view
       const scrollPosition = window.scrollY + 100; // Adding some offset
 
-      sectionRefs.current.forEach((section, index) => {
-        if (section) {
-          const sectionTop = section.offsetTop;
-          const sectionHeight = section.offsetHeight;
+      sectionRefs.current.forEach(
+        (section: HTMLElement | null, index: number) => {
+          if (section) {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.offsetHeight;
 
-          if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-            setActiveSection(`section${index + 1}`);
+            if (
+              scrollPosition >= sectionTop &&
+              scrollPosition < sectionTop + sectionHeight
+            ) {
+              setActiveSection(`section${index + 1}`);
+            }
           }
-        }
-      });
+        },
+      );
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -62,10 +67,11 @@ const Software = () => {
     };
   }, []);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
+      const sectionPosition =
+        section.getBoundingClientRect().top + window.scrollY;
       const scrollToPosition = sectionPosition + offset;
       window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
       setActiveSection(sectionId);
@@ -94,75 +100,103 @@ const Software = () => {
               }}
             >
               <ul>
-                <li onClick={() => handleScrollToSection("section1", -75)}
-                  className={activeSection === "section1" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section1", -75)}
+                  className={activeSection === "section1" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     Front End
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section2", -75)}
-                  className={activeSection === "section2" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section2", -75)}
+                  className={activeSection === "section2" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     Backend
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section3", -75)}
-                  className={activeSection === "section3" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section3", -75)}
+                  className={activeSection === "section3" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     Mobile Development
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section4", -75)}
-                  className={activeSection === "section4" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section4", -75)}
+                  className={activeSection === "section4" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     Next.js
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section5", -75)}
-                  className={activeSection === "section5" ? "active" : ""}> 
+                <li
+                  onClick={() => handleScrollToSection("section5", -75)}
+                  className={activeSection === "section5" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     Flutter
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section6", -75)}
-                  className={activeSection === "section6" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section6", -75)}
+                  className={activeSection === "section6" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     JavaScript
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
-                <li onClick={() => handleScrollToSection("section7", -75)}
-                  className={activeSection === "section7" ? "active" : ""}>
+                <li
+                  onClick={() => handleScrollToSection("section7", -75)}
+                  className={activeSection === "section7" ? "active" : ""}
+                >
                   <div className="items-content">
                     <span className="material-symbols-outlined format">
                       format_indent_increase
                     </span>
                     TypeScript
                   </div>
-                  <span className="material-symbols-outlined arrow-icon">south_east</span>
+                  <span className="material-symbols-outlined arrow-icon">
+                    south_east
+                  </span>
                 </li>
               </ul>
             </div>
@@ -175,9 +209,7 @@ const Software = () => {
                 <h2 className="course-title">FullStack Development</h2>
                 <div className="image-container">
                   {/* Fixed: Using SoftwareImage instead of undefined Image variable */}
-                  <Image 
-                    src={SoftwareImage} 
-                    alt="FullStack Development"/>
+                  <Image src={SoftwareImage} alt="FullStack Development" />
                 </div>
                 <div className="course-description">
                   <div className="text">
@@ -223,13 +255,15 @@ const Software = () => {
                 </div>
               </div>
 
-              <section id="section1"
+              <section
+                id="section1"
                 className={`section ${activeSection === "section1" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[0] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[0] = el;
+                }}
+              >
                 <div className="image-container">
-                  <Image 
-                    src={Frontend} 
-                    alt="Front End Development"/>
+                  <Image src={Frontend} alt="Front End Development" />
                 </div>
                 <div className="text-container">
                   <h2>Front End Development</h2>
@@ -255,14 +289,15 @@ const Software = () => {
                 </div>
               </section>
 
-              <section id="section2" 
+              <section
+                id="section2"
                 className={`section ${activeSection === "section2" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[1] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[1] = el;
+                }}
+              >
                 <div className="image-container">
-                  <Image 
-                    src={Backend} 
-                    alt="Backend Development"
-                  />
+                  <Image src={Backend} alt="Backend Development" />
                 </div>
                 <div className="text-container">
                   <h2>Backend Development</h2>
@@ -288,14 +323,15 @@ const Software = () => {
                 </div>
               </section>
 
-              <section id="section3" 
+              <section
+                id="section3"
                 className={`section ${activeSection === "section3" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[2] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[2] = el;
+                }}
+              >
                 <div className="image-container">
-                  <Image 
-                    src={MobileApp} 
-                    alt="Mobile App Development"
-                    />
+                  <Image src={MobileApp} alt="Mobile App Development" />
                 </div>
                 <div className="text-container">
                   <h2>Mobile App Development</h2>
@@ -304,9 +340,9 @@ const Software = () => {
                     applications for mobile devices. It involves designing and
                     building intuitive, user-friendly, and feature-rich apps
                     using platforms like Android, iOS, or cross-platform
-                    frameworks such as React Native. Mobile apps
-                    enhance user experiences, streamline services, and provide
-                    businesses with a direct channel to their audiences.
+                    frameworks such as React Native. Mobile apps enhance user
+                    experiences, streamline services, and provide businesses
+                    with a direct channel to their audiences.
                   </p>
                 </div>
                 <div className="button-container">
@@ -320,14 +356,15 @@ const Software = () => {
                 </div>
               </section>
 
-              <section id="section4" 
+              <section
+                id="section4"
                 className={`section ${activeSection === "section4" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[3] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[3] = el;
+                }}
+              >
                 <div className="image-container">
-                  <Image 
-                    src={NextJS} 
-                    alt="Next.js Development"
-                   />
+                  <Image src={NextJS} alt="Next.js Development" />
                 </div>
                 <div className="text-container">
                   <h2>Next.js</h2>
@@ -352,14 +389,15 @@ const Software = () => {
                 </div>
               </section>
 
-              <section id="section5" 
+              <section
+                id="section5"
                 className={`section ${activeSection === "section5" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[4] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[4] = el;
+                }}
+              >
                 <div className="image-container">
-                  <Image 
-                    src={Flutter} 
-                    alt="Flutter Development"
-                    />
+                  <Image src={Flutter} alt="Flutter Development" />
                 </div>
                 <div className="text-container">
                   <h2>Flutter</h2>
@@ -383,26 +421,27 @@ const Software = () => {
                   </div>
                 </div>
               </section>
-              
-              <section id="section6" 
+
+              <section
+                id="section6"
                 className={`section ${activeSection === "section6" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[5] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[5] = el;
+                }}
+              >
                 <div className="image-container">
-                  <Image 
-                    src={Javascript} 
-                    alt="JavaScript Development"
-                   />
+                  <Image src={Javascript} alt="JavaScript Development" />
                 </div>
                 <div className="text-container">
                   <h2>JavaScript</h2>
                   <p>
                     JavaScript is a versatile programming language that enables
                     interactive web pages and is an essential part of web
-                    applications. It allows developers to create dynamic content,
-                    control multimedia, animate images, and much more. With the
-                    rise of frameworks like React, Angular, and Vue.js, JavaScript
-                    has become indispensable for modern web development, both on
-                    the client and server side.
+                    applications. It allows developers to create dynamic
+                    content, control multimedia, animate images, and much more.
+                    With the rise of frameworks like React, Angular, and Vue.js,
+                    JavaScript has become indispensable for modern web
+                    development, both on the client and server side.
                   </p>
                 </div>
                 <div className="button-container">
@@ -415,15 +454,16 @@ const Software = () => {
                   </div>
                 </div>
               </section>
-              
-              <section id="section7" 
+
+              <section
+                id="section7"
                 className={`section ${activeSection === "section7" ? "section-active" : ""}`}
-                ref={el => sectionRefs.current[6] = el}>
+                ref={(el: HTMLElement | null) => {
+                  sectionRefs.current[6] = el;
+                }}
+              >
                 <div className="image-container">
-                  <Image 
-                    src={TypeScript} 
-                    alt="TypeScript Development"
-                    />
+                  <Image src={TypeScript} alt="TypeScript Development" />
                 </div>
                 <div className="text-container">
                   <h2>TypeScript</h2>
