@@ -12,12 +12,16 @@ import { useState } from "react";
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset;
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -44,7 +48,10 @@ const Details = () => {
             {/* == First Item == */}
             <div className="item">
               <div className="image-container">
-                <Image src={TwitterImage} alt="Twitter (X) Marketing Professional" />
+                <Image
+                  src={TwitterImage}
+                  alt="Twitter (X) Marketing Professional"
+                />
               </div>
 
               <div className="concept-container">
@@ -77,17 +84,52 @@ const Details = () => {
                   >
                     <div className="concept-data">
                       <h3>🐦 Twitter (X) Marketing Professional</h3>
-                      <p>This professional course teaches strategic Twitter (X) marketing for real-time engagement, brand awareness, and customer conversion. Learn to leverage Twitter's unique conversational platform for maximum business impact.</p>
-                      <div className="data-item">📌 1: Twitter/X Platform Fundamentals - Algorithm, Features, Platform updates</div>
-                      <div className="data-item">📌 2: Profile Optimization & Branding - Bio optimization, Visual identity, Verification</div>
-                      <div className="data-item">📌 3: Content Strategy for Twitter - Tweet types, Threads, Media, Spaces</div>
-                      <div className="data-item">📌 4: Twitter Ads & Promoted Content - Campaign setup, Audience targeting, Budget optimization</div>
-                      <div className="data-item">📌 5: Hashtag & Viral Strategies - Trending topics, Hashtag research, Viral campaigns</div>
-                      <div className="data-item">📌 6: Analytics & Performance Measurement - Tweet analytics, Campaign metrics, ROI tracking</div>
-                      <div className="data-item">📌 7: Community Building & Engagement - Follower growth, Engagement tactics, Customer service</div>
-                      <div className="data-item">📌 8: Crisis Management & PR - Reputation management, Crisis communication, Brand safety</div>
-                      <div className="data-item">📌 9: Influencer Partnerships - Identifying influencers, Collaboration strategies</div>
-                      <div className="data-item">📌 10: Capstone Project - Complete Twitter marketing strategy development</div>
+                      <p>
+                        This professional course teaches strategic Twitter (X)
+                        marketing for real-time engagement, brand awareness, and
+                        customer conversion. Learn to leverage Twitter's unique
+                        conversational platform for maximum business impact.
+                      </p>
+                      <div className="data-item">
+                        📌 1: Twitter/X Platform Fundamentals - Algorithm,
+                        Features, Platform updates
+                      </div>
+                      <div className="data-item">
+                        📌 2: Profile Optimization & Branding - Bio
+                        optimization, Visual identity, Verification
+                      </div>
+                      <div className="data-item">
+                        📌 3: Content Strategy for Twitter - Tweet types,
+                        Threads, Media, Spaces
+                      </div>
+                      <div className="data-item">
+                        📌 4: Twitter Ads & Promoted Content - Campaign setup,
+                        Audience targeting, Budget optimization
+                      </div>
+                      <div className="data-item">
+                        📌 5: Hashtag & Viral Strategies - Trending topics,
+                        Hashtag research, Viral campaigns
+                      </div>
+                      <div className="data-item">
+                        📌 6: Analytics & Performance Measurement - Tweet
+                        analytics, Campaign metrics, ROI tracking
+                      </div>
+                      <div className="data-item">
+                        📌 7: Community Building & Engagement - Follower growth,
+                        Engagement tactics, Customer service
+                      </div>
+                      <div className="data-item">
+                        📌 8: Crisis Management & PR - Reputation management,
+                        Crisis communication, Brand safety
+                      </div>
+                      <div className="data-item">
+                        📌 9: Influencer Partnerships - Identifying influencers,
+                        Collaboration strategies
+                      </div>
+                      <div className="data-item">
+                        📌 10: Capstone Project - Complete Twitter marketing
+                        strategy development
+                      </div>
                     </div>
                   </div>
                   <div
@@ -100,7 +142,11 @@ const Details = () => {
                             <i className="fas fa-info-circle"></i> Course
                             Description:
                           </strong>{" "}
-                          This professional course teaches strategic Twitter (X) marketing for real-time engagement, brand awareness, and customer conversion. Learn to leverage Twitter's unique conversational platform for maximum business impact.
+                          This professional course teaches strategic Twitter (X)
+                          marketing for real-time engagement, brand awareness,
+                          and customer conversion. Learn to leverage Twitter's
+                          unique conversational platform for maximum business
+                          impact.
                         </p>
 
                         <p>
@@ -108,37 +154,76 @@ const Details = () => {
                             <i className="fas fa-user-graduate"></i> Course
                             Prerequisites:
                           </strong>{" "}
-                          Basic digital literacy and Twitter account. Marketing/social media experience helpful but not required.
+                          Basic digital literacy and Twitter account.
+                          Marketing/social media experience helpful but not
+                          required.
                         </p>
                       </div>
 
                       <h4>🎯 Learning Objectives:</h4>
                       <ul>
-                        <li>✅ Optimize Twitter profiles for business objectives and brand visibility</li>
-                        <li>✅ Develop engaging content strategies across different tweet formats</li>
-                        <li>✅ Run effective Twitter ad campaigns with precise targeting</li>
-                        <li>✅ Implement viral growth techniques using hashtags and trends</li>
-                        <li>✅ Analyze and improve performance metrics using Twitter Analytics</li>
-                        <li>✅ Build active brand communities through strategic engagement</li>
-                        <li>✅ Handle PR and crisis situations effectively on social media</li>
+                        <li>
+                          ✅ Optimize Twitter profiles for business objectives
+                          and brand visibility
+                        </li>
+                        <li>
+                          ✅ Develop engaging content strategies across
+                          different tweet formats
+                        </li>
+                        <li>
+                          ✅ Run effective Twitter ad campaigns with precise
+                          targeting
+                        </li>
+                        <li>
+                          ✅ Implement viral growth techniques using hashtags
+                          and trends
+                        </li>
+                        <li>
+                          ✅ Analyze and improve performance metrics using
+                          Twitter Analytics
+                        </li>
+                        <li>
+                          ✅ Build active brand communities through strategic
+                          engagement
+                        </li>
+                        <li>
+                          ✅ Handle PR and crisis situations effectively on
+                          social media
+                        </li>
                         <li>✅ Leverage Twitter Spaces for audio engagement</li>
                         <li>✅ Develop influencer partnership strategies</li>
-                        <li>✅ Prepare for Twitter Flight School Certification</li>
+                        <li>
+                          ✅ Prepare for Twitter Flight School Certification
+                        </li>
                       </ul>
 
                       <h4>🔥 What You'll Build:</h4>
                       <ul>
-                        <li>📊 Complete Twitter content calendar and posting strategy</li>
-                        <li>📈 Optimized profile with brand-consistent visual identity</li>
-                        <li>🎯 Targeted ad campaign structure for specific objectives</li>
+                        <li>
+                          📊 Complete Twitter content calendar and posting
+                          strategy
+                        </li>
+                        <li>
+                          📈 Optimized profile with brand-consistent visual
+                          identity
+                        </li>
+                        <li>
+                          🎯 Targeted ad campaign structure for specific
+                          objectives
+                        </li>
                         <li>📉 Hashtag strategy for increased visibility</li>
-                        <li>🤝 Community engagement plan for follower growth</li>
-                        <li>🚨 Crisis communication framework for brand protection</li>
+                        <li>
+                          🤝 Community engagement plan for follower growth
+                        </li>
+                        <li>
+                          🚨 Crisis communication framework for brand protection
+                        </li>
                       </ul>
 
                       <h4>Course Structure:</h4>
                       <p>
-                        This 10-module intensive program combines theory with hands-on application:
+                        This 10-module intensive program combines theory with
+                        hands-on application:
                       </p>
                       <ul>
                         <li>Module 1: Twitter Platform Mastery</li>
@@ -155,12 +240,16 @@ const Details = () => {
 
                       <h4>Course Delivery:</h4>
                       <p>
-                        Instructor-led training with live Twitter demonstrations and real campaign management exercises. Includes access to Twitter marketing tools and resources.
+                        Instructor-led training with live Twitter demonstrations
+                        and real campaign management exercises. Includes access
+                        to Twitter marketing tools and resources.
                       </p>
 
                       <h4>Certification:</h4>
                       <p>
-                        Prepares for Twitter Flight School Certification and Hootsuite Social Marketing Certification. Includes practice tests and exam preparation materials.
+                        Prepares for Twitter Flight School Certification and
+                        Hootsuite Social Marketing Certification. Includes
+                        practice tests and exam preparation materials.
                       </p>
                     </div>
                   </div>
@@ -170,30 +259,44 @@ const Details = () => {
                   >
                     <div className="Roles-container">
                       <h3>💼 Career Opportunities</h3>
-                      <p>
-                        Graduates qualify for these professional roles:
-                      </p>
+                      <p>Graduates qualify for these professional roles:</p>
                       <ul>
                         <li>
-                          🔹 <strong>Twitter Community Manager:</strong> Manage brand presence on Twitter. Average salary: $45,000 - $68,000
+                          🔹 <strong>Twitter Community Manager:</strong> Manage
+                          brand presence on Twitter. Average salary: $45,000 -
+                          $68,000
                         </li>
                         <li>
-                          🔹 <strong>Social Media Strategist:</strong> Specialize in Twitter marketing. Average salary: $50,000 - $75,000
+                          🔹 <strong>Social Media Strategist:</strong>{" "}
+                          Specialize in Twitter marketing. Average salary:
+                          $50,000 - $75,000
                         </li>
                         <li>
-                          🔹 <strong>Digital PR Specialist:</strong> Handle public communications. Average salary: $48,000 - $72,000
+                          🔹 <strong>Digital PR Specialist:</strong> Handle
+                          public communications. Average salary: $48,000 -
+                          $72,000
                         </li>
                         <li>
-                          🔹 <strong>Content Creator:</strong> Develop Twitter-first content strategies. Average salary: $42,000 - $65,000
+                          🔹 <strong>Content Creator:</strong> Develop
+                          Twitter-first content strategies. Average salary:
+                          $42,000 - $65,000
                         </li>
                         <li>
-                          🔹 <strong>Freelance Twitter Consultant:</strong> Offer specialized services. Average income: $40,000 - $70,000
+                          🔹 <strong>Freelance Twitter Consultant:</strong>{" "}
+                          Offer specialized services. Average income: $40,000 -
+                          $70,000
                         </li>
                         <li>
-                          🔹 <strong>Crisis Communications Manager:</strong> Handle brand reputation. Average salary: $55,000 - $82,000
+                          🔹 <strong>Crisis Communications Manager:</strong>{" "}
+                          Handle brand reputation. Average salary: $55,000 -
+                          $82,000
                         </li>
                       </ul>
-                      <p>Twitter marketing expertise is valuable for brands needing real-time customer engagement and crisis management capabilities.</p>
+                      <p>
+                        Twitter marketing expertise is valuable for brands
+                        needing real-time customer engagement and crisis
+                        management capabilities.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -204,7 +307,11 @@ const Details = () => {
               <div className="text">
                 <h1>Twitter (X) Marketing Professional</h1>
                 <p>
-                  Master real-time marketing on one of the world's most influential social platforms. This course teaches strategic Twitter marketing for brand awareness, customer engagement, and business growth through hands-on training with Twitter's tools and features.
+                  Master real-time marketing on one of the world's most
+                  influential social platforms. This course teaches strategic
+                  Twitter marketing for brand awareness, customer engagement,
+                  and business growth through hands-on training with Twitter's
+                  tools and features.
                 </p>
               </div>
 
@@ -216,7 +323,10 @@ const Details = () => {
                   Certification
                 </h4>
                 <p>
-                  Earn preparation for Twitter Flight School Certification and Hootsuite Social Marketing Certification - industry-recognized credentials that validate your expertise in real-time social media marketing.
+                  Earn preparation for Twitter Flight School Certification and
+                  Hootsuite Social Marketing Certification - industry-recognized
+                  credentials that validate your expertise in real-time social
+                  media marketing.
                 </p>
               </div>
               <div className="text">
@@ -227,7 +337,8 @@ const Details = () => {
                   Duration
                 </h4>
                 <p>
-                  6-week program with 30 instructor-led hours and 40+ practical exercise hours, including real campaign management.
+                  6-week program with 30 instructor-led hours and 40+ practical
+                  exercise hours, including real campaign management.
                 </p>
               </div>
               <div className="text">
@@ -256,7 +367,8 @@ const Details = () => {
                       <span className="material-symbols-outlined">
                         done_all
                       </span>
-                      Develop real-time engagement and customer service strategies
+                      Develop real-time engagement and customer service
+                      strategies
                     </li>
                     <li>
                       <span className="material-symbols-outlined">
@@ -281,7 +393,10 @@ const Details = () => {
                   Tools Covered
                 </h4>
                 <p>
-                  Twitter Ads Manager, Twitter Analytics, TweetDeck, Twitter Spaces, Twitter Lists, Promoted Tweets, Promoted Trends, and third-party management tools like Hootsuite, Buffer, and Sprout Social.
+                  Twitter Ads Manager, Twitter Analytics, TweetDeck, Twitter
+                  Spaces, Twitter Lists, Promoted Tweets, Promoted Trends, and
+                  third-party management tools like Hootsuite, Buffer, and
+                  Sprout Social.
                 </p>
               </div>
             </div>
@@ -295,7 +410,8 @@ const Details = () => {
               <div className="course-info">
                 <h4>Course Information</h4>
                 <p>
-                  Course fee: Ghc 4,800 payable as Ghc 1,900 initial deposit and Ghc 1,450 monthly installments.
+                  Course fee: Ghc 4,800 payable as Ghc 1,900 initial deposit and
+                  Ghc 1,450 monthly installments.
                 </p>
 
                 <div className="info-text">
@@ -327,7 +443,9 @@ const Details = () => {
                     </span>
                   </div>
                   <p>
-                    <b>Requirements:</b> Active Twitter account and basic understanding of social media. Ad credits included for practical campaigns.
+                    <b>Requirements:</b> Active Twitter account and basic
+                    understanding of social media. Ad credits included for
+                    practical campaigns.
                   </p>
                 </div>
 
@@ -349,7 +467,8 @@ const Details = () => {
                     </span>
                   </div>
                   <p>
-                    <b>Times:</b> 9AM-12PM or 2PM-5PM (choose your preferred batch)
+                    <b>Times:</b> 9AM-12PM or 2PM-5PM (choose your preferred
+                    batch)
                   </p>
                 </div>
 
@@ -368,13 +487,17 @@ const Details = () => {
               <div className="course-info">
                 <h4>Course Policies</h4>
                 <p>
-                  <strong>Non-refundable policy:</strong> Payments are final once made. Students are expected to review course details carefully before enrollment.
+                  <strong>Non-refundable policy:</strong> Payments are final
+                  once made. Students are expected to review course details
+                  carefully before enrollment.
                 </p>
                 <p>
-                  <strong>Rescheduling:</strong> We may reschedule with advance notice to participants in case of unforeseen circumstances.
+                  <strong>Rescheduling:</strong> We may reschedule with advance
+                  notice to participants in case of unforeseen circumstances.
                 </p>
                 <p>
-                  <strong>Minimum enrollment:</strong> 5 students required to commence class.
+                  <strong>Minimum enrollment:</strong> 5 students required to
+                  commence class.
                 </p>
               </div>
             </div>

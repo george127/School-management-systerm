@@ -12,12 +12,16 @@ import { useState } from "react";
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset;
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -44,7 +48,10 @@ const Details = () => {
             {/* == First Item == */}
             <div className="item">
               <div className="image-container">
-                <Image src={DevOpsImage} alt="Designing and Implementing Microsoft DevOps Solutions" />
+                <Image
+                  src={DevOpsImage}
+                  alt="Designing and Implementing Microsoft DevOps Solutions"
+                />
               </div>
 
               <div className="concept-container">
@@ -76,18 +83,58 @@ const Details = () => {
                     className={`content ${activeContent === 1 ? "show" : ""}`}
                   >
                     <div className="concept-data">
-                      <h3>⚙️ Designing and Implementing Microsoft DevOps Solutions (AZ-400)</h3>
-                      <p>This comprehensive course teaches you how to design and implement DevOps practices using Microsoft tools and services. You'll learn to implement continuous integration, continuous delivery, infrastructure as code, and application monitoring using Azure DevOps, GitHub Actions, and related technologies.</p>
-                      <div className="data-item">📌 1: DevOps Principles and Practices - Culture, Collaboration, Automation, Measurement</div>
-                      <div className="data-item">📌 2: Azure DevOps and GitHub Ecosystem - Boards, Repos, Pipelines, Actions, Packages</div>
-                      <div className="data-item">📌 3: Source Control with Git - Branching strategies, Pull requests, Code reviews</div>
-                      <div className="data-item">📌 4: CI/CD Pipelines Implementation - Build pipelines, Release pipelines, Multi-stage YAML</div>
-                      <div className="data-item">📌 5: Infrastructure as Code (IaC) - ARM templates, Bicep, Terraform</div>
-                      <div className="data-item">📌 6: Configuration Management - Ansible, PowerShell DSC, Azure Automation</div>
-                      <div className="data-item">📌 7: Monitoring and Feedback Systems - Azure Monitor, Application Insights, Dashboards</div>
-                      <div className="data-item">📌 8: Security and Compliance in DevOps - DevSecOps, Secret management, Policy as Code</div>
-                      <div className="data-item">📌 9: Containerization and Orchestration - Docker, Kubernetes, AKS</div>
-                      <div className="data-item">📌 10: Capstone Project and AZ-400 Certification Preparation</div>
+                      <h3>
+                        ⚙️ Designing and Implementing Microsoft DevOps Solutions
+                        (AZ-400)
+                      </h3>
+                      <p>
+                        This comprehensive course teaches you how to design and
+                        implement DevOps practices using Microsoft tools and
+                        services. You'll learn to implement continuous
+                        integration, continuous delivery, infrastructure as
+                        code, and application monitoring using Azure DevOps,
+                        GitHub Actions, and related technologies.
+                      </p>
+                      <div className="data-item">
+                        📌 1: DevOps Principles and Practices - Culture,
+                        Collaboration, Automation, Measurement
+                      </div>
+                      <div className="data-item">
+                        📌 2: Azure DevOps and GitHub Ecosystem - Boards, Repos,
+                        Pipelines, Actions, Packages
+                      </div>
+                      <div className="data-item">
+                        📌 3: Source Control with Git - Branching strategies,
+                        Pull requests, Code reviews
+                      </div>
+                      <div className="data-item">
+                        📌 4: CI/CD Pipelines Implementation - Build pipelines,
+                        Release pipelines, Multi-stage YAML
+                      </div>
+                      <div className="data-item">
+                        📌 5: Infrastructure as Code (IaC) - ARM templates,
+                        Bicep, Terraform
+                      </div>
+                      <div className="data-item">
+                        📌 6: Configuration Management - Ansible, PowerShell
+                        DSC, Azure Automation
+                      </div>
+                      <div className="data-item">
+                        📌 7: Monitoring and Feedback Systems - Azure Monitor,
+                        Application Insights, Dashboards
+                      </div>
+                      <div className="data-item">
+                        📌 8: Security and Compliance in DevOps - DevSecOps,
+                        Secret management, Policy as Code
+                      </div>
+                      <div className="data-item">
+                        📌 9: Containerization and Orchestration - Docker,
+                        Kubernetes, AKS
+                      </div>
+                      <div className="data-item">
+                        📌 10: Capstone Project and AZ-400 Certification
+                        Preparation
+                      </div>
                     </div>
                   </div>
                   <div
@@ -100,7 +147,12 @@ const Details = () => {
                             <i className="fas fa-info-circle"></i> Course
                             Description:
                           </strong>{" "}
-                          This comprehensive course teaches you how to design and implement DevOps practices using Microsoft tools and services. You'll learn to implement continuous integration, continuous delivery, infrastructure as code, and application monitoring using Azure DevOps, GitHub Actions, and related technologies.
+                          This comprehensive course teaches you how to design
+                          and implement DevOps practices using Microsoft tools
+                          and services. You'll learn to implement continuous
+                          integration, continuous delivery, infrastructure as
+                          code, and application monitoring using Azure DevOps,
+                          GitHub Actions, and related technologies.
                         </p>
 
                         <p>
@@ -108,38 +160,84 @@ const Details = () => {
                             <i className="fas fa-user-graduate"></i> Course
                             Prerequisites:
                           </strong>{" "}
-                          Basic understanding of software development and IT operations. Familiarity with Azure and version control concepts is helpful but not required.
+                          Basic understanding of software development and IT
+                          operations. Familiarity with Azure and version control
+                          concepts is helpful but not required.
                         </p>
                       </div>
 
                       <h4>🎯 Learning Objectives:</h4>
                       <ul>
-                        <li>✅ Implement DevOps development processes with Azure Boards and GitHub Projects</li>
-                        <li>✅ Design and implement CI/CD pipelines using Azure Pipelines and GitHub Actions</li>
-                        <li>✅ Manage source control with Git including branching strategies and pull requests</li>
-                        <li>✅ Implement infrastructure as code (IaC) using ARM, Bicep, and Terraform</li>
-                        <li>✅ Design and implement dependency management with Azure Artifacts</li>
-                        <li>✅ Implement continuous feedback systems with Azure Monitor and Application Insights</li>
-                        <li>✅ Integrate security and compliance into DevOps workflows (DevSecOps)</li>
-                        <li>✅ Implement containerization strategies with Docker and Kubernetes</li>
-                        <li>✅ Automate configuration management using various tools</li>
-                        <li>✅ Prepare for Microsoft's AZ-400 certification exam</li>
+                        <li>
+                          ✅ Implement DevOps development processes with Azure
+                          Boards and GitHub Projects
+                        </li>
+                        <li>
+                          ✅ Design and implement CI/CD pipelines using Azure
+                          Pipelines and GitHub Actions
+                        </li>
+                        <li>
+                          ✅ Manage source control with Git including branching
+                          strategies and pull requests
+                        </li>
+                        <li>
+                          ✅ Implement infrastructure as code (IaC) using ARM,
+                          Bicep, and Terraform
+                        </li>
+                        <li>
+                          ✅ Design and implement dependency management with
+                          Azure Artifacts
+                        </li>
+                        <li>
+                          ✅ Implement continuous feedback systems with Azure
+                          Monitor and Application Insights
+                        </li>
+                        <li>
+                          ✅ Integrate security and compliance into DevOps
+                          workflows (DevSecOps)
+                        </li>
+                        <li>
+                          ✅ Implement containerization strategies with Docker
+                          and Kubernetes
+                        </li>
+                        <li>
+                          ✅ Automate configuration management using various
+                          tools
+                        </li>
+                        <li>
+                          ✅ Prepare for Microsoft's AZ-400 certification exam
+                        </li>
                       </ul>
 
                       <h4>🔥 What You'll Build:</h4>
                       <ul>
-                        <li>🔄 Complete CI/CD pipeline with Azure Pipelines and multi-stage YAML</li>
-                        <li>🏗️ Infrastructure as Code deployment using Bicep and Terraform</li>
-                        <li>📊 Monitoring solution with Application Insights and dashboards</li>
+                        <li>
+                          🔄 Complete CI/CD pipeline with Azure Pipelines and
+                          multi-stage YAML
+                        </li>
+                        <li>
+                          🏗️ Infrastructure as Code deployment using Bicep and
+                          Terraform
+                        </li>
+                        <li>
+                          📊 Monitoring solution with Application Insights and
+                          dashboards
+                        </li>
                         <li>🐳 Containerized application deployment to AKS</li>
-                        <li>🔐 DevSecOps pipeline with integrated security scanning</li>
-                        <li>📋 Automated configuration management with PowerShell DSC</li>
+                        <li>
+                          🔐 DevSecOps pipeline with integrated security
+                          scanning
+                        </li>
+                        <li>
+                          📋 Automated configuration management with PowerShell
+                          DSC
+                        </li>
                       </ul>
 
                       <h4>Course Structure:</h4>
                       <p>
-                        This 10-module course combines theoretical knowledge with
-                        hands-on labs using Azure DevOps and GitHub:
+                        This 10-module course combines theoretical knowledge
+                        with hands-on labs using Azure DevOps and GitHub:
                       </p>
                       <ul>
                         <li>Module 1: DevOps Principles and Practices</li>
@@ -156,12 +254,16 @@ const Details = () => {
 
                       <h4>Course Delivery:</h4>
                       <p>
-                        Instructor-led training with hands-on labs using Azure DevOps and GitHub. Includes access to Azure resources for practical exercises.
+                        Instructor-led training with hands-on labs using Azure
+                        DevOps and GitHub. Includes access to Azure resources
+                        for practical exercises.
                       </p>
 
                       <h4>Certification:</h4>
                       <p>
-                        Course prepares you for Microsoft Certified: DevOps Engineer Expert (AZ-400) exam. Includes one free exam attempt voucher and practice tests.
+                        Course prepares you for Microsoft Certified: DevOps
+                        Engineer Expert (AZ-400) exam. Includes one free exam
+                        attempt voucher and practice tests.
                       </p>
                     </div>
                   </div>
@@ -177,25 +279,41 @@ const Details = () => {
                       </p>
                       <ul>
                         <li>
-                          🔹 <strong>DevOps Engineer:</strong> Implement and manage CI/CD pipelines and infrastructure. Average salary: $110,000 - $155,000
+                          🔹 <strong>DevOps Engineer:</strong> Implement and
+                          manage CI/CD pipelines and infrastructure. Average
+                          salary: $110,000 - $155,000
                         </li>
                         <li>
-                          🔹 <strong>Cloud DevOps Specialist:</strong> Automate cloud deployments and operations. Average salary: $115,000 - $160,000
+                          🔹 <strong>Cloud DevOps Specialist:</strong> Automate
+                          cloud deployments and operations. Average salary:
+                          $115,000 - $160,000
                         </li>
                         <li>
-                          🔹 <strong>Release Manager:</strong> Oversee software releases and deployment processes. Average salary: $105,000 - $145,000
+                          🔹 <strong>Release Manager:</strong> Oversee software
+                          releases and deployment processes. Average salary:
+                          $105,000 - $145,000
                         </li>
                         <li>
-                          🔹 <strong>Site Reliability Engineer (SRE):</strong> Ensure system reliability and performance. Average salary: $120,000 - $165,000
+                          🔹 <strong>Site Reliability Engineer (SRE):</strong>{" "}
+                          Ensure system reliability and performance. Average
+                          salary: $120,000 - $165,000
                         </li>
                         <li>
-                          🔹 <strong>Automation Architect:</strong> Design automation solutions for development workflows. Average salary: $125,000 - $170,000
+                          🔹 <strong>Automation Architect:</strong> Design
+                          automation solutions for development workflows.
+                          Average salary: $125,000 - $170,000
                         </li>
                         <li>
-                          🔹 <strong>DevSecOps Engineer:</strong> Integrate security into DevOps pipelines. Average salary: $118,000 - $162,000
+                          🔹 <strong>DevSecOps Engineer:</strong> Integrate
+                          security into DevOps pipelines. Average salary:
+                          $118,000 - $162,000
                         </li>
                       </ul>
-                      <p>DevOps professionals are in extremely high demand as organizations accelerate their software delivery capabilities.</p>
+                      <p>
+                        DevOps professionals are in extremely high demand as
+                        organizations accelerate their software delivery
+                        capabilities.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -204,9 +322,17 @@ const Details = () => {
             {/* == Second Item */}
             <div className="item">
               <div className="text">
-                <h1>Designing and Implementing Microsoft DevOps Solutions (AZ-400)</h1>
+                <h1>
+                  Designing and Implementing Microsoft DevOps Solutions (AZ-400)
+                </h1>
                 <p>
-                  Master the skills to design and implement comprehensive DevOps solutions using Microsoft technologies. This expert-level course covers all aspects of DevOps implementation including CI/CD pipelines, infrastructure as code, configuration management, and monitoring. You'll gain hands-on experience with Azure DevOps and GitHub while preparing for the AZ-400 certification exam.
+                  Master the skills to design and implement comprehensive DevOps
+                  solutions using Microsoft technologies. This expert-level
+                  course covers all aspects of DevOps implementation including
+                  CI/CD pipelines, infrastructure as code, configuration
+                  management, and monitoring. You'll gain hands-on experience
+                  with Azure DevOps and GitHub while preparing for the AZ-400
+                  certification exam.
                 </p>
               </div>
 
@@ -218,7 +344,12 @@ const Details = () => {
                   Certification
                 </h4>
                 <p>
-                  This course prepares you for the Microsoft Certified: DevOps Engineer Expert certification (AZ-400). The certification validates your ability to combine people, processes, and technologies to continuously deliver valuable products and services. This is a highly respected certification in the DevOps community.
+                  This course prepares you for the Microsoft Certified: DevOps
+                  Engineer Expert certification (AZ-400). The certification
+                  validates your ability to combine people, processes, and
+                  technologies to continuously deliver valuable products and
+                  services. This is a highly respected certification in the
+                  DevOps community.
                 </p>
               </div>
               <div className="text">
@@ -229,7 +360,9 @@ const Details = () => {
                   Duration
                 </h4>
                 <p>
-                  The course is 10 weeks long, with 60 hours of instructor-led training and 80+ hours of hands-on labs and projects. Includes access to Azure DevOps and GitHub resources.
+                  The course is 10 weeks long, with 60 hours of instructor-led
+                  training and 80+ hours of hands-on labs and projects. Includes
+                  access to Azure DevOps and GitHub resources.
                 </p>
               </div>
               <div className="text">
@@ -283,7 +416,14 @@ const Details = () => {
                   Technologies Covered
                 </h4>
                 <p>
-                  Azure DevOps (Boards, Repos, Pipelines, Test Plans, Artifacts), GitHub (Actions, Projects, Advanced Security), Git (Branching, Merging, Pull Requests), Azure Pipelines (YAML, Classic), Infrastructure as Code (ARM templates, Bicep, Terraform), Configuration Management (Ansible, PowerShell DSC, Azure Automation), Containerization (Docker, AKS), Monitoring (Azure Monitor, Application Insights), and Security (Azure Security Center, Key Vault).
+                  Azure DevOps (Boards, Repos, Pipelines, Test Plans,
+                  Artifacts), GitHub (Actions, Projects, Advanced Security), Git
+                  (Branching, Merging, Pull Requests), Azure Pipelines (YAML,
+                  Classic), Infrastructure as Code (ARM templates, Bicep,
+                  Terraform), Configuration Management (Ansible, PowerShell DSC,
+                  Azure Automation), Containerization (Docker, AKS), Monitoring
+                  (Azure Monitor, Application Insights), and Security (Azure
+                  Security Center, Key Vault).
                 </p>
               </div>
             </div>
@@ -334,7 +474,9 @@ const Details = () => {
                   </div>
                   <p>
                     <b>Additional Notes:</b> Students will receive access to
-                    Azure DevOps and GitHub for hands-on labs. Basic programming knowledge is recommended. Includes Azure credits for practice.
+                    Azure DevOps and GitHub for hands-on labs. Basic programming
+                    knowledge is recommended. Includes Azure credits for
+                    practice.
                   </p>
                 </div>
 

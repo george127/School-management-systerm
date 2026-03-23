@@ -12,12 +12,16 @@ import { useState } from "react";
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset;
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -44,7 +48,10 @@ const Details = () => {
             {/* == First Item == */}
             <div className="item">
               <div className="image-container">
-                <Image src={DataEngineerImage} alt="Data Engineering on Microsoft Azure" />
+                <Image
+                  src={DataEngineerImage}
+                  alt="Data Engineering on Microsoft Azure"
+                />
               </div>
 
               <div className="concept-container">
@@ -76,18 +83,56 @@ const Details = () => {
                     className={`content ${activeContent === 1 ? "show" : ""}`}
                   >
                     <div className="concept-data">
-                      <h3>📊 Microsoft Azure Data Engineer Associate (DP-203)</h3>
-                      <p>This comprehensive course prepares you for a career in cloud-based data engineering using Microsoft Azure. You'll learn to design and implement data storage, data processing, and data security solutions using Azure services.</p>
-                      <div className="data-item">📌 1: Introduction to Azure Data Engineering - Data platforms, Modern Data Warehouse, Data Lakes</div>
-                      <div className="data-item">📌 2: Azure Data Storage Solutions - Blob Storage, Data Lake Storage, Cosmos DB</div>
-                      <div className="data-item">📌 3: Azure Data Factory and Data Pipelines - ETL/ELT, Integration Runtime, Data Flows</div>
-                      <div className="data-item">📌 4: Azure Databricks for Big Data Processing - Spark, Notebooks, Delta Lake</div>
-                      <div className="data-item">📌 5: Azure Synapse Analytics - Dedicated SQL Pools, Serverless SQL, Data Integration</div>
-                      <div className="data-item">📌 6: Data Security and Compliance in Azure - Encryption, RBAC, Private Links, Purview</div>
-                      <div className="data-item">📌 7: Monitoring and Optimizing Data Solutions - Performance Tuning, Cost Management</div>
-                      <div className="data-item">📌 8: Real-time Data Processing - Stream Analytics, Event Hubs, IoT Hub</div>
-                      <div className="data-item">📌 9: Data Orchestration and Scheduling - Azure Data Factory Triggers, Logic Apps</div>
-                      <div className="data-item">📌 10: Capstone Project and DP-203 Certification Preparation</div>
+                      <h3>
+                        📊 Microsoft Azure Data Engineer Associate (DP-203)
+                      </h3>
+                      <p>
+                        This comprehensive course prepares you for a career in
+                        cloud-based data engineering using Microsoft Azure.
+                        You'll learn to design and implement data storage, data
+                        processing, and data security solutions using Azure
+                        services.
+                      </p>
+                      <div className="data-item">
+                        📌 1: Introduction to Azure Data Engineering - Data
+                        platforms, Modern Data Warehouse, Data Lakes
+                      </div>
+                      <div className="data-item">
+                        📌 2: Azure Data Storage Solutions - Blob Storage, Data
+                        Lake Storage, Cosmos DB
+                      </div>
+                      <div className="data-item">
+                        📌 3: Azure Data Factory and Data Pipelines - ETL/ELT,
+                        Integration Runtime, Data Flows
+                      </div>
+                      <div className="data-item">
+                        📌 4: Azure Databricks for Big Data Processing - Spark,
+                        Notebooks, Delta Lake
+                      </div>
+                      <div className="data-item">
+                        📌 5: Azure Synapse Analytics - Dedicated SQL Pools,
+                        Serverless SQL, Data Integration
+                      </div>
+                      <div className="data-item">
+                        📌 6: Data Security and Compliance in Azure -
+                        Encryption, RBAC, Private Links, Purview
+                      </div>
+                      <div className="data-item">
+                        📌 7: Monitoring and Optimizing Data Solutions -
+                        Performance Tuning, Cost Management
+                      </div>
+                      <div className="data-item">
+                        📌 8: Real-time Data Processing - Stream Analytics,
+                        Event Hubs, IoT Hub
+                      </div>
+                      <div className="data-item">
+                        📌 9: Data Orchestration and Scheduling - Azure Data
+                        Factory Triggers, Logic Apps
+                      </div>
+                      <div className="data-item">
+                        📌 10: Capstone Project and DP-203 Certification
+                        Preparation
+                      </div>
                     </div>
                   </div>
                   <div
@@ -101,11 +146,11 @@ const Details = () => {
                             Description:
                           </strong>{" "}
                           This comprehensive course prepares you for a career in
-                          cloud-based data engineering using Microsoft Azure. You'll
-                          learn to design and implement data storage, data
-                          processing, and data security solutions using Azure
-                          services like Azure Data Factory, Azure Databricks,
-                          Azure Synapse Analytics, and more.
+                          cloud-based data engineering using Microsoft Azure.
+                          You'll learn to design and implement data storage,
+                          data processing, and data security solutions using
+                          Azure services like Azure Data Factory, Azure
+                          Databricks, Azure Synapse Analytics, and more.
                         </p>
 
                         <p>
@@ -114,42 +159,78 @@ const Details = () => {
                             Prerequisites:
                           </strong>{" "}
                           Basic understanding of databases and data processing
-                          concepts. Familiarity with cloud concepts is helpful but
-                          not required.
+                          concepts. Familiarity with cloud concepts is helpful
+                          but not required.
                         </p>
                       </div>
 
                       <h4>🎯 Learning Objectives:</h4>
                       <ul>
-                        <li>✅ Design and implement data storage solutions on Azure</li>
-                        <li>✅ Create and manage data pipelines using Azure Data Factory</li>
-                        <li>✅ Process big data using Azure Databricks and Spark</li>
-                        <li>✅ Implement data warehousing with Azure Synapse Analytics</li>
-                        <li>✅ Apply data security, compliance, and privacy protections</li>
-                        <li>✅ Monitor and optimize data storage and processing</li>
+                        <li>
+                          ✅ Design and implement data storage solutions on
+                          Azure
+                        </li>
+                        <li>
+                          ✅ Create and manage data pipelines using Azure Data
+                          Factory
+                        </li>
+                        <li>
+                          ✅ Process big data using Azure Databricks and Spark
+                        </li>
+                        <li>
+                          ✅ Implement data warehousing with Azure Synapse
+                          Analytics
+                        </li>
+                        <li>
+                          ✅ Apply data security, compliance, and privacy
+                          protections
+                        </li>
+                        <li>
+                          ✅ Monitor and optimize data storage and processing
+                        </li>
                         <li>✅ Build real-time data processing solutions</li>
-                        <li>✅ Prepare for Microsoft's DP-203 certification exam</li>
+                        <li>
+                          ✅ Prepare for Microsoft's DP-203 certification exam
+                        </li>
                       </ul>
 
                       <h4>🔥 What You'll Build:</h4>
                       <ul>
-                        <li>📦 End-to-end data pipeline with Azure Data Factory and Databricks</li>
-                        <li>🏗️ Modern Data Warehouse architecture using Azure Synapse</li>
-                        <li>⚡ Real-time streaming solution with Event Hubs and Stream Analytics</li>
-                        <li>🔒 Secure data lake implementation with proper access controls</li>
-                        <li>📊 Data transformation and processing with Delta Lake</li>
+                        <li>
+                          📦 End-to-end data pipeline with Azure Data Factory
+                          and Databricks
+                        </li>
+                        <li>
+                          🏗️ Modern Data Warehouse architecture using Azure
+                          Synapse
+                        </li>
+                        <li>
+                          ⚡ Real-time streaming solution with Event Hubs and
+                          Stream Analytics
+                        </li>
+                        <li>
+                          🔒 Secure data lake implementation with proper access
+                          controls
+                        </li>
+                        <li>
+                          📊 Data transformation and processing with Delta Lake
+                        </li>
                       </ul>
 
                       <h4>Course Structure:</h4>
                       <p>
-                        This 10-module course combines theoretical knowledge with
-                        hands-on labs using real Azure services:
+                        This 10-module course combines theoretical knowledge
+                        with hands-on labs using real Azure services:
                       </p>
                       <ul>
                         <li>Module 1: Azure Data Engineering Fundamentals</li>
                         <li>Module 2: Azure Data Storage Solutions</li>
-                        <li>Module 3: Data Integration with Azure Data Factory</li>
-                        <li>Module 4: Big Data Processing with Azure Databricks</li>
+                        <li>
+                          Module 3: Data Integration with Azure Data Factory
+                        </li>
+                        <li>
+                          Module 4: Big Data Processing with Azure Databricks
+                        </li>
                         <li>Module 5: Data Warehousing with Azure Synapse</li>
                         <li>Module 6: Data Security and Compliance</li>
                         <li>Module 7: Monitoring and Optimization</li>
@@ -186,29 +267,39 @@ const Details = () => {
                       <ul>
                         <li>
                           🔹 <strong>Azure Data Engineer:</strong> Design and
-                          implement data solutions using Azure data services. Average salary: $95,000 - $135,000
+                          implement data solutions using Azure data services.
+                          Average salary: $95,000 - $135,000
                         </li>
                         <li>
-                          🔹 <strong>Cloud Data Architect:</strong> Plan and optimize
-                          cloud-based data infrastructure. Average salary: $120,000 - $160,000
+                          🔹 <strong>Cloud Data Architect:</strong> Plan and
+                          optimize cloud-based data infrastructure. Average
+                          salary: $120,000 - $160,000
                         </li>
                         <li>
-                          🔹 <strong>Big Data Engineer:</strong> Process and analyze
-                          large datasets using Azure Databricks and Synapse. Average salary: $100,000 - $145,000
+                          🔹 <strong>Big Data Engineer:</strong> Process and
+                          analyze large datasets using Azure Databricks and
+                          Synapse. Average salary: $100,000 - $145,000
                         </li>
                         <li>
-                          🔹 <strong>Data Integration Specialist:</strong> Build and
-                          maintain ETL/ELT pipelines with Azure Data Factory. Average salary: $85,000 - $120,000
+                          🔹 <strong>Data Integration Specialist:</strong> Build
+                          and maintain ETL/ELT pipelines with Azure Data
+                          Factory. Average salary: $85,000 - $120,000
                         </li>
                         <li>
-                          🔹 <strong>BI Developer:</strong> Create analytics solutions
-                          using Azure data services. Average salary: $80,000 - $115,000
+                          🔹 <strong>BI Developer:</strong> Create analytics
+                          solutions using Azure data services. Average salary:
+                          $80,000 - $115,000
                         </li>
                         <li>
-                          🔹 <strong>Analytics Engineer:</strong> Transform and model data for analytics. Average salary: $90,000 - $130,000
+                          🔹 <strong>Analytics Engineer:</strong> Transform and
+                          model data for analytics. Average salary: $90,000 -
+                          $130,000
                         </li>
                       </ul>
-                      <p>Data engineering is one of the fastest-growing roles in cloud computing with excellent career prospects.</p>
+                      <p>
+                        Data engineering is one of the fastest-growing roles in
+                        cloud computing with excellent career prospects.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -242,7 +333,8 @@ const Details = () => {
                   certification validates your ability to integrate, transform,
                   and consolidate data from various structured and unstructured
                   data systems into structures suitable for building analytics
-                  solutions. This is one of the most valuable certifications for data professionals.
+                  solutions. This is one of the most valuable certifications for
+                  data professionals.
                 </p>
               </div>
               <div className="text">
@@ -254,7 +346,8 @@ const Details = () => {
                 </h4>
                 <p>
                   The course is 12 weeks long, with 60 hours of instructor-led
-                  training and 80+ hours of hands-on labs and projects. Includes access to Azure credits for practice.
+                  training and 80+ hours of hands-on labs and projects. Includes
+                  access to Azure credits for practice.
                 </p>
               </div>
               <div className="text">
@@ -309,9 +402,9 @@ const Details = () => {
                 </h4>
                 <p>
                   Azure Data Factory, Azure Databricks, Azure Synapse Analytics,
-                  Azure Storage (Blob, Data Lake Gen2), Azure SQL Database, Cosmos DB,
-                  Azure Stream Analytics, Event Hubs, Azure Purview, Delta Lake,
-                  Apache Spark, and other Azure data services.
+                  Azure Storage (Blob, Data Lake Gen2), Azure SQL Database,
+                  Cosmos DB, Azure Stream Analytics, Event Hubs, Azure Purview,
+                  Delta Lake, Apache Spark, and other Azure data services.
                 </p>
               </div>
             </div>

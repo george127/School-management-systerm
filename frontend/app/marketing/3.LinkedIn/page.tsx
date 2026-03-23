@@ -7,17 +7,21 @@ import Footer from "../../components/footer/Footer";
 import Link from "next/link";
 import LinkedInImage from "../images/image3.png";
 import Image from "next/image";
-import { useState } from "react"; 
+import { useState } from "react";
 
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset;
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -44,7 +48,10 @@ const Details = () => {
             {/* == First Item == */}
             <div className="item">
               <div className="image-container">
-                <Image src={LinkedInImage} alt="LinkedIn Marketing Professional" />
+                <Image
+                  src={LinkedInImage}
+                  alt="LinkedIn Marketing Professional"
+                />
               </div>
 
               <div className="concept-container">
@@ -77,17 +84,53 @@ const Details = () => {
                   >
                     <div className="concept-data">
                       <h3>💼 LinkedIn Marketing Professional</h3>
-                      <p>This professional course teaches advanced LinkedIn marketing strategies for business growth, lead generation, and professional branding. You'll learn to leverage LinkedIn's unique professional network for maximum business impact.</p>
-                      <div className="data-item">📌 1: LinkedIn Platform Fundamentals - Algorithm, Features, Best Practices</div>
-                      <div className="data-item">📌 2: Profile Optimization for Business - Personal branding, Company pages, SEO optimization</div>
-                      <div className="data-item">📌 3: Content Strategy for Professionals - Long-form posts, Articles, Video content, Carousels</div>
-                      <div className="data-item">📌 4: LinkedIn Advertising & Sponsored Content - Campaign setup, Audience targeting, Budget optimization</div>
-                      <div className="data-item">📌 5: B2B Lead Generation Techniques - InMail strategies, Lead Gen Forms, Conversation ads</div>
-                      <div className="data-item">📌 6: LinkedIn Analytics & Performance Tracking - Campaign metrics, Audience insights, ROI measurement</div>
-                      <div className="data-item">📌 7: Networking & Relationship Building - Strategic connections, Engagement tactics, Group management</div>
-                      <div className="data-item">📌 8: Sales Navigator Mastery - Advanced search, Lead recommendations, Account targeting</div>
-                      <div className="data-item">📌 9: Company Page Management - Showcase pages, Employee advocacy, Content calendar</div>
-                      <div className="data-item">📌 10: Capstone Project - Complete LinkedIn marketing strategy development</div>
+                      <p>
+                        This professional course teaches advanced LinkedIn
+                        marketing strategies for business growth, lead
+                        generation, and professional branding. You'll learn to
+                        leverage LinkedIn's unique professional network for
+                        maximum business impact.
+                      </p>
+                      <div className="data-item">
+                        📌 1: LinkedIn Platform Fundamentals - Algorithm,
+                        Features, Best Practices
+                      </div>
+                      <div className="data-item">
+                        📌 2: Profile Optimization for Business - Personal
+                        branding, Company pages, SEO optimization
+                      </div>
+                      <div className="data-item">
+                        📌 3: Content Strategy for Professionals - Long-form
+                        posts, Articles, Video content, Carousels
+                      </div>
+                      <div className="data-item">
+                        📌 4: LinkedIn Advertising & Sponsored Content -
+                        Campaign setup, Audience targeting, Budget optimization
+                      </div>
+                      <div className="data-item">
+                        📌 5: B2B Lead Generation Techniques - InMail
+                        strategies, Lead Gen Forms, Conversation ads
+                      </div>
+                      <div className="data-item">
+                        📌 6: LinkedIn Analytics & Performance Tracking -
+                        Campaign metrics, Audience insights, ROI measurement
+                      </div>
+                      <div className="data-item">
+                        📌 7: Networking & Relationship Building - Strategic
+                        connections, Engagement tactics, Group management
+                      </div>
+                      <div className="data-item">
+                        📌 8: Sales Navigator Mastery - Advanced search, Lead
+                        recommendations, Account targeting
+                      </div>
+                      <div className="data-item">
+                        📌 9: Company Page Management - Showcase pages, Employee
+                        advocacy, Content calendar
+                      </div>
+                      <div className="data-item">
+                        📌 10: Capstone Project - Complete LinkedIn marketing
+                        strategy development
+                      </div>
                     </div>
                   </div>
                   <div
@@ -100,7 +143,11 @@ const Details = () => {
                             <i className="fas fa-info-circle"></i> Course
                             Description:
                           </strong>{" "}
-                          This professional course teaches advanced LinkedIn marketing strategies for business growth, lead generation, and professional branding. You'll learn to leverage LinkedIn's unique professional network for maximum business impact.
+                          This professional course teaches advanced LinkedIn
+                          marketing strategies for business growth, lead
+                          generation, and professional branding. You'll learn to
+                          leverage LinkedIn's unique professional network for
+                          maximum business impact.
                         </p>
 
                         <p>
@@ -108,37 +155,79 @@ const Details = () => {
                             <i className="fas fa-user-graduate"></i> Course
                             Prerequisites:
                           </strong>{" "}
-                          Basic computer skills and LinkedIn account. Business/professional background recommended.
+                          Basic computer skills and LinkedIn account.
+                          Business/professional background recommended.
                         </p>
                       </div>
 
                       <h4>🎯 Learning Objectives:</h4>
                       <ul>
-                        <li>✅ Optimize personal and company LinkedIn profiles for maximum visibility</li>
-                        <li>✅ Develop high-impact content strategies that establish thought leadership</li>
-                        <li>✅ Run effective LinkedIn ad campaigns with precise B2B targeting</li>
-                        <li>✅ Generate quality B2B leads using advanced LinkedIn tools</li>
-                        <li>✅ Utilize Sales Navigator for strategic business development</li>
-                        <li>✅ Build professional networks strategically for long-term growth</li>
-                        <li>✅ Measure and optimize campaign performance with analytics</li>
-                        <li>✅ Master company page management and employee advocacy</li>
-                        <li>✅ Implement InMail and conversation ad strategies</li>
-                        <li>✅ Prepare for LinkedIn Marketing Labs Certification</li>
+                        <li>
+                          ✅ Optimize personal and company LinkedIn profiles for
+                          maximum visibility
+                        </li>
+                        <li>
+                          ✅ Develop high-impact content strategies that
+                          establish thought leadership
+                        </li>
+                        <li>
+                          ✅ Run effective LinkedIn ad campaigns with precise
+                          B2B targeting
+                        </li>
+                        <li>
+                          ✅ Generate quality B2B leads using advanced LinkedIn
+                          tools
+                        </li>
+                        <li>
+                          ✅ Utilize Sales Navigator for strategic business
+                          development
+                        </li>
+                        <li>
+                          ✅ Build professional networks strategically for
+                          long-term growth
+                        </li>
+                        <li>
+                          ✅ Measure and optimize campaign performance with
+                          analytics
+                        </li>
+                        <li>
+                          ✅ Master company page management and employee
+                          advocacy
+                        </li>
+                        <li>
+                          ✅ Implement InMail and conversation ad strategies
+                        </li>
+                        <li>
+                          ✅ Prepare for LinkedIn Marketing Labs Certification
+                        </li>
                       </ul>
 
                       <h4>🔥 What You'll Build:</h4>
                       <ul>
-                        <li>📊 Complete LinkedIn content strategy and editorial calendar</li>
+                        <li>
+                          📊 Complete LinkedIn content strategy and editorial
+                          calendar
+                        </li>
                         <li>📈 Optimized company page with showcase pages</li>
-                        <li>🎯 Targeted ad campaign structure for B2B lead generation</li>
-                        <li>📉 Sales Navigator saved searches and lead lists</li>
-                        <li>🤝 Strategic networking plan for industry influence</li>
-                        <li>💰 Lead generation funnel with conversion tracking</li>
+                        <li>
+                          🎯 Targeted ad campaign structure for B2B lead
+                          generation
+                        </li>
+                        <li>
+                          📉 Sales Navigator saved searches and lead lists
+                        </li>
+                        <li>
+                          🤝 Strategic networking plan for industry influence
+                        </li>
+                        <li>
+                          💰 Lead generation funnel with conversion tracking
+                        </li>
                       </ul>
 
                       <h4>Course Structure:</h4>
                       <p>
-                        This 10-module intensive program combines theory with practical application:
+                        This 10-module intensive program combines theory with
+                        practical application:
                       </p>
                       <ul>
                         <li>Module 1: LinkedIn Platform Mastery</li>
@@ -155,12 +244,16 @@ const Details = () => {
 
                       <h4>Course Delivery:</h4>
                       <p>
-                        Instructor-led training with live demonstrations and hands-on LinkedIn campaign management. Includes access to LinkedIn marketing tools and resources.
+                        Instructor-led training with live demonstrations and
+                        hands-on LinkedIn campaign management. Includes access
+                        to LinkedIn marketing tools and resources.
                       </p>
 
                       <h4>Certification:</h4>
                       <p>
-                        Prepares for LinkedIn Marketing Labs Certification and Hootsuite Social Marketing Certification. Includes practice tests and exam preparation materials.
+                        Prepares for LinkedIn Marketing Labs Certification and
+                        Hootsuite Social Marketing Certification. Includes
+                        practice tests and exam preparation materials.
                       </p>
                     </div>
                   </div>
@@ -170,30 +263,46 @@ const Details = () => {
                   >
                     <div className="Roles-container">
                       <h3>💼 Career Opportunities</h3>
-                      <p>
-                        Graduates qualify for these professional roles:
-                      </p>
+                      <p>Graduates qualify for these professional roles:</p>
                       <ul>
                         <li>
-                          🔹 <strong>LinkedIn Marketing Specialist:</strong> Manage corporate LinkedIn presence. Average salary: $55,000 - $80,000
+                          🔹 <strong>LinkedIn Marketing Specialist:</strong>{" "}
+                          Manage corporate LinkedIn presence. Average salary:
+                          $55,000 - $80,000
                         </li>
                         <li>
-                          🔹 <strong>B2B Digital Marketer:</strong> Specialize in professional platform marketing. Average salary: $58,000 - $85,000
+                          🔹 <strong>B2B Digital Marketer:</strong> Specialize
+                          in professional platform marketing. Average salary:
+                          $58,000 - $85,000
                         </li>
                         <li>
-                          🔹 <strong>Corporate Communications Manager:</strong> Handle professional branding. Average salary: $65,000 - $95,000
+                          🔹 <strong>Corporate Communications Manager:</strong>{" "}
+                          Handle professional branding. Average salary: $65,000
+                          - $95,000
                         </li>
                         <li>
-                          🔹 <strong>Lead Generation Expert:</strong> Focus on LinkedIn lead gen strategies. Average salary: $52,000 - $78,000
+                          🔹 <strong>Lead Generation Expert:</strong> Focus on
+                          LinkedIn lead gen strategies. Average salary: $52,000
+                          - $78,000
                         </li>
                         <li>
-                          🔹 <strong>Freelance LinkedIn Consultant:</strong> Offer services to multiple clients. Average income: $45,000 - $90,000
+                          🔹 <strong>Freelance LinkedIn Consultant:</strong>{" "}
+                          Offer services to multiple clients. Average income:
+                          $45,000 - $90,000
                         </li>
                         <li>
-                          🔹 <strong>Sales Development Representative (SDR):</strong> Use LinkedIn for prospecting. Average salary: $50,000 - $75,000
+                          🔹{" "}
+                          <strong>
+                            Sales Development Representative (SDR):
+                          </strong>{" "}
+                          Use LinkedIn for prospecting. Average salary: $50,000
+                          - $75,000
                         </li>
                       </ul>
-                      <p>LinkedIn marketing expertise is highly valued in B2B organizations and professional services firms.</p>
+                      <p>
+                        LinkedIn marketing expertise is highly valued in B2B
+                        organizations and professional services firms.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -204,7 +313,11 @@ const Details = () => {
               <div className="text">
                 <h1>LinkedIn Marketing Professional</h1>
                 <p>
-                  Master professional networking and B2B marketing on the world's premier business platform. This course teaches strategic LinkedIn marketing for lead generation, brand authority building, and professional growth through hands-on training with LinkedIn's marketing tools.
+                  Master professional networking and B2B marketing on the
+                  world's premier business platform. This course teaches
+                  strategic LinkedIn marketing for lead generation, brand
+                  authority building, and professional growth through hands-on
+                  training with LinkedIn's marketing tools.
                 </p>
               </div>
 
@@ -216,7 +329,10 @@ const Details = () => {
                   Certification
                 </h4>
                 <p>
-                  Earn preparation for LinkedIn Marketing Labs Certification and Hootsuite Social Marketing Certification - industry-recognized credentials that validate your expertise in professional platform marketing.
+                  Earn preparation for LinkedIn Marketing Labs Certification and
+                  Hootsuite Social Marketing Certification - industry-recognized
+                  credentials that validate your expertise in professional
+                  platform marketing.
                 </p>
               </div>
               <div className="text">
@@ -227,7 +343,8 @@ const Details = () => {
                   Duration
                 </h4>
                 <p>
-                  8-week program with 40 instructor-led hours and 50+ practical exercise hours, including real campaign management.
+                  8-week program with 40 instructor-led hours and 50+ practical
+                  exercise hours, including real campaign management.
                 </p>
               </div>
               <div className="text">
@@ -256,7 +373,8 @@ const Details = () => {
                       <span className="material-symbols-outlined">
                         done_all
                       </span>
-                      Develop professional content strategies that build authority
+                      Develop professional content strategies that build
+                      authority
                     </li>
                     <li>
                       <span className="material-symbols-outlined">
@@ -281,7 +399,10 @@ const Details = () => {
                   Tools Covered
                 </h4>
                 <p>
-                  LinkedIn Campaign Manager, Sales Navigator, LinkedIn Analytics, Content Suggestions, Lead Gen Forms, InMail, Matched Audiences, Website Demographics, and third-party LinkedIn management tools like Hootsuite and Buffer.
+                  LinkedIn Campaign Manager, Sales Navigator, LinkedIn
+                  Analytics, Content Suggestions, Lead Gen Forms, InMail,
+                  Matched Audiences, Website Demographics, and third-party
+                  LinkedIn management tools like Hootsuite and Buffer.
                 </p>
               </div>
             </div>
@@ -295,7 +416,8 @@ const Details = () => {
               <div className="course-info">
                 <h4>Course Information</h4>
                 <p>
-                  Course fee: Ghc 5,500 payable as Ghc 2,200 initial deposit and Ghc 1,650 monthly installments.
+                  Course fee: Ghc 5,500 payable as Ghc 2,200 initial deposit and
+                  Ghc 1,650 monthly installments.
                 </p>
 
                 <div className="info-text">
@@ -327,7 +449,9 @@ const Details = () => {
                     </span>
                   </div>
                   <p>
-                    <b>Requirements:</b> LinkedIn profile, business email, and basic digital literacy. Sales Navigator access provided during training.
+                    <b>Requirements:</b> LinkedIn profile, business email, and
+                    basic digital literacy. Sales Navigator access provided
+                    during training.
                   </p>
                 </div>
 
@@ -349,7 +473,8 @@ const Details = () => {
                     </span>
                   </div>
                   <p>
-                    <b>Times:</b> 9AM-12PM or 2PM-5PM (choose your preferred batch)
+                    <b>Times:</b> 9AM-12PM or 2PM-5PM (choose your preferred
+                    batch)
                   </p>
                 </div>
 
@@ -368,13 +493,17 @@ const Details = () => {
               <div className="course-info">
                 <h4>Course Policies</h4>
                 <p>
-                  <strong>Non-refundable policy:</strong> Payments are final once made. Students are expected to review course details carefully before enrollment.
+                  <strong>Non-refundable policy:</strong> Payments are final
+                  once made. Students are expected to review course details
+                  carefully before enrollment.
                 </p>
                 <p>
-                  <strong>Rescheduling:</strong> We may reschedule with advance notice to participants in case of unforeseen circumstances.
+                  <strong>Rescheduling:</strong> We may reschedule with advance
+                  notice to participants in case of unforeseen circumstances.
                 </p>
                 <p>
-                  <strong>Minimum enrollment:</strong> 5 students required to commence class.
+                  <strong>Minimum enrollment:</strong> 5 students required to
+                  commence class.
                 </p>
               </div>
             </div>

@@ -12,12 +12,16 @@ import { useState } from "react";
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset;
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -44,7 +48,10 @@ const Details = () => {
             {/* == First Item == */}
             <div className="item">
               <div className="image-container">
-                <Image src={ForexImage} alt="Professional Forex Trading Certification" />
+                <Image
+                  src={ForexImage}
+                  alt="Professional Forex Trading Certification"
+                />
               </div>
 
               <div className="concept-container">
@@ -77,17 +84,53 @@ const Details = () => {
                   >
                     <div className="concept-data">
                       <h3>💹 Professional Forex Trading Certification</h3>
-                      <p>This comprehensive forex trading course covers everything from basic concepts to advanced trading strategies. Learn to analyze currency pairs, manage risk, and execute trades like a professional in the world's largest financial market.</p>
-                      <div className="data-item">📌 1: Forex Market Fundamentals - Currency pairs, Market participants, Trading sessions</div>
-                      <div className="data-item">📌 2: Technical Analysis Mastery - Chart patterns, Indicators, Support/resistance, Trend analysis</div>
-                      <div className="data-item">📌 3: Fundamental Analysis - Economic indicators, Central bank policies, News trading</div>
-                      <div className="data-item">📌 4: Risk Management Strategies - Position sizing, Stop-loss placement, Risk-reward ratios</div>
-                      <div className="data-item">📌 5: Trading Psychology - Emotional control, Discipline, Overcoming fear and greed</div>
-                      <div className="data-item">📌 6: Trading Platforms & Tools - MetaTrader, TradingView, Order execution, Charting tools</div>
-                      <div className="data-item">📌 7: Algorithmic Trading Basics - Trading algorithms, Automated strategies, Backtesting</div>
-                      <div className="data-item">📌 8: Advanced Trading Strategies - Scalping, Day trading, Swing trading, Position trading</div>
-                      <div className="data-item">📌 9: Portfolio Management - Multi-currency strategies, Diversification, Hedging</div>
-                      <div className="data-item">📌 10: Live Trading Sessions - Real-time analysis, Trade execution, Performance review</div>
+                      <p>
+                        This comprehensive forex trading course covers
+                        everything from basic concepts to advanced trading
+                        strategies. Learn to analyze currency pairs, manage
+                        risk, and execute trades like a professional in the
+                        world's largest financial market.
+                      </p>
+                      <div className="data-item">
+                        📌 1: Forex Market Fundamentals - Currency pairs, Market
+                        participants, Trading sessions
+                      </div>
+                      <div className="data-item">
+                        📌 2: Technical Analysis Mastery - Chart patterns,
+                        Indicators, Support/resistance, Trend analysis
+                      </div>
+                      <div className="data-item">
+                        📌 3: Fundamental Analysis - Economic indicators,
+                        Central bank policies, News trading
+                      </div>
+                      <div className="data-item">
+                        📌 4: Risk Management Strategies - Position sizing,
+                        Stop-loss placement, Risk-reward ratios
+                      </div>
+                      <div className="data-item">
+                        📌 5: Trading Psychology - Emotional control,
+                        Discipline, Overcoming fear and greed
+                      </div>
+                      <div className="data-item">
+                        📌 6: Trading Platforms & Tools - MetaTrader,
+                        TradingView, Order execution, Charting tools
+                      </div>
+                      <div className="data-item">
+                        📌 7: Algorithmic Trading Basics - Trading algorithms,
+                        Automated strategies, Backtesting
+                      </div>
+                      <div className="data-item">
+                        📌 8: Advanced Trading Strategies - Scalping, Day
+                        trading, Swing trading, Position trading
+                      </div>
+                      <div className="data-item">
+                        📌 9: Portfolio Management - Multi-currency strategies,
+                        Diversification, Hedging
+                      </div>
+                      <div className="data-item">
+                        📌 10: Live Trading Sessions - Real-time analysis, Trade
+                        execution, Performance review
+                      </div>
                     </div>
                   </div>
                   <div
@@ -100,7 +143,11 @@ const Details = () => {
                             <i className="fas fa-info-circle"></i> Course
                             Description:
                           </strong>{" "}
-                          This comprehensive forex trading course covers everything from basic concepts to advanced trading strategies. Learn to analyze currency pairs, manage risk, and execute trades like a professional in the world's largest financial market.
+                          This comprehensive forex trading course covers
+                          everything from basic concepts to advanced trading
+                          strategies. Learn to analyze currency pairs, manage
+                          risk, and execute trades like a professional in the
+                          world's largest financial market.
                         </p>
 
                         <p>
@@ -108,38 +155,82 @@ const Details = () => {
                             <i className="fas fa-user-graduate"></i> Course
                             Prerequisites:
                           </strong>{" "}
-                          No prior trading experience required. Basic computer skills and internet access needed.
+                          No prior trading experience required. Basic computer
+                          skills and internet access needed.
                         </p>
                       </div>
 
                       <h4>🎯 Learning Objectives:</h4>
                       <ul>
-                        <li>✅ Understand forex market structure, participants, and trading sessions</li>
-                        <li>✅ Master technical analysis tools, indicators, and chart patterns</li>
-                        <li>✅ Analyze economic factors affecting currency values and central bank policies</li>
-                        <li>✅ Develop effective risk management strategies to protect capital</li>
-                        <li>✅ Control emotions and maintain trading discipline for consistent results</li>
-                        <li>✅ Use trading platforms effectively for analysis and execution</li>
-                        <li>✅ Create and backtest trading strategies for different market conditions</li>
-                        <li>✅ Implement advanced trading approaches including algorithmic trading</li>
-                        <li>✅ Build and manage a diversified forex portfolio</li>
-                        <li>✅ Execute trades with confidence during live market sessions</li>
+                        <li>
+                          ✅ Understand forex market structure, participants,
+                          and trading sessions
+                        </li>
+                        <li>
+                          ✅ Master technical analysis tools, indicators, and
+                          chart patterns
+                        </li>
+                        <li>
+                          ✅ Analyze economic factors affecting currency values
+                          and central bank policies
+                        </li>
+                        <li>
+                          ✅ Develop effective risk management strategies to
+                          protect capital
+                        </li>
+                        <li>
+                          ✅ Control emotions and maintain trading discipline
+                          for consistent results
+                        </li>
+                        <li>
+                          ✅ Use trading platforms effectively for analysis and
+                          execution
+                        </li>
+                        <li>
+                          ✅ Create and backtest trading strategies for
+                          different market conditions
+                        </li>
+                        <li>
+                          ✅ Implement advanced trading approaches including
+                          algorithmic trading
+                        </li>
+                        <li>
+                          ✅ Build and manage a diversified forex portfolio
+                        </li>
+                        <li>
+                          ✅ Execute trades with confidence during live market
+                          sessions
+                        </li>
                       </ul>
 
                       <h4>🔥 What You'll Build:</h4>
                       <ul>
-                        <li>📊 Complete trading plan with entry/exit rules and risk parameters</li>
-                        <li>📈 Technical analysis toolkit with custom indicators</li>
-                        <li>💰 Risk management system with position sizing calculator</li>
-                        <li>📉 Trading journal for performance tracking and improvement</li>
-                        <li>🤖 Basic algorithmic trading strategy for automation</li>
-                        <li>📋 Portfolio management framework for multiple currency pairs</li>
+                        <li>
+                          📊 Complete trading plan with entry/exit rules and
+                          risk parameters
+                        </li>
+                        <li>
+                          📈 Technical analysis toolkit with custom indicators
+                        </li>
+                        <li>
+                          💰 Risk management system with position sizing
+                          calculator
+                        </li>
+                        <li>
+                          📉 Trading journal for performance tracking and
+                          improvement
+                        </li>
+                        <li>
+                          🤖 Basic algorithmic trading strategy for automation
+                        </li>
+                        <li>
+                          📋 Portfolio management framework for multiple
+                          currency pairs
+                        </li>
                       </ul>
 
                       <h4>Course Structure:</h4>
-                      <p>
-                        This practical 10-module program covers:
-                      </p>
+                      <p>This practical 10-module program covers:</p>
                       <ul>
                         <li>Module 1: Forex Market Basics</li>
                         <li>Module 2: Technical Analysis</li>
@@ -155,12 +246,17 @@ const Details = () => {
 
                       <h4>Course Delivery:</h4>
                       <p>
-                        Interactive sessions with live market analysis, simulated trading exercises, and real-time chart reading. Includes demo trading account with virtual funds.
+                        Interactive sessions with live market analysis,
+                        simulated trading exercises, and real-time chart
+                        reading. Includes demo trading account with virtual
+                        funds.
                       </p>
 
                       <h4>Certification:</h4>
                       <p>
-                        Earn our Professional Forex Trader certification upon successful completion, recognized by financial institutions and trading firms.
+                        Earn our Professional Forex Trader certification upon
+                        successful completion, recognized by financial
+                        institutions and trading firms.
                       </p>
                     </div>
                   </div>
@@ -170,33 +266,48 @@ const Details = () => {
                   >
                     <div className="Roles-container">
                       <h3>💼 Career Opportunities</h3>
-                      <p>
-                        Graduates can pursue these exciting paths:
-                      </p>
+                      <p>Graduates can pursue these exciting paths:</p>
                       <ul>
                         <li>
-                          🔹 <strong>Retail Forex Trader:</strong> Trade your own capital independently. Average income: Variable based on performance
+                          🔹 <strong>Retail Forex Trader:</strong> Trade your
+                          own capital independently. Average income: Variable
+                          based on performance
                         </li>
                         <li>
-                          🔹 <strong>Fund Manager:</strong> Manage investment portfolios for clients. Average salary: $75,000 - $150,000
+                          🔹 <strong>Fund Manager:</strong> Manage investment
+                          portfolios for clients. Average salary: $75,000 -
+                          $150,000
                         </li>
                         <li>
-                          🔹 <strong>Trading Analyst:</strong> Provide market insights and analysis. Average salary: $55,000 - $85,000
+                          🔹 <strong>Trading Analyst:</strong> Provide market
+                          insights and analysis. Average salary: $55,000 -
+                          $85,000
                         </li>
                         <li>
-                          🔹 <strong>Brokerage Associate:</strong> Work with trading firms and brokerages. Average salary: $45,000 - $70,000
+                          🔹 <strong>Brokerage Associate:</strong> Work with
+                          trading firms and brokerages. Average salary: $45,000
+                          - $70,000
                         </li>
                         <li>
-                          🔹 <strong>Trading Educator:</strong> Teach others to trade successfully. Average income: $50,000 - $90,000
+                          🔹 <strong>Trading Educator:</strong> Teach others to
+                          trade successfully. Average income: $50,000 - $90,000
                         </li>
                         <li>
-                          🔹 <strong>Proprietary Trader:</strong> Trade firm capital with profit sharing. Average income: $60,000 - $200,000
+                          🔹 <strong>Proprietary Trader:</strong> Trade firm
+                          capital with profit sharing. Average income: $60,000 -
+                          $200,000
                         </li>
                         <li>
-                          🔹 <strong>Quantitative Trader:</strong> Develop algorithmic trading strategies. Average salary: $100,000 - $180,000
+                          🔹 <strong>Quantitative Trader:</strong> Develop
+                          algorithmic trading strategies. Average salary:
+                          $100,000 - $180,000
                         </li>
                       </ul>
-                      <p>Forex trading offers flexible career paths from independent trading to institutional roles in financial markets.</p>
+                      <p>
+                        Forex trading offers flexible career paths from
+                        independent trading to institutional roles in financial
+                        markets.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -207,7 +318,12 @@ const Details = () => {
               <div className="text">
                 <h1>Professional Forex Trading Certification</h1>
                 <p>
-                  Master the art of currency trading with our professional forex course. Learn proven strategies from experienced traders and gain the skills to navigate the $6.6 trillion daily forex market with confidence. Whether you aspire to trade independently or work with financial institutions, this comprehensive program provides the foundation for success.
+                  Master the art of currency trading with our professional forex
+                  course. Learn proven strategies from experienced traders and
+                  gain the skills to navigate the $6.6 trillion daily forex
+                  market with confidence. Whether you aspire to trade
+                  independently or work with financial institutions, this
+                  comprehensive program provides the foundation for success.
                 </p>
               </div>
 
@@ -219,7 +335,9 @@ const Details = () => {
                   Certification
                 </h4>
                 <p>
-                  Professional Forex Trader Certification recognized by financial institutions and trading firms. Includes a verifiable digital credential for your professional profile.
+                  Professional Forex Trader Certification recognized by
+                  financial institutions and trading firms. Includes a
+                  verifiable digital credential for your professional profile.
                 </p>
               </div>
               <div className="text">
@@ -230,7 +348,9 @@ const Details = () => {
                   Duration
                 </h4>
                 <p>
-                  8-week program with 48 instructor-led hours and 100+ practical trading hours, including live market sessions and strategy development.
+                  8-week program with 48 instructor-led hours and 100+ practical
+                  trading hours, including live market sessions and strategy
+                  development.
                 </p>
               </div>
               <div className="text">
@@ -247,7 +367,8 @@ const Details = () => {
                       <span className="material-symbols-outlined">
                         done_all
                       </span>
-                      Learn from professional traders with real market experience
+                      Learn from professional traders with real market
+                      experience
                     </li>
                     <li>
                       <span className="material-symbols-outlined">
@@ -284,7 +405,11 @@ const Details = () => {
                   Tools Covered
                 </h4>
                 <p>
-                  MetaTrader 4 (MT4), MetaTrader 5 (MT5), TradingView, economic calendars (Forex Factory, DailyFX), correlation matrices, pivot point calculators, position size calculators, and various technical analysis tools including Fibonacci, moving averages, RSI, MACD, Bollinger Bands, and Ichimoku Kinko Hyo.
+                  MetaTrader 4 (MT4), MetaTrader 5 (MT5), TradingView, economic
+                  calendars (Forex Factory, DailyFX), correlation matrices,
+                  pivot point calculators, position size calculators, and
+                  various technical analysis tools including Fibonacci, moving
+                  averages, RSI, MACD, Bollinger Bands, and Ichimoku Kinko Hyo.
                 </p>
               </div>
             </div>
@@ -298,7 +423,8 @@ const Details = () => {
               <div className="course-info">
                 <h4>Course Information</h4>
                 <p>
-                  Course fee: Ghc 4,500 payable as Ghc 1,500 initial deposit and Ghc 1,500 monthly installments.
+                  Course fee: Ghc 4,500 payable as Ghc 1,500 initial deposit and
+                  Ghc 1,500 monthly installments.
                 </p>
 
                 <div className="info-text">
@@ -330,7 +456,9 @@ const Details = () => {
                     </span>
                   </div>
                   <p>
-                    <b>Requirements:</b> Laptop with internet access. Demo trading account will be provided. No financial commitment to live trading required.
+                    <b>Requirements:</b> Laptop with internet access. Demo
+                    trading account will be provided. No financial commitment to
+                    live trading required.
                   </p>
                 </div>
 
@@ -352,7 +480,8 @@ const Details = () => {
                     </span>
                   </div>
                   <p>
-                    <b>Times:</b> Weekdays 6PM-9PM, Saturday 10AM-1PM (choose your preferred batch)
+                    <b>Times:</b> Weekdays 6PM-9PM, Saturday 10AM-1PM (choose
+                    your preferred batch)
                   </p>
                 </div>
 
@@ -371,16 +500,23 @@ const Details = () => {
               <div className="course-info">
                 <h4>Course Policies</h4>
                 <p>
-                  <strong>Non-refundable policy:</strong> Payments are final once made. Students are expected to review course details carefully before enrollment.
+                  <strong>Non-refundable policy:</strong> Payments are final
+                  once made. Students are expected to review course details
+                  carefully before enrollment.
                 </p>
                 <p>
-                  <strong>Rescheduling:</strong> We may reschedule with advance notice to participants in case of unforeseen circumstances.
+                  <strong>Rescheduling:</strong> We may reschedule with advance
+                  notice to participants in case of unforeseen circumstances.
                 </p>
                 <p>
-                  <strong>Minimum enrollment:</strong> 5 students required to commence class.
+                  <strong>Minimum enrollment:</strong> 5 students required to
+                  commence class.
                 </p>
                 <p>
-                  <strong>Trading risks:</strong> Past performance doesn't guarantee future results. Trading involves significant risk of loss. This educational program focuses on skill development, not guaranteed returns.
+                  <strong>Trading risks:</strong> Past performance doesn't
+                  guarantee future results. Trading involves significant risk of
+                  loss. This educational program focuses on skill development,
+                  not guaranteed returns.
                 </p>
               </div>
             </div>

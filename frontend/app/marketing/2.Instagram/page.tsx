@@ -12,12 +12,16 @@ import { useState } from "react";
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset;
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -44,7 +48,10 @@ const Details = () => {
             {/* == First Item == */}
             <div className="item">
               <div className="image-container">
-                <Image src={InstagramImage} alt="Instagram Marketing Professional" />
+                <Image
+                  src={InstagramImage}
+                  alt="Instagram Marketing Professional"
+                />
               </div>
 
               <div className="concept-container">
@@ -77,17 +84,53 @@ const Details = () => {
                   >
                     <div className="concept-data">
                       <h3>📸 Instagram Marketing Professional</h3>
-                      <p>This comprehensive course teaches professional Instagram marketing strategies to grow businesses and personal brands. You'll learn content creation, audience growth, advertising, analytics, and monetization techniques specifically for Instagram's unique platform.</p>
-                      <div className="data-item">📌 1: Instagram Platform Fundamentals - Algorithm understanding, Features overview, Platform updates</div>
-                      <div className="data-item">📌 2: Business Profile Optimization - Bio optimization, Link strategies, Call-to-action setup</div>
-                      <div className="data-item">📌 3: Content Strategy & Planning - Feed posts, Stories, Reels, IGTV, Carousels</div>
-                      <div className="data-item">📌 4: Instagram Ads & Shopping - Campaign setup, Shopping tags, Product catalog</div>
-                      <div className="data-item">📌 5: Growth & Engagement Strategies - Hashtag strategy, Engagement pods, Community building</div>
-                      <div className="data-item">📌 6: Instagram Analytics & Insights - Performance metrics, Audience insights, Content analysis</div>
-                      <div className="data-item">📌 7: Influencer Collaborations - Finding influencers, Partnership strategies, Campaign management</div>
-                      <div className="data-item">📌 8: Monetization Strategies - Brand deals, Affiliate marketing, Product sales</div>
-                      <div className="data-item">📌 9: Visual Branding - Aesthetic consistency, Photo editing, Video production</div>
-                      <div className="data-item">📌 10: Capstone Project - Complete Instagram marketing strategy development</div>
+                      <p>
+                        This comprehensive course teaches professional Instagram
+                        marketing strategies to grow businesses and personal
+                        brands. You'll learn content creation, audience growth,
+                        advertising, analytics, and monetization techniques
+                        specifically for Instagram's unique platform.
+                      </p>
+                      <div className="data-item">
+                        📌 1: Instagram Platform Fundamentals - Algorithm
+                        understanding, Features overview, Platform updates
+                      </div>
+                      <div className="data-item">
+                        📌 2: Business Profile Optimization - Bio optimization,
+                        Link strategies, Call-to-action setup
+                      </div>
+                      <div className="data-item">
+                        📌 3: Content Strategy & Planning - Feed posts, Stories,
+                        Reels, IGTV, Carousels
+                      </div>
+                      <div className="data-item">
+                        📌 4: Instagram Ads & Shopping - Campaign setup,
+                        Shopping tags, Product catalog
+                      </div>
+                      <div className="data-item">
+                        📌 5: Growth & Engagement Strategies - Hashtag strategy,
+                        Engagement pods, Community building
+                      </div>
+                      <div className="data-item">
+                        📌 6: Instagram Analytics & Insights - Performance
+                        metrics, Audience insights, Content analysis
+                      </div>
+                      <div className="data-item">
+                        📌 7: Influencer Collaborations - Finding influencers,
+                        Partnership strategies, Campaign management
+                      </div>
+                      <div className="data-item">
+                        📌 8: Monetization Strategies - Brand deals, Affiliate
+                        marketing, Product sales
+                      </div>
+                      <div className="data-item">
+                        📌 9: Visual Branding - Aesthetic consistency, Photo
+                        editing, Video production
+                      </div>
+                      <div className="data-item">
+                        📌 10: Capstone Project - Complete Instagram marketing
+                        strategy development
+                      </div>
                     </div>
                   </div>
                   <div
@@ -100,7 +143,12 @@ const Details = () => {
                             <i className="fas fa-info-circle"></i> Course
                             Description:
                           </strong>{" "}
-                          This comprehensive course teaches professional Instagram marketing strategies to grow businesses and personal brands. You'll learn content creation, audience growth, advertising, analytics, and monetization techniques specifically for Instagram's unique platform.
+                          This comprehensive course teaches professional
+                          Instagram marketing strategies to grow businesses and
+                          personal brands. You'll learn content creation,
+                          audience growth, advertising, analytics, and
+                          monetization techniques specifically for Instagram's
+                          unique platform.
                         </p>
 
                         <p>
@@ -108,38 +156,78 @@ const Details = () => {
                             <i className="fas fa-user-graduate"></i> Course
                             Prerequisites:
                           </strong>{" "}
-                          Basic smartphone skills and Instagram account. No prior marketing experience required.
+                          Basic smartphone skills and Instagram account. No
+                          prior marketing experience required.
                         </p>
                       </div>
 
                       <h4>🎯 Learning Objectives:</h4>
                       <ul>
-                        <li>✅ Set up and optimize Instagram Business profiles for maximum visibility</li>
-                        <li>✅ Create high-performing content strategies across all Instagram formats</li>
-                        <li>✅ Run effective Instagram ad campaigns and shopping features</li>
-                        <li>✅ Implement growth hacking techniques for organic audience growth</li>
-                        <li>✅ Analyze performance metrics and optimize content strategy</li>
-                        <li>✅ Develop influencer partnerships and collaboration strategies</li>
-                        <li>✅ Monetize Instagram presence through multiple revenue streams</li>
-                        <li>✅ Master visual branding for consistent aesthetic appeal</li>
-                        <li>✅ Understand Instagram algorithm and leverage platform updates</li>
-                        <li>✅ Prepare for Meta certification with Instagram specialization</li>
+                        <li>
+                          ✅ Set up and optimize Instagram Business profiles for
+                          maximum visibility
+                        </li>
+                        <li>
+                          ✅ Create high-performing content strategies across
+                          all Instagram formats
+                        </li>
+                        <li>
+                          ✅ Run effective Instagram ad campaigns and shopping
+                          features
+                        </li>
+                        <li>
+                          ✅ Implement growth hacking techniques for organic
+                          audience growth
+                        </li>
+                        <li>
+                          ✅ Analyze performance metrics and optimize content
+                          strategy
+                        </li>
+                        <li>
+                          ✅ Develop influencer partnerships and collaboration
+                          strategies
+                        </li>
+                        <li>
+                          ✅ Monetize Instagram presence through multiple
+                          revenue streams
+                        </li>
+                        <li>
+                          ✅ Master visual branding for consistent aesthetic
+                          appeal
+                        </li>
+                        <li>
+                          ✅ Understand Instagram algorithm and leverage
+                          platform updates
+                        </li>
+                        <li>
+                          ✅ Prepare for Meta certification with Instagram
+                          specialization
+                        </li>
                       </ul>
 
                       <h4>🔥 What You'll Build:</h4>
                       <ul>
-                        <li>📊 Complete Instagram content calendar and strategy</li>
-                        <li>📈 Optimized business profile with conversion-focused bio</li>
+                        <li>
+                          📊 Complete Instagram content calendar and strategy
+                        </li>
+                        <li>
+                          📈 Optimized business profile with conversion-focused
+                          bio
+                        </li>
                         <li>🎨 Brand aesthetic guide and content templates</li>
                         <li>📉 Analytics dashboard for performance tracking</li>
-                        <li>💰 Monetization plan with multiple revenue streams</li>
-                        <li>🤝 Influencer outreach and collaboration framework</li>
+                        <li>
+                          💰 Monetization plan with multiple revenue streams
+                        </li>
+                        <li>
+                          🤝 Influencer outreach and collaboration framework
+                        </li>
                       </ul>
 
                       <h4>Course Structure:</h4>
                       <p>
-                        This 10-module course combines theoretical knowledge with
-                        hands-on practical exercises:
+                        This 10-module course combines theoretical knowledge
+                        with hands-on practical exercises:
                       </p>
                       <ul>
                         <li>Module 1: Instagram Platform Fundamentals</li>
@@ -156,12 +244,16 @@ const Details = () => {
 
                       <h4>Course Delivery:</h4>
                       <p>
-                        Instructor-led training with live demonstrations and hands-on content creation. Includes access to Instagram analytics tools and resources.
+                        Instructor-led training with live demonstrations and
+                        hands-on content creation. Includes access to Instagram
+                        analytics tools and resources.
                       </p>
 
                       <h4>Certification:</h4>
                       <p>
-                        Course prepares you for Meta Certified Digital Marketing Associate certification with Instagram specialization. Includes practice tests and exam preparation materials.
+                        Course prepares you for Meta Certified Digital Marketing
+                        Associate certification with Instagram specialization.
+                        Includes practice tests and exam preparation materials.
                       </p>
                     </div>
                   </div>
@@ -177,25 +269,40 @@ const Details = () => {
                       </p>
                       <ul>
                         <li>
-                          🔹 <strong>Instagram Manager:</strong> Manage brand presence on Instagram. Average salary: $42,000 - $65,000
+                          🔹 <strong>Instagram Manager:</strong> Manage brand
+                          presence on Instagram. Average salary: $42,000 -
+                          $65,000
                         </li>
                         <li>
-                          🔹 <strong>Social Media Specialist:</strong> Focus on Instagram marketing strategies. Average salary: $40,000 - $60,000
+                          🔹 <strong>Social Media Specialist:</strong> Focus on
+                          Instagram marketing strategies. Average salary:
+                          $40,000 - $60,000
                         </li>
                         <li>
-                          🔹 <strong>Content Creator:</strong> Develop Instagram-first content for brands. Average salary: $38,000 - $70,000
+                          🔹 <strong>Content Creator:</strong> Develop
+                          Instagram-first content for brands. Average salary:
+                          $38,000 - $70,000
                         </li>
                         <li>
-                          🔹 <strong>Influencer Marketer:</strong> Manage influencer partnerships and campaigns. Average salary: $45,000 - $68,000
+                          🔹 <strong>Influencer Marketer:</strong> Manage
+                          influencer partnerships and campaigns. Average salary:
+                          $45,000 - $68,000
                         </li>
                         <li>
-                          🔹 <strong>Freelance Instagram Consultant:</strong> Offer services to multiple clients. Average income: $35,000 - $75,000
+                          🔹 <strong>Freelance Instagram Consultant:</strong>{" "}
+                          Offer services to multiple clients. Average income:
+                          $35,000 - $75,000
                         </li>
                         <li>
-                          🔹 <strong>Community Manager:</strong> Build and engage Instagram communities. Average salary: $40,000 - $62,000
+                          🔹 <strong>Community Manager:</strong> Build and
+                          engage Instagram communities. Average salary: $40,000
+                          - $62,000
                         </li>
                       </ul>
-                      <p>Instagram marketing expertise is highly valued as brands prioritize visual content and influencer partnerships.</p>
+                      <p>
+                        Instagram marketing expertise is highly valued as brands
+                        prioritize visual content and influencer partnerships.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -206,7 +313,12 @@ const Details = () => {
               <div className="text">
                 <h1>Instagram Marketing Professional</h1>
                 <p>
-                  Master the art of Instagram marketing to build powerful brands and drive business growth. This comprehensive course covers everything from profile optimization to content strategy, advertising, analytics, and monetization. Gain practical skills that businesses need to succeed on one of the world's most influential social platforms.
+                  Master the art of Instagram marketing to build powerful brands
+                  and drive business growth. This comprehensive course covers
+                  everything from profile optimization to content strategy,
+                  advertising, analytics, and monetization. Gain practical
+                  skills that businesses need to succeed on one of the world's
+                  most influential social platforms.
                 </p>
               </div>
 
@@ -218,7 +330,10 @@ const Details = () => {
                   Certification
                 </h4>
                 <p>
-                  This course prepares you for Meta Certified Digital Marketing Associate certification with Instagram specialization, validating your expertise in Instagram marketing and advertising strategies.
+                  This course prepares you for Meta Certified Digital Marketing
+                  Associate certification with Instagram specialization,
+                  validating your expertise in Instagram marketing and
+                  advertising strategies.
                 </p>
               </div>
               <div className="text">
@@ -229,7 +344,9 @@ const Details = () => {
                   Duration
                 </h4>
                 <p>
-                  The course is 6 weeks long, with 30 hours of instructor-led training and 40+ hours of practical exercises and content creation.
+                  The course is 6 weeks long, with 30 hours of instructor-led
+                  training and 40+ hours of practical exercises and content
+                  creation.
                 </p>
               </div>
               <div className="text">
@@ -246,7 +363,8 @@ const Details = () => {
                       <span className="material-symbols-outlined">
                         done_all
                       </span>
-                      Hands-on experience with Instagram Business Tools and Creator Studio
+                      Hands-on experience with Instagram Business Tools and
+                      Creator Studio
                     </li>
                     <li>
                       <span className="material-symbols-outlined">
@@ -264,13 +382,15 @@ const Details = () => {
                       <span className="material-symbols-outlined">
                         done_all
                       </span>
-                      Practical content creation and campaign management experience
+                      Practical content creation and campaign management
+                      experience
                     </li>
                     <li>
                       <span className="material-symbols-outlined">
                         done_all
                       </span>
-                      Career guidance and portfolio development with real projects
+                      Career guidance and portfolio development with real
+                      projects
                     </li>
                   </ul>
                 </div>
@@ -283,7 +403,10 @@ const Details = () => {
                   Tools Covered
                 </h4>
                 <p>
-                  Instagram Business Suite, Creator Studio, Instagram Insights, Ads Manager, Shopping Manager, Reels tools, Stories features, Canva for design, Later for scheduling, and third-party analytics platforms for comprehensive performance tracking.
+                  Instagram Business Suite, Creator Studio, Instagram Insights,
+                  Ads Manager, Shopping Manager, Reels tools, Stories features,
+                  Canva for design, Later for scheduling, and third-party
+                  analytics platforms for comprehensive performance tracking.
                 </p>
               </div>
             </div>
@@ -310,7 +433,8 @@ const Details = () => {
                   </div>
                   <p>
                     <b>Course duration:</b> 6 weeks, with classes held 3 days a
-                    week (Tuesday, Thursday, Saturday). Practical assignments between sessions.
+                    week (Tuesday, Thursday, Saturday). Practical assignments
+                    between sessions.
                   </p>
                 </div>
 
@@ -333,7 +457,9 @@ const Details = () => {
                   </div>
                   <p>
                     <b>Additional Notes:</b> Students will need access to an
-                    Instagram account. Business tools access will be demonstrated during training. Content creation tools provided.
+                    Instagram account. Business tools access will be
+                    demonstrated during training. Content creation tools
+                    provided.
                   </p>
                 </div>
 
@@ -344,7 +470,8 @@ const Details = () => {
                     </span>
                   </div>
                   <p>
-                    <b>Class Days:</b> Tuesday, Thursday, Saturday (6 hours/week)
+                    <b>Class Days:</b> Tuesday, Thursday, Saturday (6
+                    hours/week)
                   </p>
                 </div>
 

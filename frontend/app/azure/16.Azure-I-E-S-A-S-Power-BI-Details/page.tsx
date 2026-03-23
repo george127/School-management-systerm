@@ -12,12 +12,16 @@ import { useState } from "react";
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset;
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -44,7 +48,10 @@ const Details = () => {
             {/* == First Item == */}
             <div className="item">
               <div className="image-container">
-                <Image src={AnalyticsImage} alt="Enterprise Analytics with Azure and Power BI" />
+                <Image
+                  src={AnalyticsImage}
+                  alt="Enterprise Analytics with Azure and Power BI"
+                />
               </div>
 
               <div className="concept-container">
@@ -76,18 +83,56 @@ const Details = () => {
                     className={`content ${activeContent === 1 ? "show" : ""}`}
                   >
                     <div className="concept-data">
-                      <h3>📊 Enterprise Analytics with Azure and Power BI (DP-500)</h3>
-                      <p>This comprehensive course teaches you to design and implement end-to-end analytics solutions at enterprise scale using Microsoft Azure and Power BI. You'll learn to build modern data warehouses, create powerful data models, and develop interactive dashboards that drive business decisions.</p>
-                      <div className="data-item">📌 1: Enterprise Analytics Architecture - Modern data warehouse, Data lakehouse, Medallion architecture</div>
-                      <div className="data-item">📌 2: Azure Data Lake and Data Factory - Data ingestion, Transformation, Orchestration</div>
-                      <div className="data-item">📌 3: Azure Synapse Analytics - Dedicated SQL pools, Serverless SQL, Data integration pipelines</div>
-                      <div className="data-item">📌 4: Power BI Data Modeling - Star schema, Relationships, DAX calculations, Row-level security</div>
-                      <div className="data-item">📌 5: Advanced Power BI Visualizations - Custom visuals, Power BI Embedded, Paginated reports</div>
-                      <div className="data-item">📌 6: Data Security and Governance - Row-level security, Azure Purview, Data lineage</div>
-                      <div className="data-item">📌 7: Performance Optimization - Query optimization, Aggregations, Incremental refresh</div>
-                      <div className="data-item">📌 8: Enterprise Deployment and Management - Workspaces, Apps, Deployment pipelines, Capacity management</div>
-                      <div className="data-item">📌 9: Advanced Analytics - Azure Machine Learning integration, AI visuals, Cognitive Services</div>
-                      <div className="data-item">📌 10: Capstone Project and Certification Preparation</div>
+                      <h3>
+                        📊 Enterprise Analytics with Azure and Power BI (DP-500)
+                      </h3>
+                      <p>
+                        This comprehensive course teaches you to design and
+                        implement end-to-end analytics solutions at enterprise
+                        scale using Microsoft Azure and Power BI. You'll learn
+                        to build modern data warehouses, create powerful data
+                        models, and develop interactive dashboards that drive
+                        business decisions.
+                      </p>
+                      <div className="data-item">
+                        📌 1: Enterprise Analytics Architecture - Modern data
+                        warehouse, Data lakehouse, Medallion architecture
+                      </div>
+                      <div className="data-item">
+                        📌 2: Azure Data Lake and Data Factory - Data ingestion,
+                        Transformation, Orchestration
+                      </div>
+                      <div className="data-item">
+                        📌 3: Azure Synapse Analytics - Dedicated SQL pools,
+                        Serverless SQL, Data integration pipelines
+                      </div>
+                      <div className="data-item">
+                        📌 4: Power BI Data Modeling - Star schema,
+                        Relationships, DAX calculations, Row-level security
+                      </div>
+                      <div className="data-item">
+                        📌 5: Advanced Power BI Visualizations - Custom visuals,
+                        Power BI Embedded, Paginated reports
+                      </div>
+                      <div className="data-item">
+                        📌 6: Data Security and Governance - Row-level security,
+                        Azure Purview, Data lineage
+                      </div>
+                      <div className="data-item">
+                        📌 7: Performance Optimization - Query optimization,
+                        Aggregations, Incremental refresh
+                      </div>
+                      <div className="data-item">
+                        📌 8: Enterprise Deployment and Management - Workspaces,
+                        Apps, Deployment pipelines, Capacity management
+                      </div>
+                      <div className="data-item">
+                        📌 9: Advanced Analytics - Azure Machine Learning
+                        integration, AI visuals, Cognitive Services
+                      </div>
+                      <div className="data-item">
+                        📌 10: Capstone Project and Certification Preparation
+                      </div>
                     </div>
                   </div>
                   <div
@@ -100,7 +145,12 @@ const Details = () => {
                             <i className="fas fa-info-circle"></i> Course
                             Description:
                           </strong>{" "}
-                          This comprehensive course teaches you to design and implement end-to-end analytics solutions at enterprise scale using Microsoft Azure and Power BI. You'll learn to build modern data warehouses, create powerful data models, and develop interactive dashboards that drive business decisions.
+                          This comprehensive course teaches you to design and
+                          implement end-to-end analytics solutions at enterprise
+                          scale using Microsoft Azure and Power BI. You'll learn
+                          to build modern data warehouses, create powerful data
+                          models, and develop interactive dashboards that drive
+                          business decisions.
                         </p>
 
                         <p>
@@ -108,36 +158,84 @@ const Details = () => {
                             <i className="fas fa-user-graduate"></i> Course
                             Prerequisites:
                           </strong>{" "}
-                          Basic understanding of data concepts and familiarity with cloud services. Experience with SQL is helpful but not required.
+                          Basic understanding of data concepts and familiarity
+                          with cloud services. Experience with SQL is helpful
+                          but not required.
                         </p>
                       </div>
 
                       <h4>🎯 Learning Objectives:</h4>
                       <ul>
-                        <li>✅ Design enterprise-scale analytics architectures using modern data patterns</li>
-                        <li>✅ Implement data pipelines with Azure Data Factory and Synapse pipelines</li>
-                        <li>✅ Build modern data warehouses with Azure Synapse Analytics</li>
-                        <li>✅ Create sophisticated data models in Power BI using DAX and star schemas</li>
-                        <li>✅ Develop interactive dashboards and enterprise reports</li>
-                        <li>✅ Implement security and governance policies across the analytics platform</li>
-                        <li>✅ Optimize performance of analytics solutions at scale</li>
-                        <li>✅ Integrate advanced analytics and machine learning capabilities</li>
-                        <li>✅ Prepare for Microsoft PL-300 and DP-500 certifications</li>
+                        <li>
+                          ✅ Design enterprise-scale analytics architectures
+                          using modern data patterns
+                        </li>
+                        <li>
+                          ✅ Implement data pipelines with Azure Data Factory
+                          and Synapse pipelines
+                        </li>
+                        <li>
+                          ✅ Build modern data warehouses with Azure Synapse
+                          Analytics
+                        </li>
+                        <li>
+                          ✅ Create sophisticated data models in Power BI using
+                          DAX and star schemas
+                        </li>
+                        <li>
+                          ✅ Develop interactive dashboards and enterprise
+                          reports
+                        </li>
+                        <li>
+                          ✅ Implement security and governance policies across
+                          the analytics platform
+                        </li>
+                        <li>
+                          ✅ Optimize performance of analytics solutions at
+                          scale
+                        </li>
+                        <li>
+                          ✅ Integrate advanced analytics and machine learning
+                          capabilities
+                        </li>
+                        <li>
+                          ✅ Prepare for Microsoft PL-300 and DP-500
+                          certifications
+                        </li>
                       </ul>
 
                       <h4>🔥 What You'll Build:</h4>
                       <ul>
-                        <li>🏗️ Complete modern data warehouse on Azure Synapse Analytics</li>
-                        <li>🔄 End-to-end data pipeline with Data Factory and Azure Data Lake</li>
-                        <li>📊 Enterprise Power BI dashboard with advanced DAX calculations</li>
-                        <li>🔒 Secure analytics platform with row-level security and Purview governance</li>
-                        <li>⚡ Optimized data model with performance tuning and aggregations</li>
-                        <li>🤖 ML-powered analytics with Azure Machine Learning integration</li>
+                        <li>
+                          🏗️ Complete modern data warehouse on Azure Synapse
+                          Analytics
+                        </li>
+                        <li>
+                          🔄 End-to-end data pipeline with Data Factory and
+                          Azure Data Lake
+                        </li>
+                        <li>
+                          📊 Enterprise Power BI dashboard with advanced DAX
+                          calculations
+                        </li>
+                        <li>
+                          🔒 Secure analytics platform with row-level security
+                          and Purview governance
+                        </li>
+                        <li>
+                          ⚡ Optimized data model with performance tuning and
+                          aggregations
+                        </li>
+                        <li>
+                          🤖 ML-powered analytics with Azure Machine Learning
+                          integration
+                        </li>
                       </ul>
 
                       <h4>Course Structure:</h4>
                       <p>
-                        This 10-module program combines theory with hands-on labs:
+                        This 10-module program combines theory with hands-on
+                        labs:
                       </p>
                       <ul>
                         <li>Module 1: Analytics Architecture Fundamentals</li>
@@ -154,12 +252,17 @@ const Details = () => {
 
                       <h4>Course Delivery:</h4>
                       <p>
-                        Instructor-led training with hands-on labs using real Azure and Power BI environments. Includes access to cloud resources for practical exercises.
+                        Instructor-led training with hands-on labs using real
+                        Azure and Power BI environments. Includes access to
+                        cloud resources for practical exercises.
                       </p>
 
                       <h4>Certification:</h4>
                       <p>
-                        Prepares for Microsoft Certified: Power BI Data Analyst (PL-300) and Azure Enterprise Data Analyst (DP-500) exams. Includes one free exam attempt voucher and practice tests.
+                        Prepares for Microsoft Certified: Power BI Data Analyst
+                        (PL-300) and Azure Enterprise Data Analyst (DP-500)
+                        exams. Includes one free exam attempt voucher and
+                        practice tests.
                       </p>
                     </div>
                   </div>
@@ -174,25 +277,40 @@ const Details = () => {
                       </p>
                       <ul>
                         <li>
-                          🔹 <strong>Enterprise Data Analyst:</strong> Design and implement analytics solutions at scale. Average salary: $90,000 - $135,000
+                          🔹 <strong>Enterprise Data Analyst:</strong> Design
+                          and implement analytics solutions at scale. Average
+                          salary: $90,000 - $135,000
                         </li>
                         <li>
-                          🔹 <strong>Power BI Architect:</strong> Develop complex reporting solutions. Average salary: $100,000 - $145,000
+                          🔹 <strong>Power BI Architect:</strong> Develop
+                          complex reporting solutions. Average salary: $100,000
+                          - $145,000
                         </li>
                         <li>
-                          🔹 <strong>Azure Data Engineer:</strong> Build and optimize data pipelines. Average salary: $95,000 - $140,000
+                          🔹 <strong>Azure Data Engineer:</strong> Build and
+                          optimize data pipelines. Average salary: $95,000 -
+                          $140,000
                         </li>
                         <li>
-                          🔹 <strong>Business Intelligence Developer:</strong> Create dashboards and visualizations. Average salary: $85,000 - $125,000
+                          🔹 <strong>Business Intelligence Developer:</strong>{" "}
+                          Create dashboards and visualizations. Average salary:
+                          $85,000 - $125,000
                         </li>
                         <li>
-                          🔹 <strong>Data Solutions Architect:</strong> Design end-to-end analytics platforms. Average salary: $120,000 - $165,000
+                          🔹 <strong>Data Solutions Architect:</strong> Design
+                          end-to-end analytics platforms. Average salary:
+                          $120,000 - $165,000
                         </li>
                         <li>
-                          🔹 <strong>Analytics Engineer:</strong> Transform and model data for analytics. Average salary: $92,000 - $138,000
+                          🔹 <strong>Analytics Engineer:</strong> Transform and
+                          model data for analytics. Average salary: $92,000 -
+                          $138,000
                         </li>
                       </ul>
-                      <p>Enterprise analytics professionals are in high demand as organizations invest in data-driven decision making.</p>
+                      <p>
+                        Enterprise analytics professionals are in high demand as
+                        organizations invest in data-driven decision making.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -203,7 +321,12 @@ const Details = () => {
               <div className="text">
                 <h1>Enterprise Analytics with Azure and Power BI (DP-500)</h1>
                 <p>
-                  Master the complete analytics stack from data ingestion to visualization. This course teaches you to design and implement enterprise-scale analytics solutions using Microsoft Azure services and Power BI. You'll gain hands-on experience with data lakes, warehouses, pipelines, and interactive dashboards while preparing for industry-recognized certifications.
+                  Master the complete analytics stack from data ingestion to
+                  visualization. This course teaches you to design and implement
+                  enterprise-scale analytics solutions using Microsoft Azure
+                  services and Power BI. You'll gain hands-on experience with
+                  data lakes, warehouses, pipelines, and interactive dashboards
+                  while preparing for industry-recognized certifications.
                 </p>
               </div>
 
@@ -215,7 +338,11 @@ const Details = () => {
                   Certification
                 </h4>
                 <p>
-                  This course prepares you for both Microsoft Power BI Data Analyst (PL-300) and Azure Enterprise Data Analyst (DP-500) certifications, validating your ability to deliver complete analytics solutions. These certifications are highly valued in the data analytics industry.
+                  This course prepares you for both Microsoft Power BI Data
+                  Analyst (PL-300) and Azure Enterprise Data Analyst (DP-500)
+                  certifications, validating your ability to deliver complete
+                  analytics solutions. These certifications are highly valued in
+                  the data analytics industry.
                 </p>
               </div>
               <div className="text">
@@ -226,7 +353,9 @@ const Details = () => {
                   Duration
                 </h4>
                 <p>
-                  The course is 12 weeks long, with 60 hours of instructor-led training and 90+ hours of hands-on labs and projects. Includes access to Azure credits for practice.
+                  The course is 12 weeks long, with 60 hours of instructor-led
+                  training and 90+ hours of hands-on labs and projects. Includes
+                  access to Azure credits for practice.
                 </p>
               </div>
               <div className="text">
@@ -249,7 +378,8 @@ const Details = () => {
                       <span className="material-symbols-outlined">
                         done_all
                       </span>
-                      Preparation for two Microsoft certifications (PL-300 & DP-500)
+                      Preparation for two Microsoft certifications (PL-300 &
+                      DP-500)
                     </li>
                     <li>
                       <span className="material-symbols-outlined">
@@ -280,7 +410,12 @@ const Details = () => {
                   Technologies Covered
                 </h4>
                 <p>
-                  Azure Data Lake Storage Gen2, Azure Data Factory, Azure Synapse Analytics, Power BI Service, Power BI Desktop, DAX (Data Analysis Expressions), Power Query M Language, Azure Purview, Azure Active Directory, Azure Machine Learning, Power BI Embedded, Paginated Reports, and other Microsoft analytics technologies.
+                  Azure Data Lake Storage Gen2, Azure Data Factory, Azure
+                  Synapse Analytics, Power BI Service, Power BI Desktop, DAX
+                  (Data Analysis Expressions), Power Query M Language, Azure
+                  Purview, Azure Active Directory, Azure Machine Learning, Power
+                  BI Embedded, Paginated Reports, and other Microsoft analytics
+                  technologies.
                 </p>
               </div>
             </div>
@@ -306,8 +441,9 @@ const Details = () => {
                     </span>
                   </div>
                   <p>
-                    <b>Course duration:</b> 3 months intensive program, with classes 3 days
-                    a week (Monday to Wednesday). Project work continues through weekends.
+                    <b>Course duration:</b> 3 months intensive program, with
+                    classes 3 days a week (Monday to Wednesday). Project work
+                    continues through weekends.
                   </p>
                 </div>
 
@@ -329,8 +465,10 @@ const Details = () => {
                     </span>
                   </div>
                   <p>
-                    <b>Additional Notes:</b> Students receive full access to Azure and Power BI
-                    resources. Basic data concepts understanding recommended. Includes Azure credits for hands-on practice.
+                    <b>Additional Notes:</b> Students receive full access to
+                    Azure and Power BI resources. Basic data concepts
+                    understanding recommended. Includes Azure credits for
+                    hands-on practice.
                   </p>
                 </div>
 

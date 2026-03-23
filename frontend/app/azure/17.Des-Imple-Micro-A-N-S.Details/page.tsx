@@ -12,12 +12,16 @@ import { useState } from "react";
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset;
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -77,17 +81,57 @@ const Details = () => {
                   >
                     <div className="concept-data">
                       <h3>🌐 Azure Networking Solutions (AZ-700)</h3>
-                      <p>This comprehensive course teaches you to design, implement, and manage networking solutions in Microsoft Azure. You'll learn to build secure, high-performance network architectures using Azure Virtual Networks, hybrid connections, security services, and traffic management solutions.</p>
-                      <div className="data-item">📌 1: Azure Virtual Networks Fundamentals - VNet design, Subnetting, IP addressing, VNet peering</div>
-                      <div className="data-item">📌 2: Hybrid Networking with VPN and ExpressRoute - Site-to-site VPN, Point-to-site VPN, ExpressRoute circuits</div>
-                      <div className="data-item">📌 3: Network Security Groups and Firewalls - NSG rules, Application Security Groups, Azure Firewall, Firewall policies</div>
-                      <div className="data-item">📌 4: Load Balancing and Traffic Management - Load Balancer, Application Gateway, Traffic Manager, Front Door</div>
-                      <div className="data-item">📌 5: Azure DNS and Private Link - DNS zones, Private DNS, Private Link, Private Endpoints</div>
-                      <div className="data-item">📌 6: Network Monitoring and Troubleshooting - Network Watcher, NSG flow logs, Connection Monitor</div>
-                      <div className="data-item">📌 7: Network Automation with ARM and Bicep - Infrastructure as Code, Template deployment</div>
-                      <div className="data-item">📌 8: Virtual WAN and Hub-Spoke Architectures - Azure Virtual WAN, Hub-spoke topology</div>
-                      <div className="data-item">📌 9: Advanced Networking - Service endpoints, VNet integration, Private Link services</div>
-                      <div className="data-item">📌 10: Capstone Project and AZ-700 Certification Preparation</div>
+                      <p>
+                        This comprehensive course teaches you to design,
+                        implement, and manage networking solutions in Microsoft
+                        Azure. You'll learn to build secure, high-performance
+                        network architectures using Azure Virtual Networks,
+                        hybrid connections, security services, and traffic
+                        management solutions.
+                      </p>
+                      <div className="data-item">
+                        📌 1: Azure Virtual Networks Fundamentals - VNet design,
+                        Subnetting, IP addressing, VNet peering
+                      </div>
+                      <div className="data-item">
+                        📌 2: Hybrid Networking with VPN and ExpressRoute -
+                        Site-to-site VPN, Point-to-site VPN, ExpressRoute
+                        circuits
+                      </div>
+                      <div className="data-item">
+                        📌 3: Network Security Groups and Firewalls - NSG rules,
+                        Application Security Groups, Azure Firewall, Firewall
+                        policies
+                      </div>
+                      <div className="data-item">
+                        📌 4: Load Balancing and Traffic Management - Load
+                        Balancer, Application Gateway, Traffic Manager, Front
+                        Door
+                      </div>
+                      <div className="data-item">
+                        📌 5: Azure DNS and Private Link - DNS zones, Private
+                        DNS, Private Link, Private Endpoints
+                      </div>
+                      <div className="data-item">
+                        📌 6: Network Monitoring and Troubleshooting - Network
+                        Watcher, NSG flow logs, Connection Monitor
+                      </div>
+                      <div className="data-item">
+                        📌 7: Network Automation with ARM and Bicep -
+                        Infrastructure as Code, Template deployment
+                      </div>
+                      <div className="data-item">
+                        📌 8: Virtual WAN and Hub-Spoke Architectures - Azure
+                        Virtual WAN, Hub-spoke topology
+                      </div>
+                      <div className="data-item">
+                        📌 9: Advanced Networking - Service endpoints, VNet
+                        integration, Private Link services
+                      </div>
+                      <div className="data-item">
+                        📌 10: Capstone Project and AZ-700 Certification
+                        Preparation
+                      </div>
                     </div>
                   </div>
                   <div
@@ -100,7 +144,12 @@ const Details = () => {
                             <i className="fas fa-info-circle"></i> Course
                             Description:
                           </strong>{" "}
-                          This comprehensive course teaches you to design, implement, and manage networking solutions in Microsoft Azure. You'll learn to build secure, high-performance network architectures using Azure Virtual Networks, hybrid connections, security services, and traffic management solutions.
+                          This comprehensive course teaches you to design,
+                          implement, and manage networking solutions in
+                          Microsoft Azure. You'll learn to build secure,
+                          high-performance network architectures using Azure
+                          Virtual Networks, hybrid connections, security
+                          services, and traffic management solutions.
                         </p>
 
                         <p>
@@ -108,39 +157,89 @@ const Details = () => {
                             <i className="fas fa-user-graduate"></i> Course
                             Prerequisites:
                           </strong>{" "}
-                          Basic understanding of networking concepts (TCP/IP, DNS, VPN) and familiarity with cloud services. Experience with Azure fundamentals is helpful but not required.
+                          Basic understanding of networking concepts (TCP/IP,
+                          DNS, VPN) and familiarity with cloud services.
+                          Experience with Azure fundamentals is helpful but not
+                          required.
                         </p>
                       </div>
 
                       <h4>🎯 Learning Objectives:</h4>
                       <ul>
-                        <li>✅ Design and implement Azure Virtual Networks with proper segmentation</li>
-                        <li>✅ Configure hybrid connections using VPN Gateway and ExpressRoute</li>
-                        <li>✅ Implement network security with NSGs, ASGs, and Azure Firewall</li>
-                        <li>✅ Configure load balancing and traffic routing across global and regional solutions</li>
-                        <li>✅ Implement private and public DNS solutions with custom domains</li>
-                        <li>✅ Monitor and troubleshoot network performance with Network Watcher</li>
-                        <li>✅ Automate network deployments with Infrastructure as Code (ARM/Bicep)</li>
-                        <li>✅ Design hub-spoke architectures with Virtual WAN</li>
-                        <li>✅ Implement private connectivity with Private Link and Private Endpoints</li>
-                        <li>✅ Prepare for Microsoft's AZ-700 certification exam</li>
+                        <li>
+                          ✅ Design and implement Azure Virtual Networks with
+                          proper segmentation
+                        </li>
+                        <li>
+                          ✅ Configure hybrid connections using VPN Gateway and
+                          ExpressRoute
+                        </li>
+                        <li>
+                          ✅ Implement network security with NSGs, ASGs, and
+                          Azure Firewall
+                        </li>
+                        <li>
+                          ✅ Configure load balancing and traffic routing across
+                          global and regional solutions
+                        </li>
+                        <li>
+                          ✅ Implement private and public DNS solutions with
+                          custom domains
+                        </li>
+                        <li>
+                          ✅ Monitor and troubleshoot network performance with
+                          Network Watcher
+                        </li>
+                        <li>
+                          ✅ Automate network deployments with Infrastructure as
+                          Code (ARM/Bicep)
+                        </li>
+                        <li>
+                          ✅ Design hub-spoke architectures with Virtual WAN
+                        </li>
+                        <li>
+                          ✅ Implement private connectivity with Private Link
+                          and Private Endpoints
+                        </li>
+                        <li>
+                          ✅ Prepare for Microsoft's AZ-700 certification exam
+                        </li>
                       </ul>
 
                       <h4>🔥 What You'll Build:</h4>
                       <ul>
-                        <li>🏗️ Complete hub-spoke network architecture with Virtual WAN</li>
-                        <li>🔒 Secure hybrid connection with VPN Gateway and ExpressRoute</li>
-                        <li>🛡️ Network security implementation with Azure Firewall and NSGs</li>
-                        <li>⚡ Global load balancing with Traffic Manager and Front Door</li>
-                        <li>📡 Private connectivity solution with Private Link and Private Endpoints</li>
-                        <li>📊 Network monitoring dashboard with Network Watcher</li>
-                        <li>🔄 Automated network deployment using Bicep templates</li>
+                        <li>
+                          🏗️ Complete hub-spoke network architecture with
+                          Virtual WAN
+                        </li>
+                        <li>
+                          🔒 Secure hybrid connection with VPN Gateway and
+                          ExpressRoute
+                        </li>
+                        <li>
+                          🛡️ Network security implementation with Azure Firewall
+                          and NSGs
+                        </li>
+                        <li>
+                          ⚡ Global load balancing with Traffic Manager and
+                          Front Door
+                        </li>
+                        <li>
+                          📡 Private connectivity solution with Private Link and
+                          Private Endpoints
+                        </li>
+                        <li>
+                          📊 Network monitoring dashboard with Network Watcher
+                        </li>
+                        <li>
+                          🔄 Automated network deployment using Bicep templates
+                        </li>
                       </ul>
 
                       <h4>Course Structure:</h4>
                       <p>
-                        This 10-module course combines theoretical knowledge with
-                        hands-on labs using Azure networking services:
+                        This 10-module course combines theoretical knowledge
+                        with hands-on labs using Azure networking services:
                       </p>
                       <ul>
                         <li>Module 1: Azure Networking Fundamentals</li>
@@ -157,12 +256,16 @@ const Details = () => {
 
                       <h4>Course Delivery:</h4>
                       <p>
-                        Instructor-led training with hands-on labs in live Azure environment. Includes access to networking resources for practical configuration exercises.
+                        Instructor-led training with hands-on labs in live Azure
+                        environment. Includes access to networking resources for
+                        practical configuration exercises.
                       </p>
 
                       <h4>Certification:</h4>
                       <p>
-                        Course prepares you for Microsoft Certified: Azure Network Engineer Associate (AZ-700) exam. Includes one free exam attempt voucher and practice tests.
+                        Course prepares you for Microsoft Certified: Azure
+                        Network Engineer Associate (AZ-700) exam. Includes one
+                        free exam attempt voucher and practice tests.
                       </p>
                     </div>
                   </div>
@@ -178,25 +281,40 @@ const Details = () => {
                       </p>
                       <ul>
                         <li>
-                          🔹 <strong>Azure Network Engineer:</strong> Design and implement Azure networking solutions. Average salary: $95,000 - $140,000
+                          🔹 <strong>Azure Network Engineer:</strong> Design and
+                          implement Azure networking solutions. Average salary:
+                          $95,000 - $140,000
                         </li>
                         <li>
-                          🔹 <strong>Cloud Network Architect:</strong> Plan and optimize cloud network infrastructure. Average salary: $115,000 - $160,000
+                          🔹 <strong>Cloud Network Architect:</strong> Plan and
+                          optimize cloud network infrastructure. Average salary:
+                          $115,000 - $160,000
                         </li>
                         <li>
-                          🔹 <strong>Network Security Specialist:</strong> Secure cloud network environments. Average salary: $105,000 - $150,000
+                          🔹 <strong>Network Security Specialist:</strong>{" "}
+                          Secure cloud network environments. Average salary:
+                          $105,000 - $150,000
                         </li>
                         <li>
-                          🔹 <strong>Cloud Infrastructure Engineer:</strong> Implement and manage cloud networking components. Average salary: $90,000 - $135,000
+                          🔹 <strong>Cloud Infrastructure Engineer:</strong>{" "}
+                          Implement and manage cloud networking components.
+                          Average salary: $90,000 - $135,000
                         </li>
                         <li>
-                          🔹 <strong>DevOps Engineer (Networking):</strong> Automate network deployments. Average salary: $100,000 - $145,000
+                          🔹 <strong>DevOps Engineer (Networking):</strong>{" "}
+                          Automate network deployments. Average salary: $100,000
+                          - $145,000
                         </li>
                         <li>
-                          🔹 <strong>Hybrid Cloud Specialist:</strong> Design and implement hybrid connectivity. Average salary: $98,000 - $142,000
+                          🔹 <strong>Hybrid Cloud Specialist:</strong> Design
+                          and implement hybrid connectivity. Average salary:
+                          $98,000 - $142,000
                         </li>
                       </ul>
-                      <p>Networking professionals with Azure expertise are in high demand as organizations migrate to the cloud.</p>
+                      <p>
+                        Networking professionals with Azure expertise are in
+                        high demand as organizations migrate to the cloud.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -207,7 +325,11 @@ const Details = () => {
               <div className="text">
                 <h1>Azure Networking Solutions (AZ-700)</h1>
                 <p>
-                  Master the skills to design and implement comprehensive networking solutions in Microsoft Azure. This course covers all aspects of cloud networking including virtual networks, hybrid connectivity, security implementations, and traffic management while preparing for the AZ-700 certification exam.
+                  Master the skills to design and implement comprehensive
+                  networking solutions in Microsoft Azure. This course covers
+                  all aspects of cloud networking including virtual networks,
+                  hybrid connectivity, security implementations, and traffic
+                  management while preparing for the AZ-700 certification exam.
                 </p>
               </div>
 
@@ -219,7 +341,11 @@ const Details = () => {
                   Certification
                 </h4>
                 <p>
-                  This course prepares you for the Microsoft Certified: Azure Network Engineer Associate certification (AZ-700), validating your ability to design, implement, and maintain Azure networking solutions. This certification is essential for network professionals working with Azure.
+                  This course prepares you for the Microsoft Certified: Azure
+                  Network Engineer Associate certification (AZ-700), validating
+                  your ability to design, implement, and maintain Azure
+                  networking solutions. This certification is essential for
+                  network professionals working with Azure.
                 </p>
               </div>
               <div className="text">
@@ -230,7 +356,9 @@ const Details = () => {
                   Duration
                 </h4>
                 <p>
-                  The course is 12 weeks long, with 60 hours of instructor-led training and 80+ hours of hands-on labs and projects. Includes access to Azure credits for practice.
+                  The course is 12 weeks long, with 60 hours of instructor-led
+                  training and 80+ hours of hands-on labs and projects. Includes
+                  access to Azure credits for practice.
                 </p>
               </div>
               <div className="text">
@@ -284,7 +412,13 @@ const Details = () => {
                   Technologies Covered
                 </h4>
                 <p>
-                  Azure Virtual Networks (VNet), VNet Peering, VPN Gateway, ExpressRoute, Network Security Groups (NSG), Application Security Groups (ASG), Azure Firewall, Azure Firewall Manager, Load Balancer, Application Gateway, Traffic Manager, Front Door, Azure DNS, Private DNS, Private Link, Private Endpoint, Network Watcher, NSG Flow Logs, Virtual WAN, Bicep, ARM Templates, and other Azure networking services.
+                  Azure Virtual Networks (VNet), VNet Peering, VPN Gateway,
+                  ExpressRoute, Network Security Groups (NSG), Application
+                  Security Groups (ASG), Azure Firewall, Azure Firewall Manager,
+                  Load Balancer, Application Gateway, Traffic Manager, Front
+                  Door, Azure DNS, Private DNS, Private Link, Private Endpoint,
+                  Network Watcher, NSG Flow Logs, Virtual WAN, Bicep, ARM
+                  Templates, and other Azure networking services.
                 </p>
               </div>
             </div>
@@ -335,7 +469,8 @@ const Details = () => {
                   </div>
                   <p>
                     <b>Additional Notes:</b> Students will receive access to
-                    Azure networking resources for hands-on labs. Basic networking knowledge (TCP/IP, DNS, routing) is recommended.
+                    Azure networking resources for hands-on labs. Basic
+                    networking knowledge (TCP/IP, DNS, routing) is recommended.
                   </p>
                 </div>
 

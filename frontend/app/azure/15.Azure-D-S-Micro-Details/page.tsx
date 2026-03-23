@@ -12,12 +12,16 @@ import { useState } from "react";
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset;
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -44,7 +48,10 @@ const Details = () => {
             {/* == First Item == */}
             <div className="item">
               <div className="image-container">
-                <Image src={AzureDevImage} alt="Developing Solutions for Microsoft Azure" />
+                <Image
+                  src={AzureDevImage}
+                  alt="Developing Solutions for Microsoft Azure"
+                />
               </div>
 
               <div className="concept-container">
@@ -76,18 +83,58 @@ const Details = () => {
                     className={`content ${activeContent === 1 ? "show" : ""}`}
                   >
                     <div className="concept-data">
-                      <h3>💻 Developing Solutions for Microsoft Azure (AZ-204)</h3>
-                      <p>This comprehensive course teaches you how to design, build, test, and maintain cloud applications and services on Microsoft Azure. You'll learn to implement Azure compute solutions, work with Azure storage options, integrate Azure security features, and connect to Azure services using APIs.</p>
-                      <div className="data-item">📌 1: Azure Development Fundamentals - SDKs, APIs, Azure CLI, development tools</div>
-                      <div className="data-item">📌 2: Developing Azure Compute Solutions - App Services, Functions, Containers, AKS</div>
-                      <div className="data-item">📌 3: Developing for Azure Storage - Blobs, Tables, Queues, Files, Cosmos DB</div>
-                      <div className="data-item">📌 4: Implementing Azure Security - Authentication, Authorization, Key Vault, Managed Identities</div>
-                      <div className="data-item">📌 5: Monitoring, Troubleshooting and Optimizing Solutions - Application Insights, Log Analytics</div>
-                      <div className="data-item">📌 6: Connecting to and Consuming Azure Services - Service Bus, Event Grid, Event Hubs</div>
-                      <div className="data-item">📌 7: Implementing Authentication and Authorization - Azure AD, OAuth2, OpenID Connect, Microsoft Identity Platform</div>
-                      <div className="data-item">📌 8: Caching and Content Delivery - Redis Cache, CDN, Front Door</div>
-                      <div className="data-item">📌 9: API Management - Creating and managing APIs, Policies, Versioning</div>
-                      <div className="data-item">📌 10: Capstone Project and AZ-204 Certification Preparation</div>
+                      <h3>
+                        💻 Developing Solutions for Microsoft Azure (AZ-204)
+                      </h3>
+                      <p>
+                        This comprehensive course teaches you how to design,
+                        build, test, and maintain cloud applications and
+                        services on Microsoft Azure. You'll learn to implement
+                        Azure compute solutions, work with Azure storage
+                        options, integrate Azure security features, and connect
+                        to Azure services using APIs.
+                      </p>
+                      <div className="data-item">
+                        📌 1: Azure Development Fundamentals - SDKs, APIs, Azure
+                        CLI, development tools
+                      </div>
+                      <div className="data-item">
+                        📌 2: Developing Azure Compute Solutions - App Services,
+                        Functions, Containers, AKS
+                      </div>
+                      <div className="data-item">
+                        📌 3: Developing for Azure Storage - Blobs, Tables,
+                        Queues, Files, Cosmos DB
+                      </div>
+                      <div className="data-item">
+                        📌 4: Implementing Azure Security - Authentication,
+                        Authorization, Key Vault, Managed Identities
+                      </div>
+                      <div className="data-item">
+                        📌 5: Monitoring, Troubleshooting and Optimizing
+                        Solutions - Application Insights, Log Analytics
+                      </div>
+                      <div className="data-item">
+                        📌 6: Connecting to and Consuming Azure Services -
+                        Service Bus, Event Grid, Event Hubs
+                      </div>
+                      <div className="data-item">
+                        📌 7: Implementing Authentication and Authorization -
+                        Azure AD, OAuth2, OpenID Connect, Microsoft Identity
+                        Platform
+                      </div>
+                      <div className="data-item">
+                        📌 8: Caching and Content Delivery - Redis Cache, CDN,
+                        Front Door
+                      </div>
+                      <div className="data-item">
+                        📌 9: API Management - Creating and managing APIs,
+                        Policies, Versioning
+                      </div>
+                      <div className="data-item">
+                        📌 10: Capstone Project and AZ-204 Certification
+                        Preparation
+                      </div>
                     </div>
                   </div>
                   <div
@@ -100,7 +147,12 @@ const Details = () => {
                             <i className="fas fa-info-circle"></i> Course
                             Description:
                           </strong>{" "}
-                          This comprehensive course teaches you how to design, build, test, and maintain cloud applications and services on Microsoft Azure. You'll learn to implement Azure compute solutions, work with Azure storage options, integrate Azure security features, and connect to Azure services using APIs.
+                          This comprehensive course teaches you how to design,
+                          build, test, and maintain cloud applications and
+                          services on Microsoft Azure. You'll learn to implement
+                          Azure compute solutions, work with Azure storage
+                          options, integrate Azure security features, and
+                          connect to Azure services using APIs.
                         </p>
 
                         <p>
@@ -108,37 +160,79 @@ const Details = () => {
                             <i className="fas fa-user-graduate"></i> Course
                             Prerequisites:
                           </strong>{" "}
-                          Basic understanding of programming concepts and familiarity with C#, Python, or JavaScript. Experience with cloud development is helpful but not required.
+                          Basic understanding of programming concepts and
+                          familiarity with C#, Python, or JavaScript. Experience
+                          with cloud development is helpful but not required.
                         </p>
                       </div>
 
                       <h4>🎯 Learning Objectives:</h4>
                       <ul>
-                        <li>✅ Develop Azure compute solutions using VMs, containers, and serverless technologies</li>
-                        <li>✅ Implement Azure storage solutions including blobs, files, and Cosmos DB</li>
-                        <li>✅ Secure applications using Azure Active Directory and Key Vault</li>
-                        <li>✅ Monitor and optimize Azure solutions with Application Insights</li>
-                        <li>✅ Connect applications to Azure services using REST APIs and SDKs</li>
-                        <li>✅ Implement authentication and authorization with Microsoft Identity Platform</li>
-                        <li>✅ Create and manage APIs using Azure API Management</li>
-                        <li>✅ Implement caching and content delivery solutions</li>
-                        <li>✅ Prepare for Microsoft's AZ-204 certification exam</li>
+                        <li>
+                          ✅ Develop Azure compute solutions using VMs,
+                          containers, and serverless technologies
+                        </li>
+                        <li>
+                          ✅ Implement Azure storage solutions including blobs,
+                          files, and Cosmos DB
+                        </li>
+                        <li>
+                          ✅ Secure applications using Azure Active Directory
+                          and Key Vault
+                        </li>
+                        <li>
+                          ✅ Monitor and optimize Azure solutions with
+                          Application Insights
+                        </li>
+                        <li>
+                          ✅ Connect applications to Azure services using REST
+                          APIs and SDKs
+                        </li>
+                        <li>
+                          ✅ Implement authentication and authorization with
+                          Microsoft Identity Platform
+                        </li>
+                        <li>
+                          ✅ Create and manage APIs using Azure API Management
+                        </li>
+                        <li>
+                          ✅ Implement caching and content delivery solutions
+                        </li>
+                        <li>
+                          ✅ Prepare for Microsoft's AZ-204 certification exam
+                        </li>
                       </ul>
 
                       <h4>🔥 What You'll Build:</h4>
                       <ul>
-                        <li>🌐 Full-stack web application deployed on Azure App Service</li>
-                        <li>⚡ Serverless API using Azure Functions and Cosmos DB</li>
-                        <li>🔐 Secure application with Azure AD authentication and Key Vault integration</li>
-                        <li>📦 Containerized application deployed to Azure Kubernetes Service</li>
-                        <li>📊 Monitoring dashboard with Application Insights</li>
-                        <li>🔁 Event-driven application using Service Bus and Event Grid</li>
+                        <li>
+                          🌐 Full-stack web application deployed on Azure App
+                          Service
+                        </li>
+                        <li>
+                          ⚡ Serverless API using Azure Functions and Cosmos DB
+                        </li>
+                        <li>
+                          🔐 Secure application with Azure AD authentication and
+                          Key Vault integration
+                        </li>
+                        <li>
+                          📦 Containerized application deployed to Azure
+                          Kubernetes Service
+                        </li>
+                        <li>
+                          📊 Monitoring dashboard with Application Insights
+                        </li>
+                        <li>
+                          🔁 Event-driven application using Service Bus and
+                          Event Grid
+                        </li>
                       </ul>
 
                       <h4>Course Structure:</h4>
                       <p>
-                        This 10-module course combines theoretical knowledge with
-                        hands-on labs using Azure development tools:
+                        This 10-module course combines theoretical knowledge
+                        with hands-on labs using Azure development tools:
                       </p>
                       <ul>
                         <li>Module 1: Azure Development Fundamentals</li>
@@ -155,12 +249,16 @@ const Details = () => {
 
                       <h4>Course Delivery:</h4>
                       <p>
-                        Instructor-led training with hands-on coding labs in live Azure environment. Includes access to Azure development resources and credits.
+                        Instructor-led training with hands-on coding labs in
+                        live Azure environment. Includes access to Azure
+                        development resources and credits.
                       </p>
 
                       <h4>Certification:</h4>
                       <p>
-                        Course prepares you for Microsoft Certified: Azure Developer Associate (AZ-204) exam. Includes one free exam attempt voucher and practice tests.
+                        Course prepares you for Microsoft Certified: Azure
+                        Developer Associate (AZ-204) exam. Includes one free
+                        exam attempt voucher and practice tests.
                       </p>
                     </div>
                   </div>
@@ -176,25 +274,40 @@ const Details = () => {
                       </p>
                       <ul>
                         <li>
-                          🔹 <strong>Azure Developer:</strong> Build and maintain cloud-native applications on Azure. Average salary: $95,000 - $140,000
+                          🔹 <strong>Azure Developer:</strong> Build and
+                          maintain cloud-native applications on Azure. Average
+                          salary: $95,000 - $140,000
                         </li>
                         <li>
-                          🔹 <strong>Cloud Application Developer:</strong> Design and implement scalable cloud solutions. Average salary: $100,000 - $145,000
+                          🔹 <strong>Cloud Application Developer:</strong>{" "}
+                          Design and implement scalable cloud solutions. Average
+                          salary: $100,000 - $145,000
                         </li>
                         <li>
-                          🔹 <strong>Full Stack Developer (Azure):</strong> Develop end-to-end solutions using Azure services. Average salary: $90,000 - $135,000
+                          🔹 <strong>Full Stack Developer (Azure):</strong>{" "}
+                          Develop end-to-end solutions using Azure services.
+                          Average salary: $90,000 - $135,000
                         </li>
                         <li>
-                          🔹 <strong>DevOps Engineer (Azure):</strong> Implement CI/CD pipelines for Azure applications. Average salary: $105,000 - $150,000
+                          🔹 <strong>DevOps Engineer (Azure):</strong> Implement
+                          CI/CD pipelines for Azure applications. Average
+                          salary: $105,000 - $150,000
                         </li>
                         <li>
-                          🔹 <strong>Cloud Solutions Developer:</strong> Create custom solutions leveraging Azure services. Average salary: $98,000 - $142,000
+                          🔹 <strong>Cloud Solutions Developer:</strong> Create
+                          custom solutions leveraging Azure services. Average
+                          salary: $98,000 - $142,000
                         </li>
                         <li>
-                          🔹 <strong>Serverless Developer:</strong> Specialize in Azure Functions and event-driven architectures. Average salary: $102,000 - $148,000
+                          🔹 <strong>Serverless Developer:</strong> Specialize
+                          in Azure Functions and event-driven architectures.
+                          Average salary: $102,000 - $148,000
                         </li>
                       </ul>
-                      <p>Azure development skills are in high demand as organizations accelerate their cloud adoption.</p>
+                      <p>
+                        Azure development skills are in high demand as
+                        organizations accelerate their cloud adoption.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -205,7 +318,14 @@ const Details = () => {
               <div className="text">
                 <h1>Developing Solutions for Microsoft Azure (AZ-204)</h1>
                 <p>
-                  Master the skills to build cloud-native applications and services on Microsoft Azure. This comprehensive course covers all aspects of Azure development including compute solutions, storage implementations, security features, and service integration. You'll gain hands-on experience with Azure development tools while preparing for the AZ-204 certification exam, one of the most valuable developer certifications in the cloud industry.
+                  Master the skills to build cloud-native applications and
+                  services on Microsoft Azure. This comprehensive course covers
+                  all aspects of Azure development including compute solutions,
+                  storage implementations, security features, and service
+                  integration. You'll gain hands-on experience with Azure
+                  development tools while preparing for the AZ-204 certification
+                  exam, one of the most valuable developer certifications in the
+                  cloud industry.
                 </p>
               </div>
 
@@ -217,7 +337,12 @@ const Details = () => {
                   Certification
                 </h4>
                 <p>
-                  This course prepares you for the Microsoft Certified: Azure Developer Associate certification (AZ-204). The certification validates your ability to design, build, test, and maintain cloud applications and services on Azure. This certification is essential for developers working with Microsoft cloud technologies.
+                  This course prepares you for the Microsoft Certified: Azure
+                  Developer Associate certification (AZ-204). The certification
+                  validates your ability to design, build, test, and maintain
+                  cloud applications and services on Azure. This certification
+                  is essential for developers working with Microsoft cloud
+                  technologies.
                 </p>
               </div>
               <div className="text">
@@ -228,7 +353,9 @@ const Details = () => {
                   Duration
                 </h4>
                 <p>
-                  The course is 12 weeks long, with 60 hours of instructor-led training and 80+ hours of hands-on labs and projects. Includes access to Azure credits for practice.
+                  The course is 12 weeks long, with 60 hours of instructor-led
+                  training and 80+ hours of hands-on labs and projects. Includes
+                  access to Azure credits for practice.
                 </p>
               </div>
               <div className="text">
@@ -245,7 +372,8 @@ const Details = () => {
                       <span className="material-symbols-outlined">
                         done_all
                       </span>
-                      Hands-on experience with Azure development tools and services
+                      Hands-on experience with Azure development tools and
+                      services
                     </li>
                     <li>
                       <span className="material-symbols-outlined">
@@ -282,7 +410,13 @@ const Details = () => {
                   Technologies Covered
                 </h4>
                 <p>
-                  Azure App Services, Azure Functions, Azure Kubernetes Service (AKS), Azure Container Instances, Azure Storage (Blobs, Tables, Queues, Files), Cosmos DB, Azure SQL Database, Azure Active Directory, Azure Key Vault, Azure Monitor, Application Insights, Azure API Management, Azure Service Bus, Event Grid, Event Hubs, Azure Redis Cache, Azure CDN, Front Door, and other Azure development services.
+                  Azure App Services, Azure Functions, Azure Kubernetes Service
+                  (AKS), Azure Container Instances, Azure Storage (Blobs,
+                  Tables, Queues, Files), Cosmos DB, Azure SQL Database, Azure
+                  Active Directory, Azure Key Vault, Azure Monitor, Application
+                  Insights, Azure API Management, Azure Service Bus, Event Grid,
+                  Event Hubs, Azure Redis Cache, Azure CDN, Front Door, and
+                  other Azure development services.
                 </p>
               </div>
             </div>
@@ -333,7 +467,9 @@ const Details = () => {
                   </div>
                   <p>
                     <b>Additional Notes:</b> Students will receive access to
-                    Azure development resources for hands-on labs. Basic programming knowledge in C#, Python, or JavaScript is recommended.
+                    Azure development resources for hands-on labs. Basic
+                    programming knowledge in C#, Python, or JavaScript is
+                    recommended.
                   </p>
                 </div>
 

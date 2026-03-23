@@ -12,12 +12,16 @@ import { useState } from "react";
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset;
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -44,7 +48,10 @@ const Details = () => {
             {/* == First Item == */}
             <div className="item">
               <div className="image-container">
-                <Image src={WindowsServerImage} alt="Administering Windows Server Hybrid Core Infrastructure" />
+                <Image
+                  src={WindowsServerImage}
+                  alt="Administering Windows Server Hybrid Core Infrastructure"
+                />
               </div>
 
               <div className="concept-container">
@@ -76,18 +83,59 @@ const Details = () => {
                     className={`content ${activeContent === 1 ? "show" : ""}`}
                   >
                     <div className="concept-data">
-                      <h3>🖥️ Administering Windows Server Hybrid Core Infrastructure (AZ-800)</h3>
-                      <p>This comprehensive course teaches you how to administer core Windows Server workloads using hybrid technologies. You'll learn to deploy and manage Windows Server on-premises and in Azure, implement hybrid networking, secure hybrid identities, and maintain hybrid server environments.</p>
-                      <div className="data-item">📌 1: Windows Server Hybrid Administration Fundamentals - Hybrid architecture, Azure integration, Management tools</div>
-                      <div className="data-item">📌 2: Deploying and Configuring Hybrid Services - Azure Arc, Windows Admin Center, Azure Migrate</div>
-                      <div className="data-item">📌 3: Managing Windows Server in Hybrid Environments - Server management, Update management, Compliance</div>
-                      <div className="data-item">📌 4: Implementing Hybrid Network Infrastructure - VPN connectivity, Azure Network Adapter, DNS integration</div>
-                      <div className="data-item">📌 5: Hybrid Identity and Access Management - Azure AD Connect, Active Directory synchronization, SSO</div>
-                      <div className="data-item">📌 6: Monitoring and Maintaining Hybrid Systems - Azure Monitor, Azure Log Analytics, Performance monitoring</div>
-                      <div className="data-item">📌 7: Disaster Recovery in Hybrid Environments - Azure Site Recovery, Backup strategies, Failover planning</div>
-                      <div className="data-item">📌 8: File Services and Storage Migration - Azure File Sync, Storage migration, Data deduplication</div>
-                      <div className="data-item">📌 9: Automation and Scripting - PowerShell, Desired State Configuration, Runbooks</div>
-                      <div className="data-item">📌 10: Capstone Project and AZ-800 Certification Preparation</div>
+                      <h3>
+                        🖥️ Administering Windows Server Hybrid Core
+                        Infrastructure (AZ-800)
+                      </h3>
+                      <p>
+                        This comprehensive course teaches you how to administer
+                        core Windows Server workloads using hybrid technologies.
+                        You'll learn to deploy and manage Windows Server
+                        on-premises and in Azure, implement hybrid networking,
+                        secure hybrid identities, and maintain hybrid server
+                        environments.
+                      </p>
+                      <div className="data-item">
+                        📌 1: Windows Server Hybrid Administration Fundamentals
+                        - Hybrid architecture, Azure integration, Management
+                        tools
+                      </div>
+                      <div className="data-item">
+                        📌 2: Deploying and Configuring Hybrid Services - Azure
+                        Arc, Windows Admin Center, Azure Migrate
+                      </div>
+                      <div className="data-item">
+                        📌 3: Managing Windows Server in Hybrid Environments -
+                        Server management, Update management, Compliance
+                      </div>
+                      <div className="data-item">
+                        📌 4: Implementing Hybrid Network Infrastructure - VPN
+                        connectivity, Azure Network Adapter, DNS integration
+                      </div>
+                      <div className="data-item">
+                        📌 5: Hybrid Identity and Access Management - Azure AD
+                        Connect, Active Directory synchronization, SSO
+                      </div>
+                      <div className="data-item">
+                        📌 6: Monitoring and Maintaining Hybrid Systems - Azure
+                        Monitor, Azure Log Analytics, Performance monitoring
+                      </div>
+                      <div className="data-item">
+                        📌 7: Disaster Recovery in Hybrid Environments - Azure
+                        Site Recovery, Backup strategies, Failover planning
+                      </div>
+                      <div className="data-item">
+                        📌 8: File Services and Storage Migration - Azure File
+                        Sync, Storage migration, Data deduplication
+                      </div>
+                      <div className="data-item">
+                        📌 9: Automation and Scripting - PowerShell, Desired
+                        State Configuration, Runbooks
+                      </div>
+                      <div className="data-item">
+                        📌 10: Capstone Project and AZ-800 Certification
+                        Preparation
+                      </div>
                     </div>
                   </div>
                   <div
@@ -100,7 +148,12 @@ const Details = () => {
                             <i className="fas fa-info-circle"></i> Course
                             Description:
                           </strong>{" "}
-                          This comprehensive course teaches you how to administer core Windows Server workloads using hybrid technologies. You'll learn to deploy and manage Windows Server on-premises and in Azure, implement hybrid networking, secure hybrid identities, and maintain hybrid server environments.
+                          This comprehensive course teaches you how to
+                          administer core Windows Server workloads using hybrid
+                          technologies. You'll learn to deploy and manage
+                          Windows Server on-premises and in Azure, implement
+                          hybrid networking, secure hybrid identities, and
+                          maintain hybrid server environments.
                         </p>
 
                         <p>
@@ -108,39 +161,85 @@ const Details = () => {
                             <i className="fas fa-user-graduate"></i> Course
                             Prerequisites:
                           </strong>{" "}
-                          Basic understanding of Windows Server administration and networking concepts. Familiarity with Azure is helpful but not required.
+                          Basic understanding of Windows Server administration
+                          and networking concepts. Familiarity with Azure is
+                          helpful but not required.
                         </p>
                       </div>
 
                       <h4>🎯 Learning Objectives:</h4>
                       <ul>
-                        <li>✅ Deploy and configure Windows Server in hybrid environments using Azure Arc and Azure Migrate</li>
-                        <li>✅ Implement hybrid networking solutions including VPN connectivity and DNS integration</li>
-                        <li>✅ Manage hybrid identities using Azure AD Connect and Active Directory synchronization</li>
-                        <li>✅ Monitor and maintain hybrid server infrastructure with Azure Monitor and Log Analytics</li>
-                        <li>✅ Implement disaster recovery for hybrid systems using Azure Site Recovery and Backup</li>
-                        <li>✅ Configure file services and storage migration with Azure File Sync</li>
-                        <li>✅ Automate administrative tasks in hybrid environments using PowerShell and DSC</li>
-                        <li>✅ Manage updates and compliance across hybrid environments</li>
-                        <li>✅ Implement security and access control in hybrid configurations</li>
-                        <li>✅ Prepare for Microsoft's AZ-800 certification exam</li>
+                        <li>
+                          ✅ Deploy and configure Windows Server in hybrid
+                          environments using Azure Arc and Azure Migrate
+                        </li>
+                        <li>
+                          ✅ Implement hybrid networking solutions including VPN
+                          connectivity and DNS integration
+                        </li>
+                        <li>
+                          ✅ Manage hybrid identities using Azure AD Connect and
+                          Active Directory synchronization
+                        </li>
+                        <li>
+                          ✅ Monitor and maintain hybrid server infrastructure
+                          with Azure Monitor and Log Analytics
+                        </li>
+                        <li>
+                          ✅ Implement disaster recovery for hybrid systems
+                          using Azure Site Recovery and Backup
+                        </li>
+                        <li>
+                          ✅ Configure file services and storage migration with
+                          Azure File Sync
+                        </li>
+                        <li>
+                          ✅ Automate administrative tasks in hybrid
+                          environments using PowerShell and DSC
+                        </li>
+                        <li>
+                          ✅ Manage updates and compliance across hybrid
+                          environments
+                        </li>
+                        <li>
+                          ✅ Implement security and access control in hybrid
+                          configurations
+                        </li>
+                        <li>
+                          ✅ Prepare for Microsoft's AZ-800 certification exam
+                        </li>
                       </ul>
 
                       <h4>🔥 What You'll Build:</h4>
                       <ul>
-                        <li>🌐 Complete hybrid infrastructure with on-premises servers and Azure integration</li>
-                        <li>🔗 Hybrid network connectivity with VPN and Azure Network Adapter</li>
-                        <li>🔄 Identity synchronization with Azure AD Connect and SSO</li>
-                        <li>📊 Monitoring solution with Azure Monitor and Log Analytics</li>
-                        <li>💾 Disaster recovery plan with Azure Site Recovery and Backup</li>
+                        <li>
+                          🌐 Complete hybrid infrastructure with on-premises
+                          servers and Azure integration
+                        </li>
+                        <li>
+                          🔗 Hybrid network connectivity with VPN and Azure
+                          Network Adapter
+                        </li>
+                        <li>
+                          🔄 Identity synchronization with Azure AD Connect and
+                          SSO
+                        </li>
+                        <li>
+                          📊 Monitoring solution with Azure Monitor and Log
+                          Analytics
+                        </li>
+                        <li>
+                          💾 Disaster recovery plan with Azure Site Recovery and
+                          Backup
+                        </li>
                         <li>📁 Hybrid file services with Azure File Sync</li>
                         <li>⚡ Automated management scripts with PowerShell</li>
                       </ul>
 
                       <h4>Course Structure:</h4>
                       <p>
-                        This 10-module course combines theoretical knowledge with
-                        hands-on labs using Windows Server and Azure:
+                        This 10-module course combines theoretical knowledge
+                        with hands-on labs using Windows Server and Azure:
                       </p>
                       <ul>
                         <li>Module 1: Hybrid Administration Fundamentals</li>
@@ -157,12 +256,17 @@ const Details = () => {
 
                       <h4>Course Delivery:</h4>
                       <p>
-                        Instructor-led training with hands-on labs in hybrid environments. Includes access to Azure and on-premises resources for practical exercises.
+                        Instructor-led training with hands-on labs in hybrid
+                        environments. Includes access to Azure and on-premises
+                        resources for practical exercises.
                       </p>
 
                       <h4>Certification:</h4>
                       <p>
-                        Course prepares you for Microsoft Certified: Windows Server Hybrid Administrator Associate (AZ-800) exam. Includes one free exam attempt voucher and practice tests.
+                        Course prepares you for Microsoft Certified: Windows
+                        Server Hybrid Administrator Associate (AZ-800) exam.
+                        Includes one free exam attempt voucher and practice
+                        tests.
                       </p>
                     </div>
                   </div>
@@ -178,25 +282,43 @@ const Details = () => {
                       </p>
                       <ul>
                         <li>
-                          🔹 <strong>Windows Server Hybrid Administrator:</strong> Manage and maintain hybrid Windows Server environments. Average salary: $85,000 - $125,000
+                          🔹{" "}
+                          <strong>Windows Server Hybrid Administrator:</strong>{" "}
+                          Manage and maintain hybrid Windows Server
+                          environments. Average salary: $85,000 - $125,000
                         </li>
                         <li>
-                          🔹 <strong>Cloud Infrastructure Administrator:</strong> Administer hybrid cloud infrastructure. Average salary: $90,000 - $130,000
+                          🔹{" "}
+                          <strong>Cloud Infrastructure Administrator:</strong>{" "}
+                          Administer hybrid cloud infrastructure. Average
+                          salary: $90,000 - $130,000
                         </li>
                         <li>
-                          🔹 <strong>Systems Administrator (Hybrid):</strong> Support hybrid IT environments. Average salary: $80,000 - $115,000
+                          🔹 <strong>Systems Administrator (Hybrid):</strong>{" "}
+                          Support hybrid IT environments. Average salary:
+                          $80,000 - $115,000
                         </li>
                         <li>
-                          🔹 <strong>Network Administrator (Hybrid):</strong> Implement and maintain hybrid networking solutions. Average salary: $88,000 - $128,000
+                          🔹 <strong>Network Administrator (Hybrid):</strong>{" "}
+                          Implement and maintain hybrid networking solutions.
+                          Average salary: $88,000 - $128,000
                         </li>
                         <li>
-                          🔹 <strong>IT Infrastructure Specialist:</strong> Design and implement hybrid infrastructure solutions. Average salary: $95,000 - $135,000
+                          🔹 <strong>IT Infrastructure Specialist:</strong>{" "}
+                          Design and implement hybrid infrastructure solutions.
+                          Average salary: $95,000 - $135,000
                         </li>
                         <li>
-                          🔹 <strong>Hybrid Cloud Engineer:</strong> Manage hybrid server workloads across on-premises and Azure. Average salary: $92,000 - $140,000
+                          🔹 <strong>Hybrid Cloud Engineer:</strong> Manage
+                          hybrid server workloads across on-premises and Azure.
+                          Average salary: $92,000 - $140,000
                         </li>
                       </ul>
-                      <p>Hybrid infrastructure professionals are essential as organizations maintain both on-premises and cloud environments.</p>
+                      <p>
+                        Hybrid infrastructure professionals are essential as
+                        organizations maintain both on-premises and cloud
+                        environments.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -205,9 +327,18 @@ const Details = () => {
             {/* == Second Item */}
             <div className="item">
               <div className="text">
-                <h1>Administering Windows Server Hybrid Core Infrastructure (AZ-800)</h1>
+                <h1>
+                  Administering Windows Server Hybrid Core Infrastructure
+                  (AZ-800)
+                </h1>
                 <p>
-                  Master the skills to deploy, configure, and manage Windows Server in hybrid environments. This comprehensive course covers all aspects of hybrid administration including identity management, networking, monitoring, and disaster recovery. You'll gain hands-on experience with both on-premises and cloud-based Windows Server administration while preparing for the AZ-800 certification exam.
+                  Master the skills to deploy, configure, and manage Windows
+                  Server in hybrid environments. This comprehensive course
+                  covers all aspects of hybrid administration including identity
+                  management, networking, monitoring, and disaster recovery.
+                  You'll gain hands-on experience with both on-premises and
+                  cloud-based Windows Server administration while preparing for
+                  the AZ-800 certification exam.
                 </p>
               </div>
 
@@ -219,7 +350,12 @@ const Details = () => {
                   Certification
                 </h4>
                 <p>
-                  This course prepares you for the Microsoft Certified: Windows Server Hybrid Administrator Associate certification (AZ-800). The certification validates your ability to administer Windows Server in hybrid environments, including both on-premises and Azure-integrated services. This certification is essential for IT professionals managing modern Windows Server environments.
+                  This course prepares you for the Microsoft Certified: Windows
+                  Server Hybrid Administrator Associate certification (AZ-800).
+                  The certification validates your ability to administer Windows
+                  Server in hybrid environments, including both on-premises and
+                  Azure-integrated services. This certification is essential for
+                  IT professionals managing modern Windows Server environments.
                 </p>
               </div>
               <div className="text">
@@ -230,7 +366,9 @@ const Details = () => {
                   Duration
                 </h4>
                 <p>
-                  The course is 12 weeks long, with 60 hours of instructor-led training and 70+ hours of hands-on labs and projects. Includes access to Azure credits for hybrid practice.
+                  The course is 12 weeks long, with 60 hours of instructor-led
+                  training and 70+ hours of hands-on labs and projects. Includes
+                  access to Azure credits for hybrid practice.
                 </p>
               </div>
               <div className="text">
@@ -241,13 +379,15 @@ const Details = () => {
                   Benefits
                 </h4>
                 <div>
-                  Benefits of completing this Windows Server Hybrid Administration course:
+                  Benefits of completing this Windows Server Hybrid
+                  Administration course:
                   <ul>
                     <li>
                       <span className="material-symbols-outlined">
                         done_all
                       </span>
-                      Hands-on experience with hybrid Windows Server environments
+                      Hands-on experience with hybrid Windows Server
+                      environments
                     </li>
                     <li>
                       <span className="material-symbols-outlined">
@@ -265,7 +405,8 @@ const Details = () => {
                       <span className="material-symbols-outlined">
                         done_all
                       </span>
-                      Access to Azure and on-premises resources for practical learning
+                      Access to Azure and on-premises resources for practical
+                      learning
                     </li>
                     <li>
                       <span className="material-symbols-outlined">
@@ -284,7 +425,12 @@ const Details = () => {
                   Technologies Covered
                 </h4>
                 <p>
-                  Windows Server 2022, Windows Server 2019, Azure Arc, Azure AD Connect, Azure Network Adapter, Azure Monitor, Azure Log Analytics, Azure Site Recovery, Azure Backup, Azure File Sync, Windows Admin Center, PowerShell, Desired State Configuration (DSC), Azure Migrate, DNS integration, and other hybrid administration tools.
+                  Windows Server 2022, Windows Server 2019, Azure Arc, Azure AD
+                  Connect, Azure Network Adapter, Azure Monitor, Azure Log
+                  Analytics, Azure Site Recovery, Azure Backup, Azure File Sync,
+                  Windows Admin Center, PowerShell, Desired State Configuration
+                  (DSC), Azure Migrate, DNS integration, and other hybrid
+                  administration tools.
                 </p>
               </div>
             </div>
@@ -335,7 +481,9 @@ const Details = () => {
                   </div>
                   <p>
                     <b>Additional Notes:</b> Students will receive access to
-                    hybrid environment resources for hands-on labs. Basic Windows Server knowledge is recommended. Includes Azure credits for practice.
+                    hybrid environment resources for hands-on labs. Basic
+                    Windows Server knowledge is recommended. Includes Azure
+                    credits for practice.
                   </p>
                 </div>
 

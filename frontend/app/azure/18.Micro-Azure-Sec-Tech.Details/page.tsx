@@ -12,12 +12,16 @@ import { useState } from "react";
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset;
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -44,7 +48,10 @@ const Details = () => {
             {/* == First Item == */}
             <div className="item">
               <div className="image-container">
-                <Image src={SecurityImage} alt="Microsoft Azure Security Technologies" />
+                <Image
+                  src={SecurityImage}
+                  alt="Microsoft Azure Security Technologies"
+                />
               </div>
 
               <div className="concept-container">
@@ -77,17 +84,54 @@ const Details = () => {
                   >
                     <div className="concept-data">
                       <h3>🛡️ Microsoft Azure Security Technologies (AZ-500)</h3>
-                      <p>This comprehensive course teaches you to implement security controls, maintain security posture, and identify and remediate vulnerabilities using Azure security technologies. You'll learn to manage identity and access, protect data and networks, and leverage Azure security tools.</p>
-                      <div className="data-item">📌 1: Azure Security Fundamentals - Security concepts, Shared responsibility model, Defense in depth</div>
-                      <div className="data-item">📌 2: Identity and Access Management - Azure AD, Conditional Access, MFA, Identity Protection</div>
-                      <div className="data-item">📌 3: Platform Protection - Network security, NSGs, Azure Firewall, DDoS Protection</div>
-                      <div className="data-item">📌 4: Security Operations - Microsoft Defender for Cloud, Security alerts, Incident response</div>
-                      <div className="data-item">📌 5: Data and Application Security - Key Vault, Storage security, SQL security, App Security</div>
-                      <div className="data-item">📌 6: Security Governance and Compliance - Azure Policy, RBAC, Security benchmarks</div>
-                      <div className="data-item">📌 7: Advanced Threat Protection - Microsoft Sentinel, Threat intelligence, SIEM/SOAR</div>
-                      <div className="data-item">📌 8: Container and Kubernetes Security - AKS security, Container registry, Defender for containers</div>
-                      <div className="data-item">📌 9: Compliance and Privacy - Azure compliance, Privacy standards, Regulatory requirements</div>
-                      <div className="data-item">📌 10: Capstone Project and AZ-500 Certification Preparation</div>
+                      <p>
+                        This comprehensive course teaches you to implement
+                        security controls, maintain security posture, and
+                        identify and remediate vulnerabilities using Azure
+                        security technologies. You'll learn to manage identity
+                        and access, protect data and networks, and leverage
+                        Azure security tools.
+                      </p>
+                      <div className="data-item">
+                        📌 1: Azure Security Fundamentals - Security concepts,
+                        Shared responsibility model, Defense in depth
+                      </div>
+                      <div className="data-item">
+                        📌 2: Identity and Access Management - Azure AD,
+                        Conditional Access, MFA, Identity Protection
+                      </div>
+                      <div className="data-item">
+                        📌 3: Platform Protection - Network security, NSGs,
+                        Azure Firewall, DDoS Protection
+                      </div>
+                      <div className="data-item">
+                        📌 4: Security Operations - Microsoft Defender for
+                        Cloud, Security alerts, Incident response
+                      </div>
+                      <div className="data-item">
+                        📌 5: Data and Application Security - Key Vault, Storage
+                        security, SQL security, App Security
+                      </div>
+                      <div className="data-item">
+                        📌 6: Security Governance and Compliance - Azure Policy,
+                        RBAC, Security benchmarks
+                      </div>
+                      <div className="data-item">
+                        📌 7: Advanced Threat Protection - Microsoft Sentinel,
+                        Threat intelligence, SIEM/SOAR
+                      </div>
+                      <div className="data-item">
+                        📌 8: Container and Kubernetes Security - AKS security,
+                        Container registry, Defender for containers
+                      </div>
+                      <div className="data-item">
+                        📌 9: Compliance and Privacy - Azure compliance, Privacy
+                        standards, Regulatory requirements
+                      </div>
+                      <div className="data-item">
+                        📌 10: Capstone Project and AZ-500 Certification
+                        Preparation
+                      </div>
                     </div>
                   </div>
                   <div
@@ -100,7 +144,12 @@ const Details = () => {
                             <i className="fas fa-info-circle"></i> Course
                             Description:
                           </strong>{" "}
-                          This comprehensive course teaches you to implement security controls, maintain security posture, and identify and remediate vulnerabilities using Azure security technologies. You'll learn to manage identity and access, protect data and networks, and leverage Azure security tools.
+                          This comprehensive course teaches you to implement
+                          security controls, maintain security posture, and
+                          identify and remediate vulnerabilities using Azure
+                          security technologies. You'll learn to manage identity
+                          and access, protect data and networks, and leverage
+                          Azure security tools.
                         </p>
 
                         <p>
@@ -108,39 +157,88 @@ const Details = () => {
                             <i className="fas fa-user-graduate"></i> Course
                             Prerequisites:
                           </strong>{" "}
-                          Basic understanding of security concepts and familiarity with Azure services. Experience with IT security is helpful but not required.
+                          Basic understanding of security concepts and
+                          familiarity with Azure services. Experience with IT
+                          security is helpful but not required.
                         </p>
                       </div>
 
                       <h4>🎯 Learning Objectives:</h4>
                       <ul>
-                        <li>✅ Implement Azure Active Directory security controls including Conditional Access and Identity Protection</li>
-                        <li>✅ Configure network security with NSGs, ASGs, Azure Firewall, and DDoS Protection</li>
-                        <li>✅ Manage security operations with Microsoft Defender for Cloud and security alerts</li>
-                        <li>✅ Implement data security with Azure Key Vault, encryption, and SQL security features</li>
-                        <li>✅ Configure security policies and governance using Azure Policy and RBAC</li>
-                        <li>✅ Implement threat protection solutions with Microsoft Sentinel</li>
-                        <li>✅ Monitor and respond to security incidents with SIEM/SOAR capabilities</li>
-                        <li>✅ Secure container and Kubernetes workloads in AKS</li>
-                        <li>✅ Ensure compliance with Azure compliance and privacy standards</li>
-                        <li>✅ Prepare for Microsoft's AZ-500 certification exam</li>
+                        <li>
+                          ✅ Implement Azure Active Directory security controls
+                          including Conditional Access and Identity Protection
+                        </li>
+                        <li>
+                          ✅ Configure network security with NSGs, ASGs, Azure
+                          Firewall, and DDoS Protection
+                        </li>
+                        <li>
+                          ✅ Manage security operations with Microsoft Defender
+                          for Cloud and security alerts
+                        </li>
+                        <li>
+                          ✅ Implement data security with Azure Key Vault,
+                          encryption, and SQL security features
+                        </li>
+                        <li>
+                          ✅ Configure security policies and governance using
+                          Azure Policy and RBAC
+                        </li>
+                        <li>
+                          ✅ Implement threat protection solutions with
+                          Microsoft Sentinel
+                        </li>
+                        <li>
+                          ✅ Monitor and respond to security incidents with
+                          SIEM/SOAR capabilities
+                        </li>
+                        <li>
+                          ✅ Secure container and Kubernetes workloads in AKS
+                        </li>
+                        <li>
+                          ✅ Ensure compliance with Azure compliance and privacy
+                          standards
+                        </li>
+                        <li>
+                          ✅ Prepare for Microsoft's AZ-500 certification exam
+                        </li>
                       </ul>
 
                       <h4>🔥 What You'll Build:</h4>
                       <ul>
-                        <li>🔐 Complete identity security framework with Azure AD and Conditional Access</li>
-                        <li>🛡️ Network security architecture with Azure Firewall and DDoS Protection</li>
-                        <li>📊 Security monitoring solution with Microsoft Sentinel</li>
-                        <li>🔑 Key management system with Azure Key Vault and HSM</li>
-                        <li>📋 Security governance framework with Azure Policy and initiatives</li>
-                        <li>⚡ Container security implementation for AKS workloads</li>
-                        <li>🚨 Incident response playbook with security alerts and automation</li>
+                        <li>
+                          🔐 Complete identity security framework with Azure AD
+                          and Conditional Access
+                        </li>
+                        <li>
+                          🛡️ Network security architecture with Azure Firewall
+                          and DDoS Protection
+                        </li>
+                        <li>
+                          📊 Security monitoring solution with Microsoft
+                          Sentinel
+                        </li>
+                        <li>
+                          🔑 Key management system with Azure Key Vault and HSM
+                        </li>
+                        <li>
+                          📋 Security governance framework with Azure Policy and
+                          initiatives
+                        </li>
+                        <li>
+                          ⚡ Container security implementation for AKS workloads
+                        </li>
+                        <li>
+                          🚨 Incident response playbook with security alerts and
+                          automation
+                        </li>
                       </ul>
 
                       <h4>Course Structure:</h4>
                       <p>
-                        This 10-module course combines theoretical knowledge with
-                        hands-on security implementations:
+                        This 10-module course combines theoretical knowledge
+                        with hands-on security implementations:
                       </p>
                       <ul>
                         <li>Module 1: Azure Security Fundamentals</li>
@@ -157,12 +255,16 @@ const Details = () => {
 
                       <h4>Course Delivery:</h4>
                       <p>
-                        Instructor-led training with hands-on security labs in live Azure environment. Includes access to security resources for practical exercises.
+                        Instructor-led training with hands-on security labs in
+                        live Azure environment. Includes access to security
+                        resources for practical exercises.
                       </p>
 
                       <h4>Certification:</h4>
                       <p>
-                        Course prepares you for Microsoft Certified: Azure Security Engineer Associate (AZ-500) exam. Includes one free exam attempt voucher and practice tests.
+                        Course prepares you for Microsoft Certified: Azure
+                        Security Engineer Associate (AZ-500) exam. Includes one
+                        free exam attempt voucher and practice tests.
                       </p>
                     </div>
                   </div>
@@ -178,25 +280,41 @@ const Details = () => {
                       </p>
                       <ul>
                         <li>
-                          🔹 <strong>Azure Security Engineer:</strong> Implement security controls and threat protection. Average salary: $105,000 - $150,000
+                          🔹 <strong>Azure Security Engineer:</strong> Implement
+                          security controls and threat protection. Average
+                          salary: $105,000 - $150,000
                         </li>
                         <li>
-                          🔹 <strong>Cloud Security Architect:</strong> Design secure cloud solutions. Average salary: $125,000 - $170,000
+                          🔹 <strong>Cloud Security Architect:</strong> Design
+                          secure cloud solutions. Average salary: $125,000 -
+                          $170,000
                         </li>
                         <li>
-                          🔹 <strong>Security Operations Analyst:</strong> Monitor and respond to security incidents. Average salary: $95,000 - $135,000
+                          🔹 <strong>Security Operations Analyst:</strong>{" "}
+                          Monitor and respond to security incidents. Average
+                          salary: $95,000 - $135,000
                         </li>
                         <li>
-                          🔹 <strong>Identity and Access Administrator:</strong> Manage secure access to resources. Average salary: $90,000 - $130,000
+                          🔹 <strong>Identity and Access Administrator:</strong>{" "}
+                          Manage secure access to resources. Average salary:
+                          $90,000 - $130,000
                         </li>
                         <li>
-                          🔹 <strong>Compliance Specialist:</strong> Implement governance and compliance policies. Average salary: $88,000 - $125,000
+                          🔹 <strong>Compliance Specialist:</strong> Implement
+                          governance and compliance policies. Average salary:
+                          $88,000 - $125,000
                         </li>
                         <li>
-                          🔹 <strong>DevSecOps Engineer:</strong> Integrate security into DevOps pipelines. Average salary: $110,000 - $155,000
+                          🔹 <strong>DevSecOps Engineer:</strong> Integrate
+                          security into DevOps pipelines. Average salary:
+                          $110,000 - $155,000
                         </li>
                       </ul>
-                      <p>Cloud security professionals are in extremely high demand as organizations prioritize protecting their cloud assets.</p>
+                      <p>
+                        Cloud security professionals are in extremely high
+                        demand as organizations prioritize protecting their
+                        cloud assets.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -207,7 +325,11 @@ const Details = () => {
               <div className="text">
                 <h1>Microsoft Azure Security Technologies (AZ-500)</h1>
                 <p>
-                  Master the skills to secure Microsoft Azure environments and protect against modern threats. This comprehensive course covers all aspects of Azure security including identity protection, network security, data protection, and security monitoring while preparing for the AZ-500 certification exam.
+                  Master the skills to secure Microsoft Azure environments and
+                  protect against modern threats. This comprehensive course
+                  covers all aspects of Azure security including identity
+                  protection, network security, data protection, and security
+                  monitoring while preparing for the AZ-500 certification exam.
                 </p>
               </div>
 
@@ -219,7 +341,12 @@ const Details = () => {
                   Certification
                 </h4>
                 <p>
-                  This course prepares you for the Microsoft Certified: Azure Security Engineer Associate certification (AZ-500), validating your ability to implement security controls, maintain security posture, and identify and remediate vulnerabilities. This certification is essential for security professionals working with Azure.
+                  This course prepares you for the Microsoft Certified: Azure
+                  Security Engineer Associate certification (AZ-500), validating
+                  your ability to implement security controls, maintain security
+                  posture, and identify and remediate vulnerabilities. This
+                  certification is essential for security professionals working
+                  with Azure.
                 </p>
               </div>
               <div className="text">
@@ -230,7 +357,9 @@ const Details = () => {
                   Duration
                 </h4>
                 <p>
-                  The course is 12 weeks long, with 60 hours of instructor-led training and 80+ hours of hands-on labs and projects. Includes access to Azure credits for practice.
+                  The course is 12 weeks long, with 60 hours of instructor-led
+                  training and 80+ hours of hands-on labs and projects. Includes
+                  access to Azure credits for practice.
                 </p>
               </div>
               <div className="text">
@@ -284,7 +413,15 @@ const Details = () => {
                   Technologies Covered
                 </h4>
                 <p>
-                  Azure Active Directory, Conditional Access, Multi-Factor Authentication (MFA), Azure AD Identity Protection, Microsoft Defender for Cloud, Azure Security Center, Azure Sentinel, Azure Firewall, Network Security Groups (NSG), DDoS Protection, Azure Key Vault, Azure Policy, Role-Based Access Control (RBAC), Microsoft Defender for Identity, Microsoft Defender for Office 365, Microsoft Defender for Endpoint, Azure Information Protection, and other Azure security services.
+                  Azure Active Directory, Conditional Access, Multi-Factor
+                  Authentication (MFA), Azure AD Identity Protection, Microsoft
+                  Defender for Cloud, Azure Security Center, Azure Sentinel,
+                  Azure Firewall, Network Security Groups (NSG), DDoS
+                  Protection, Azure Key Vault, Azure Policy, Role-Based Access
+                  Control (RBAC), Microsoft Defender for Identity, Microsoft
+                  Defender for Office 365, Microsoft Defender for Endpoint,
+                  Azure Information Protection, and other Azure security
+                  services.
                 </p>
               </div>
             </div>
@@ -310,8 +447,9 @@ const Details = () => {
                     </span>
                   </div>
                   <p>
-                    <b>Course duration:</b> 3 months intensive program, with classes 3 days
-                    a week (Monday to Wednesday). Security project work continues through weekends.
+                    <b>Course duration:</b> 3 months intensive program, with
+                    classes 3 days a week (Monday to Wednesday). Security
+                    project work continues through weekends.
                   </p>
                 </div>
 
@@ -333,8 +471,10 @@ const Details = () => {
                     </span>
                   </div>
                   <p>
-                    <b>Additional Notes:</b> Students receive full access to Azure security
-                    resources. Basic security concepts understanding recommended. Includes Azure credits for hands-on practice.
+                    <b>Additional Notes:</b> Students receive full access to
+                    Azure security resources. Basic security concepts
+                    understanding recommended. Includes Azure credits for
+                    hands-on practice.
                   </p>
                 </div>
 

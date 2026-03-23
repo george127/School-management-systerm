@@ -12,12 +12,16 @@ import { useState } from "react";
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset;
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -44,7 +48,10 @@ const Details = () => {
             {/* == First Item == */}
             <div className="item">
               <div className="image-container">
-                <Image src={FacebookImage} alt="Facebook Marketing Professional" />
+                <Image
+                  src={FacebookImage}
+                  alt="Facebook Marketing Professional"
+                />
               </div>
 
               <div className="concept-container">
@@ -77,17 +84,54 @@ const Details = () => {
                   >
                     <div className="concept-data">
                       <h3>📱 Facebook Marketing Professional</h3>
-                      <p>This comprehensive course teaches you professional Facebook marketing strategies to grow businesses. You'll learn to create high-converting ad campaigns, target the right audiences, analyze performance metrics, and optimize for maximum ROI using Facebook's advertising platform.</p>
-                      <div className="data-item">📌 1: Facebook Marketing Fundamentals - Platform overview, Algorithm understanding, Marketing objectives</div>
-                      <div className="data-item">📌 2: Business Manager & Ad Account Setup - Account structure, Team management, Payment methods</div>
-                      <div className="data-item">📌 3: Audience Research & Targeting - Custom audiences, Lookalike audiences, Interest targeting</div>
-                      <div className="data-item">📌 4: Ad Creative & Copywriting - Visual design principles, Compelling copy, Video content strategy</div>
-                      <div className="data-item">📌 5: Campaign Structures & Strategies - Campaign objectives, Ad sets, Ad optimization</div>
-                      <div className="data-item">📌 6: Facebook Pixel & Tracking - Pixel installation, Event tracking, Conversion tracking</div>
-                      <div className="data-item">📌 7: Analytics & Optimization - Performance metrics, A/B testing, ROAS calculation</div>
-                      <div className="data-item">📌 8: Scaling & Advanced Strategies - Budget optimization, Retargeting, Funnel strategies</div>
-                      <div className="data-item">📌 9: Instagram Integration - Cross-platform advertising, Instagram Stories, Shopping ads</div>
-                      <div className="data-item">📌 10: Capstone Project - Live campaign creation and management</div>
+                      <p>
+                        This comprehensive course teaches you professional
+                        Facebook marketing strategies to grow businesses. You'll
+                        learn to create high-converting ad campaigns, target the
+                        right audiences, analyze performance metrics, and
+                        optimize for maximum ROI using Facebook's advertising
+                        platform.
+                      </p>
+                      <div className="data-item">
+                        📌 1: Facebook Marketing Fundamentals - Platform
+                        overview, Algorithm understanding, Marketing objectives
+                      </div>
+                      <div className="data-item">
+                        📌 2: Business Manager & Ad Account Setup - Account
+                        structure, Team management, Payment methods
+                      </div>
+                      <div className="data-item">
+                        📌 3: Audience Research & Targeting - Custom audiences,
+                        Lookalike audiences, Interest targeting
+                      </div>
+                      <div className="data-item">
+                        📌 4: Ad Creative & Copywriting - Visual design
+                        principles, Compelling copy, Video content strategy
+                      </div>
+                      <div className="data-item">
+                        📌 5: Campaign Structures & Strategies - Campaign
+                        objectives, Ad sets, Ad optimization
+                      </div>
+                      <div className="data-item">
+                        📌 6: Facebook Pixel & Tracking - Pixel installation,
+                        Event tracking, Conversion tracking
+                      </div>
+                      <div className="data-item">
+                        📌 7: Analytics & Optimization - Performance metrics,
+                        A/B testing, ROAS calculation
+                      </div>
+                      <div className="data-item">
+                        📌 8: Scaling & Advanced Strategies - Budget
+                        optimization, Retargeting, Funnel strategies
+                      </div>
+                      <div className="data-item">
+                        📌 9: Instagram Integration - Cross-platform
+                        advertising, Instagram Stories, Shopping ads
+                      </div>
+                      <div className="data-item">
+                        📌 10: Capstone Project - Live campaign creation and
+                        management
+                      </div>
                     </div>
                   </div>
                   <div
@@ -100,7 +144,12 @@ const Details = () => {
                             <i className="fas fa-info-circle"></i> Course
                             Description:
                           </strong>{" "}
-                          This comprehensive course teaches you professional Facebook marketing strategies to grow businesses. You'll learn to create high-converting ad campaigns, target the right audiences, analyze performance metrics, and optimize for maximum ROI using Facebook's advertising platform.
+                          This comprehensive course teaches you professional
+                          Facebook marketing strategies to grow businesses.
+                          You'll learn to create high-converting ad campaigns,
+                          target the right audiences, analyze performance
+                          metrics, and optimize for maximum ROI using Facebook's
+                          advertising platform.
                         </p>
 
                         <p>
@@ -108,38 +157,77 @@ const Details = () => {
                             <i className="fas fa-user-graduate"></i> Course
                             Prerequisites:
                           </strong>{" "}
-                          Basic computer skills and Facebook account. No prior marketing experience required.
+                          Basic computer skills and Facebook account. No prior
+                          marketing experience required.
                         </p>
                       </div>
 
                       <h4>🎯 Learning Objectives:</h4>
                       <ul>
-                        <li>✅ Set up and optimize Facebook Business Manager for business use</li>
-                        <li>✅ Create effective ad campaigns for different marketing objectives</li>
-                        <li>✅ Master audience targeting and segmentation strategies</li>
-                        <li>✅ Design high-converting ad creatives and compelling copy</li>
-                        <li>✅ Implement Facebook Pixel for accurate conversion tracking</li>
-                        <li>✅ Analyze campaign performance and optimize for better results</li>
-                        <li>✅ Scale successful campaigns profitably using data-driven decisions</li>
-                        <li>✅ Integrate Instagram advertising for cross-platform reach</li>
-                        <li>✅ Calculate and improve Return on Ad Spend (ROAS)</li>
+                        <li>
+                          ✅ Set up and optimize Facebook Business Manager for
+                          business use
+                        </li>
+                        <li>
+                          ✅ Create effective ad campaigns for different
+                          marketing objectives
+                        </li>
+                        <li>
+                          ✅ Master audience targeting and segmentation
+                          strategies
+                        </li>
+                        <li>
+                          ✅ Design high-converting ad creatives and compelling
+                          copy
+                        </li>
+                        <li>
+                          ✅ Implement Facebook Pixel for accurate conversion
+                          tracking
+                        </li>
+                        <li>
+                          ✅ Analyze campaign performance and optimize for
+                          better results
+                        </li>
+                        <li>
+                          ✅ Scale successful campaigns profitably using
+                          data-driven decisions
+                        </li>
+                        <li>
+                          ✅ Integrate Instagram advertising for cross-platform
+                          reach
+                        </li>
+                        <li>
+                          ✅ Calculate and improve Return on Ad Spend (ROAS)
+                        </li>
                         <li>✅ Prepare for Facebook Blueprint Certification</li>
                       </ul>
 
                       <h4>🔥 What You'll Build:</h4>
                       <ul>
-                        <li>📊 Complete Facebook Business Manager setup with team access</li>
-                        <li>📈 Multi-campaign funnel strategy for lead generation</li>
-                        <li>🔄 Retargeting campaign to convert website visitors</li>
-                        <li>🎯 Custom and lookalike audiences for precision targeting</li>
+                        <li>
+                          📊 Complete Facebook Business Manager setup with team
+                          access
+                        </li>
+                        <li>
+                          📈 Multi-campaign funnel strategy for lead generation
+                        </li>
+                        <li>
+                          🔄 Retargeting campaign to convert website visitors
+                        </li>
+                        <li>
+                          🎯 Custom and lookalike audiences for precision
+                          targeting
+                        </li>
                         <li>📉 Analytics dashboard for performance tracking</li>
-                        <li>💰 Scaled campaign strategy with optimized budgets</li>
+                        <li>
+                          💰 Scaled campaign strategy with optimized budgets
+                        </li>
                       </ul>
 
                       <h4>Course Structure:</h4>
                       <p>
-                        This 10-module course combines theoretical knowledge with
-                        hands-on practical exercises:
+                        This 10-module course combines theoretical knowledge
+                        with hands-on practical exercises:
                       </p>
                       <ul>
                         <li>Module 1: Facebook Marketing Fundamentals</li>
@@ -156,12 +244,16 @@ const Details = () => {
 
                       <h4>Course Delivery:</h4>
                       <p>
-                        Instructor-led training with live demonstrations and hands-on campaign creation. Includes access to Facebook ad account for practical exercises.
+                        Instructor-led training with live demonstrations and
+                        hands-on campaign creation. Includes access to Facebook
+                        ad account for practical exercises.
                       </p>
 
                       <h4>Certification:</h4>
                       <p>
-                        Course prepares you for Facebook Blueprint Certification. Includes one free exam attempt voucher and practice tests.
+                        Course prepares you for Facebook Blueprint
+                        Certification. Includes one free exam attempt voucher
+                        and practice tests.
                       </p>
                     </div>
                   </div>
@@ -177,25 +269,41 @@ const Details = () => {
                       </p>
                       <ul>
                         <li>
-                          🔹 <strong>Facebook Ads Specialist:</strong> Manage Facebook ad campaigns for businesses. Average salary: $45,000 - $70,000
+                          🔹 <strong>Facebook Ads Specialist:</strong> Manage
+                          Facebook ad campaigns for businesses. Average salary:
+                          $45,000 - $70,000
                         </li>
                         <li>
-                          🔹 <strong>Digital Marketing Executive:</strong> Handle social media advertising strategies. Average salary: $40,000 - $65,000
+                          🔹 <strong>Digital Marketing Executive:</strong>{" "}
+                          Handle social media advertising strategies. Average
+                          salary: $40,000 - $65,000
                         </li>
                         <li>
-                          🔹 <strong>Media Buyer:</strong> Purchase and optimize ad space across platforms. Average salary: $50,000 - $75,000
+                          🔹 <strong>Media Buyer:</strong> Purchase and optimize
+                          ad space across platforms. Average salary: $50,000 -
+                          $75,000
                         </li>
                         <li>
-                          🔹 <strong>Social Media Manager:</strong> Oversee brand presence on social platforms. Average salary: $42,000 - $68,000
+                          🔹 <strong>Social Media Manager:</strong> Oversee
+                          brand presence on social platforms. Average salary:
+                          $42,000 - $68,000
                         </li>
                         <li>
-                          🔹 <strong>Freelance Facebook Marketer:</strong> Offer services to multiple clients. Average income: $35,000 - $80,000
+                          🔹 <strong>Freelance Facebook Marketer:</strong> Offer
+                          services to multiple clients. Average income: $35,000
+                          - $80,000
                         </li>
                         <li>
-                          🔹 <strong>Performance Marketing Manager:</strong> Drive measurable results through paid social. Average salary: $55,000 - $85,000
+                          🔹 <strong>Performance Marketing Manager:</strong>{" "}
+                          Drive measurable results through paid social. Average
+                          salary: $55,000 - $85,000
                         </li>
                       </ul>
-                      <p>Digital marketing professionals with Facebook expertise are in high demand as businesses shift more budget to social media advertising.</p>
+                      <p>
+                        Digital marketing professionals with Facebook expertise
+                        are in high demand as businesses shift more budget to
+                        social media advertising.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -206,7 +314,12 @@ const Details = () => {
               <div className="text">
                 <h1>Facebook Marketing Professional</h1>
                 <p>
-                  Master the art of Facebook marketing to drive business growth. This comprehensive course covers everything from setting up your Business Manager to creating high-converting ad campaigns, targeting the right audiences, and analyzing performance metrics. Gain practical skills that businesses desperately need in today's digital landscape.
+                  Master the art of Facebook marketing to drive business growth.
+                  This comprehensive course covers everything from setting up
+                  your Business Manager to creating high-converting ad
+                  campaigns, targeting the right audiences, and analyzing
+                  performance metrics. Gain practical skills that businesses
+                  desperately need in today's digital landscape.
                 </p>
               </div>
 
@@ -218,7 +331,11 @@ const Details = () => {
                   Certification
                 </h4>
                 <p>
-                  This course prepares you for Facebook Blueprint Certification, validating your expertise in Facebook marketing and advertising. The certification is recognized globally by employers and clients as proof of your professional capabilities.
+                  This course prepares you for Facebook Blueprint Certification,
+                  validating your expertise in Facebook marketing and
+                  advertising. The certification is recognized globally by
+                  employers and clients as proof of your professional
+                  capabilities.
                 </p>
               </div>
               <div className="text">
@@ -229,7 +346,9 @@ const Details = () => {
                   Duration
                 </h4>
                 <p>
-                  The course is 8 weeks long, with 40 hours of instructor-led training and 50+ hours of practical exercises and campaign creation.
+                  The course is 8 weeks long, with 40 hours of instructor-led
+                  training and 50+ hours of practical exercises and campaign
+                  creation.
                 </p>
               </div>
               <div className="text">
@@ -246,13 +365,15 @@ const Details = () => {
                       <span className="material-symbols-outlined">
                         done_all
                       </span>
-                      Hands-on experience with Facebook Ads Manager and Business Manager
+                      Hands-on experience with Facebook Ads Manager and Business
+                      Manager
                     </li>
                     <li>
                       <span className="material-symbols-outlined">
                         done_all
                       </span>
-                      Comprehensive preparation for Facebook Blueprint Certification
+                      Comprehensive preparation for Facebook Blueprint
+                      Certification
                     </li>
                     <li>
                       <span className="material-symbols-outlined">
@@ -283,7 +404,11 @@ const Details = () => {
                   Tools Covered
                 </h4>
                 <p>
-                  Facebook Business Manager, Ads Manager, Audience Insights, Facebook Pixel, Events Manager, Creator Studio, Commerce Manager, Ads Reporting, Analytics, and third-party tools like Canva for creative design and Google Analytics for comprehensive tracking.
+                  Facebook Business Manager, Ads Manager, Audience Insights,
+                  Facebook Pixel, Events Manager, Creator Studio, Commerce
+                  Manager, Ads Reporting, Analytics, and third-party tools like
+                  Canva for creative design and Google Analytics for
+                  comprehensive tracking.
                 </p>
               </div>
             </div>
@@ -309,9 +434,9 @@ const Details = () => {
                     </span>
                   </div>
                   <p>
-                    <b>Course duration:</b> 2 months (8 weeks), with classes held 3 days a
-                    week (Monday, Wednesday, Friday). Students will work on
-                    practical assignments between sessions.
+                    <b>Course duration:</b> 2 months (8 weeks), with classes
+                    held 3 days a week (Monday, Wednesday, Friday). Students
+                    will work on practical assignments between sessions.
                   </p>
                 </div>
 
@@ -335,7 +460,8 @@ const Details = () => {
                   <p>
                     <b>Additional Notes:</b> Students will need access to a
                     Facebook account. Business Manager access will be provided
-                    for training purposes. Ad credits included for practical campaigns.
+                    for training purposes. Ad credits included for practical
+                    campaigns.
                   </p>
                 </div>
 

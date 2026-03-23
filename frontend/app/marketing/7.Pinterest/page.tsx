@@ -12,12 +12,16 @@ import { useState } from "react";
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset;
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -44,7 +48,10 @@ const Details = () => {
             {/* == First Item == */}
             <div className="item">
               <div className="image-container">
-                <Image src={PinterestImage} alt="Pinterest Marketing Certification" />
+                <Image
+                  src={PinterestImage}
+                  alt="Pinterest Marketing Certification"
+                />
               </div>
 
               <div className="concept-container">
@@ -77,17 +84,52 @@ const Details = () => {
                   >
                     <div className="concept-data">
                       <h3>📌 Pinterest Marketing Certification</h3>
-                      <p>Master Pinterest marketing from basics to advanced strategies. Learn to leverage Pinterest for business growth, drive traffic, and generate leads through organic and paid strategies. Become a certified Pinterest marketing professional.</p>
-                      <div className="data-item">📌 1: Pinterest Marketing Fundamentals - Platform overview, Algorithm, User behavior</div>
-                      <div className="data-item">📌 2: Pinterest Business Account Setup - Profile optimization, Rich pins, Verification</div>
-                      <div className="data-item">📌 3: Pinterest SEO & Content Strategy - Keyword research, Board optimization, Pin creation</div>
-                      <div className="data-item">📌 4: Pinterest Advertising (PPC) - Campaign setup, Audience targeting, Ad formats</div>
-                      <div className="data-item">📌 5: Pinterest Analytics & Reporting - Metrics tracking, Performance analysis, ROI measurement</div>
-                      <div className="data-item">📌 6: Pinterest Shopping & E-commerce Integration - Product catalogs, Shopping ads, Catalogs</div>
-                      <div className="data-item">📌 7: Advanced Pinterest Strategies - Promoted pins, Audience expansion, Seasonal campaigns</div>
-                      <div className="data-item">📌 8: Content Ideation & Visual Strategy - Graphic design, Pin templates, Video pins</div>
-                      <div className="data-item">📌 9: Community Growth & Engagement - Follower strategies, Group boards, Collaboration</div>
-                      <div className="data-item">📌 10: Capstone Project & Certification Preparation</div>
+                      <p>
+                        Master Pinterest marketing from basics to advanced
+                        strategies. Learn to leverage Pinterest for business
+                        growth, drive traffic, and generate leads through
+                        organic and paid strategies. Become a certified
+                        Pinterest marketing professional.
+                      </p>
+                      <div className="data-item">
+                        📌 1: Pinterest Marketing Fundamentals - Platform
+                        overview, Algorithm, User behavior
+                      </div>
+                      <div className="data-item">
+                        📌 2: Pinterest Business Account Setup - Profile
+                        optimization, Rich pins, Verification
+                      </div>
+                      <div className="data-item">
+                        📌 3: Pinterest SEO & Content Strategy - Keyword
+                        research, Board optimization, Pin creation
+                      </div>
+                      <div className="data-item">
+                        📌 4: Pinterest Advertising (PPC) - Campaign setup,
+                        Audience targeting, Ad formats
+                      </div>
+                      <div className="data-item">
+                        📌 5: Pinterest Analytics & Reporting - Metrics
+                        tracking, Performance analysis, ROI measurement
+                      </div>
+                      <div className="data-item">
+                        📌 6: Pinterest Shopping & E-commerce Integration -
+                        Product catalogs, Shopping ads, Catalogs
+                      </div>
+                      <div className="data-item">
+                        📌 7: Advanced Pinterest Strategies - Promoted pins,
+                        Audience expansion, Seasonal campaigns
+                      </div>
+                      <div className="data-item">
+                        📌 8: Content Ideation & Visual Strategy - Graphic
+                        design, Pin templates, Video pins
+                      </div>
+                      <div className="data-item">
+                        📌 9: Community Growth & Engagement - Follower
+                        strategies, Group boards, Collaboration
+                      </div>
+                      <div className="data-item">
+                        📌 10: Capstone Project & Certification Preparation
+                      </div>
                     </div>
                   </div>
                   <div
@@ -100,7 +142,11 @@ const Details = () => {
                             <i className="fas fa-info-circle"></i> Course
                             Description:
                           </strong>{" "}
-                          Master Pinterest marketing from basics to advanced strategies. Learn to leverage Pinterest for business growth, drive traffic, and generate leads through organic and paid strategies. Become a certified Pinterest marketing professional.
+                          Master Pinterest marketing from basics to advanced
+                          strategies. Learn to leverage Pinterest for business
+                          growth, drive traffic, and generate leads through
+                          organic and paid strategies. Become a certified
+                          Pinterest marketing professional.
                         </p>
 
                         <p>
@@ -108,38 +154,67 @@ const Details = () => {
                             <i className="fas fa-user-graduate"></i> Course
                             Prerequisites:
                           </strong>{" "}
-                          Basic understanding of social media marketing. Pinterest business account required for practical exercises.
+                          Basic understanding of social media marketing.
+                          Pinterest business account required for practical
+                          exercises.
                         </p>
                       </div>
 
                       <h4>🎯 Learning Objectives:</h4>
                       <ul>
-                        <li>✅ Set up and optimize Pinterest business accounts for maximum visibility</li>
-                        <li>✅ Master Pinterest SEO and content strategy for organic reach</li>
-                        <li>✅ Create effective Pinterest ad campaigns for targeted audiences</li>
-                        <li>✅ Implement Pinterest shopping features for e-commerce success</li>
-                        <li>✅ Analyze Pinterest analytics for campaign optimization</li>
-                        <li>✅ Develop advanced Pinterest marketing strategies for growth</li>
-                        <li>✅ Create visually compelling pins that drive engagement</li>
+                        <li>
+                          ✅ Set up and optimize Pinterest business accounts for
+                          maximum visibility
+                        </li>
+                        <li>
+                          ✅ Master Pinterest SEO and content strategy for
+                          organic reach
+                        </li>
+                        <li>
+                          ✅ Create effective Pinterest ad campaigns for
+                          targeted audiences
+                        </li>
+                        <li>
+                          ✅ Implement Pinterest shopping features for
+                          e-commerce success
+                        </li>
+                        <li>
+                          ✅ Analyze Pinterest analytics for campaign
+                          optimization
+                        </li>
+                        <li>
+                          ✅ Develop advanced Pinterest marketing strategies for
+                          growth
+                        </li>
+                        <li>
+                          ✅ Create visually compelling pins that drive
+                          engagement
+                        </li>
                         <li>✅ Build and nurture Pinterest communities</li>
-                        <li>✅ Measure and improve ROI on Pinterest campaigns</li>
+                        <li>
+                          ✅ Measure and improve ROI on Pinterest campaigns
+                        </li>
                         <li>✅ Prepare for Pinterest certification exams</li>
                       </ul>
 
                       <h4>🔥 What You'll Build:</h4>
                       <ul>
-                        <li>📊 Optimized Pinterest business profile with rich pins</li>
-                        <li>🎯 Complete Pinterest advertising campaign structure</li>
+                        <li>
+                          📊 Optimized Pinterest business profile with rich pins
+                        </li>
+                        <li>
+                          🎯 Complete Pinterest advertising campaign structure
+                        </li>
                         <li>📈 Analytics dashboard for performance tracking</li>
-                        <li>🛍️ Pinterest Shopping setup with product catalog</li>
+                        <li>
+                          🛍️ Pinterest Shopping setup with product catalog
+                        </li>
                         <li>📌 Content calendar with SEO-optimized pins</li>
                         <li>📱 Community engagement strategy for growth</li>
                       </ul>
 
                       <h4>Course Structure:</h4>
-                      <p>
-                        This 10-module comprehensive program covers:
-                      </p>
+                      <p>This 10-module comprehensive program covers:</p>
                       <ul>
                         <li>Module 1: Pinterest Marketing Fundamentals</li>
                         <li>Module 2: Business Account Setup</li>
@@ -155,12 +230,17 @@ const Details = () => {
 
                       <h4>Course Delivery:</h4>
                       <p>
-                        Hands-on training with live Pinterest account demonstrations and real campaign management. Includes access to Pinterest Business tools for practical exercises.
+                        Hands-on training with live Pinterest account
+                        demonstrations and real campaign management. Includes
+                        access to Pinterest Business tools for practical
+                        exercises.
                       </p>
 
                       <h4>Certification:</h4>
                       <p>
-                        Prepares for official Pinterest marketing certifications and provides our institute's certification. Includes practice tests and exam preparation materials.
+                        Prepares for official Pinterest marketing certifications
+                        and provides our institute's certification. Includes
+                        practice tests and exam preparation materials.
                       </p>
                     </div>
                   </div>
@@ -170,30 +250,42 @@ const Details = () => {
                   >
                     <div className="Roles-container">
                       <h3>💼 Career Opportunities</h3>
-                      <p>
-                        Graduates qualify for these high-demand positions:
-                      </p>
+                      <p>Graduates qualify for these high-demand positions:</p>
                       <ul>
                         <li>
-                          🔹 <strong>Pinterest Marketing Specialist:</strong> Manage Pinterest accounts and campaigns. Average salary: $48,000 - $72,000
+                          🔹 <strong>Pinterest Marketing Specialist:</strong>{" "}
+                          Manage Pinterest accounts and campaigns. Average
+                          salary: $48,000 - $72,000
                         </li>
                         <li>
-                          🔹 <strong>Social Media Manager:</strong> Oversee Pinterest strategy. Average salary: $52,000 - $78,000
+                          🔹 <strong>Social Media Manager:</strong> Oversee
+                          Pinterest strategy. Average salary: $52,000 - $78,000
                         </li>
                         <li>
-                          🔹 <strong>E-commerce Pinterest Strategist:</strong> Optimize product pins and shopping. Average salary: $55,000 - $82,000
+                          🔹 <strong>E-commerce Pinterest Strategist:</strong>{" "}
+                          Optimize product pins and shopping. Average salary:
+                          $55,000 - $82,000
                         </li>
                         <li>
-                          🔹 <strong>Content Marketer:</strong> Create Pinterest-optimized content. Average salary: $45,000 - $68,000
+                          🔹 <strong>Content Marketer:</strong> Create
+                          Pinterest-optimized content. Average salary: $45,000 -
+                          $68,000
                         </li>
                         <li>
-                          🔹 <strong>Freelance Pinterest Consultant:</strong> Offer expert services to businesses. Average income: $42,000 - $75,000
+                          🔹 <strong>Freelance Pinterest Consultant:</strong>{" "}
+                          Offer expert services to businesses. Average income:
+                          $42,000 - $75,000
                         </li>
                         <li>
-                          🔹 <strong>Visual Content Strategist:</strong> Develop Pinterest-first visual content. Average salary: $50,000 - $74,000
+                          🔹 <strong>Visual Content Strategist:</strong> Develop
+                          Pinterest-first visual content. Average salary:
+                          $50,000 - $74,000
                         </li>
                       </ul>
-                      <p>Pinterest marketing expertise is especially valuable for e-commerce, lifestyle, and visual brands.</p>
+                      <p>
+                        Pinterest marketing expertise is especially valuable for
+                        e-commerce, lifestyle, and visual brands.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -204,7 +296,10 @@ const Details = () => {
               <div className="text">
                 <h1>Pinterest Marketing Certification</h1>
                 <p>
-                  Become a certified Pinterest marketing professional with this comprehensive training covering organic and paid strategies. Learn to create, manage, and optimize high-performing Pinterest campaigns for business growth.
+                  Become a certified Pinterest marketing professional with this
+                  comprehensive training covering organic and paid strategies.
+                  Learn to create, manage, and optimize high-performing
+                  Pinterest campaigns for business growth.
                 </p>
               </div>
 
@@ -216,7 +311,10 @@ const Details = () => {
                   Certification
                 </h4>
                 <p>
-                  Earn our official Pinterest Marketing Certification and prepare for Pinterest's own certification programs. Demonstrate your expertise in visual discovery and social commerce.
+                  Earn our official Pinterest Marketing Certification and
+                  prepare for Pinterest's own certification programs.
+                  Demonstrate your expertise in visual discovery and social
+                  commerce.
                 </p>
               </div>
               <div className="text">
@@ -227,7 +325,8 @@ const Details = () => {
                   Duration
                 </h4>
                 <p>
-                  7-week program with 35 instructor-led hours and 45+ practical hours, including live campaign creation.
+                  7-week program with 35 instructor-led hours and 45+ practical
+                  hours, including live campaign creation.
                 </p>
               </div>
               <div className="text">
@@ -281,7 +380,10 @@ const Details = () => {
                   Tools Covered
                 </h4>
                 <p>
-                  Pinterest Business, Pinterest Ads Manager, Pinterest Analytics, Pinterest Shopping, Rich Pins, Catalogs, Tag Manager, and third-party analytics and content creation tools for Pinterest optimization.
+                  Pinterest Business, Pinterest Ads Manager, Pinterest
+                  Analytics, Pinterest Shopping, Rich Pins, Catalogs, Tag
+                  Manager, and third-party analytics and content creation tools
+                  for Pinterest optimization.
                 </p>
               </div>
             </div>
@@ -295,7 +397,8 @@ const Details = () => {
               <div className="course-info">
                 <h4>Course Information</h4>
                 <p>
-                  Course fee: Ghc 5,500 payable as Ghc 2,000 initial deposit and Ghc 1,750 monthly installments.
+                  Course fee: Ghc 5,500 payable as Ghc 2,000 initial deposit and
+                  Ghc 1,750 monthly installments.
                 </p>
 
                 <div className="info-text">
@@ -327,7 +430,9 @@ const Details = () => {
                     </span>
                   </div>
                   <p>
-                    <b>Requirements:</b> Pinterest business account and basic understanding of social media marketing. Ad credits provided for practical campaigns.
+                    <b>Requirements:</b> Pinterest business account and basic
+                    understanding of social media marketing. Ad credits provided
+                    for practical campaigns.
                   </p>
                 </div>
 
@@ -349,7 +454,8 @@ const Details = () => {
                     </span>
                   </div>
                   <p>
-                    <b>Times:</b> 9AM-12PM or 2PM-5PM (choose your preferred batch)
+                    <b>Times:</b> 9AM-12PM or 2PM-5PM (choose your preferred
+                    batch)
                   </p>
                 </div>
 
@@ -368,13 +474,17 @@ const Details = () => {
               <div className="course-info">
                 <h4>Course Policies</h4>
                 <p>
-                  <strong>Non-refundable policy:</strong> Payments are final once made. Students are expected to review course details carefully before enrollment.
+                  <strong>Non-refundable policy:</strong> Payments are final
+                  once made. Students are expected to review course details
+                  carefully before enrollment.
                 </p>
                 <p>
-                  <strong>Rescheduling:</strong> We may reschedule with advance notice to participants in case of unforeseen circumstances.
+                  <strong>Rescheduling:</strong> We may reschedule with advance
+                  notice to participants in case of unforeseen circumstances.
                 </p>
                 <p>
-                  <strong>Minimum enrollment:</strong> 5 students required to commence class.
+                  <strong>Minimum enrollment:</strong> 5 students required to
+                  commence class.
                 </p>
               </div>
             </div>

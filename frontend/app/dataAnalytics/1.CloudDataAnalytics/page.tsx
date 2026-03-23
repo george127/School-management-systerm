@@ -12,12 +12,16 @@ import { useState } from "react";
 const Details = () => {
   const [activeContent, setActiveContent] = useState(1);
 
-  const handleScrollToSection = (sectionId, offset = 0) => {
+  const handleScrollToSection = (sectionId: string, offset: number = 0) => {
     const section = document.getElementById(sectionId);
+
     if (section) {
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      const scrollToPosition = sectionPosition + offset;
-      window.scrollTo({ top: scrollToPosition, behavior: "smooth" });
+      const sectionPosition = section.offsetTop - offset;
+
+      window.scrollTo({
+        top: sectionPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -44,7 +48,10 @@ const Details = () => {
             {/* == First Item == */}
             <div className="item">
               <div className="image-container">
-                <Image src={CloudDataImage} alt="Cloud Data Analytics Professional Certification" />
+                <Image
+                  src={CloudDataImage}
+                  alt="Cloud Data Analytics Professional Certification"
+                />
               </div>
 
               <div className="concept-container">
@@ -76,18 +83,55 @@ const Details = () => {
                     className={`content ${activeContent === 1 ? "show" : ""}`}
                   >
                     <div className="concept-data">
-                      <h3>☁️ Cloud Data Analytics Professional Certification</h3>
-                      <p>Master cloud-based data analytics using leading platforms like AWS, Azure, and Google Cloud. Learn to design, build, and optimize cloud data pipelines, implement data warehouses, and perform advanced analytics at scale.</p>
-                      <div className="data-item">📌 1: Cloud Data Fundamentals - Cloud computing models, Data storage options, Analytics architecture</div>
-                      <div className="data-item">📌 2: Big Data Processing in Cloud - AWS EMR, Azure HDInsight, Google Dataproc, Apache Spark</div>
-                      <div className="data-item">📌 3: Data Warehousing Solutions - AWS Redshift, Azure Synapse, Google BigQuery, Snowflake</div>
-                      <div className="data-item">📌 4: Real-time Analytics Pipelines - AWS Kinesis, Azure Stream Analytics, Google Dataflow</div>
-                      <div className="data-item">📌 5: Machine Learning Integration - AWS SageMaker, Azure ML, Google AI Platform</div>
-                      <div className="data-item">📌 6: Multi-Cloud Data Strategies - Cross-platform integration, Data federation, Portability</div>
-                      <div className="data-item">📌 7: Data Governance & Security - Encryption, Access control, Compliance, Data lineage</div>
-                      <div className="data-item">📌 8: Data Visualization - Power BI, Tableau, Looker integration with cloud data</div>
-                      <div className="data-item">📌 9: Data Lake Implementation - AWS Lake Formation, Azure Data Lake, Google Cloud Storage</div>
-                      <div className="data-item">📌 10: Capstone Project & Certification Preparation</div>
+                      <h3>
+                        ☁️ Cloud Data Analytics Professional Certification
+                      </h3>
+                      <p>
+                        Master cloud-based data analytics using leading
+                        platforms like AWS, Azure, and Google Cloud. Learn to
+                        design, build, and optimize cloud data pipelines,
+                        implement data warehouses, and perform advanced
+                        analytics at scale.
+                      </p>
+                      <div className="data-item">
+                        📌 1: Cloud Data Fundamentals - Cloud computing models,
+                        Data storage options, Analytics architecture
+                      </div>
+                      <div className="data-item">
+                        📌 2: Big Data Processing in Cloud - AWS EMR, Azure
+                        HDInsight, Google Dataproc, Apache Spark
+                      </div>
+                      <div className="data-item">
+                        📌 3: Data Warehousing Solutions - AWS Redshift, Azure
+                        Synapse, Google BigQuery, Snowflake
+                      </div>
+                      <div className="data-item">
+                        📌 4: Real-time Analytics Pipelines - AWS Kinesis, Azure
+                        Stream Analytics, Google Dataflow
+                      </div>
+                      <div className="data-item">
+                        📌 5: Machine Learning Integration - AWS SageMaker,
+                        Azure ML, Google AI Platform
+                      </div>
+                      <div className="data-item">
+                        📌 6: Multi-Cloud Data Strategies - Cross-platform
+                        integration, Data federation, Portability
+                      </div>
+                      <div className="data-item">
+                        📌 7: Data Governance & Security - Encryption, Access
+                        control, Compliance, Data lineage
+                      </div>
+                      <div className="data-item">
+                        📌 8: Data Visualization - Power BI, Tableau, Looker
+                        integration with cloud data
+                      </div>
+                      <div className="data-item">
+                        📌 9: Data Lake Implementation - AWS Lake Formation,
+                        Azure Data Lake, Google Cloud Storage
+                      </div>
+                      <div className="data-item">
+                        📌 10: Capstone Project & Certification Preparation
+                      </div>
                     </div>
                   </div>
                   <div
@@ -100,7 +144,11 @@ const Details = () => {
                             <i className="fas fa-info-circle"></i> Course
                             Description:
                           </strong>{" "}
-                          Master cloud-based data analytics using leading platforms like AWS, Azure, and Google Cloud. Learn to design, build, and optimize cloud data pipelines, implement data warehouses, and perform advanced analytics at scale.
+                          Master cloud-based data analytics using leading
+                          platforms like AWS, Azure, and Google Cloud. Learn to
+                          design, build, and optimize cloud data pipelines,
+                          implement data warehouses, and perform advanced
+                          analytics at scale.
                         </p>
 
                         <p>
@@ -108,38 +156,80 @@ const Details = () => {
                             <i className="fas fa-user-graduate"></i> Course
                             Prerequisites:
                           </strong>{" "}
-                          Basic SQL knowledge and understanding of data concepts. No prior cloud experience required.
+                          Basic SQL knowledge and understanding of data
+                          concepts. No prior cloud experience required.
                         </p>
                       </div>
 
                       <h4>🎯 Learning Objectives:</h4>
                       <ul>
-                        <li>✅ Design and implement cloud data solutions across multiple cloud platforms</li>
-                        <li>✅ Process big data using cloud-native tools like Spark, EMR, and Dataproc</li>
-                        <li>✅ Build real-time analytics pipelines for streaming data</li>
-                        <li>✅ Implement enterprise data warehousing solutions on all major clouds</li>
-                        <li>✅ Integrate machine learning with data pipelines for predictive analytics</li>
-                        <li>✅ Ensure data governance, security, and compliance across cloud environments</li>
-                        <li>✅ Build and manage data lakes for large-scale storage</li>
-                        <li>✅ Create compelling visualizations connecting to cloud data sources</li>
-                        <li>✅ Implement multi-cloud and hybrid cloud data strategies</li>
-                        <li>✅ Prepare for cloud platform certifications (AWS, Azure, Google)</li>
+                        <li>
+                          ✅ Design and implement cloud data solutions across
+                          multiple cloud platforms
+                        </li>
+                        <li>
+                          ✅ Process big data using cloud-native tools like
+                          Spark, EMR, and Dataproc
+                        </li>
+                        <li>
+                          ✅ Build real-time analytics pipelines for streaming
+                          data
+                        </li>
+                        <li>
+                          ✅ Implement enterprise data warehousing solutions on
+                          all major clouds
+                        </li>
+                        <li>
+                          ✅ Integrate machine learning with data pipelines for
+                          predictive analytics
+                        </li>
+                        <li>
+                          ✅ Ensure data governance, security, and compliance
+                          across cloud environments
+                        </li>
+                        <li>
+                          ✅ Build and manage data lakes for large-scale storage
+                        </li>
+                        <li>
+                          ✅ Create compelling visualizations connecting to
+                          cloud data sources
+                        </li>
+                        <li>
+                          ✅ Implement multi-cloud and hybrid cloud data
+                          strategies
+                        </li>
+                        <li>
+                          ✅ Prepare for cloud platform certifications (AWS,
+                          Azure, Google)
+                        </li>
                       </ul>
 
                       <h4>🔥 What You'll Build:</h4>
                       <ul>
-                        <li>☁️ Complete cloud data pipeline architecture across AWS, Azure, and GCP</li>
-                        <li>📊 Enterprise data warehouse implementation on Snowflake or Redshift</li>
-                        <li>⚡ Real-time streaming pipeline with Kinesis and Kafka</li>
-                        <li>🤖 ML-integrated analytics solution with SageMaker or Azure ML</li>
-                        <li>🔒 Secure data lake implementation with governance controls</li>
+                        <li>
+                          ☁️ Complete cloud data pipeline architecture across
+                          AWS, Azure, and GCP
+                        </li>
+                        <li>
+                          📊 Enterprise data warehouse implementation on
+                          Snowflake or Redshift
+                        </li>
+                        <li>
+                          ⚡ Real-time streaming pipeline with Kinesis and Kafka
+                        </li>
+                        <li>
+                          🤖 ML-integrated analytics solution with SageMaker or
+                          Azure ML
+                        </li>
+                        <li>
+                          🔒 Secure data lake implementation with governance
+                          controls
+                        </li>
                         <li>📈 Multi-cloud data visualization dashboard</li>
                       </ul>
 
                       <h4>Course Structure:</h4>
-                      <p>
-                        This 10-module intensive program covers:
-                      </p>
+                      <p>This 10-module intensive program covers:</p>
                       <ul>
                         <li>Module 1: Cloud Data Fundamentals</li>
                         <li>Module 2: Big Data Processing</li>
@@ -155,12 +245,17 @@ const Details = () => {
 
                       <h4>Course Delivery:</h4>
                       <p>
-                        Hands-on labs using AWS, Azure, and Google Cloud platforms with real-world datasets and scenarios. Includes cloud credits for hands-on practice.
+                        Hands-on labs using AWS, Azure, and Google Cloud
+                        platforms with real-world datasets and scenarios.
+                        Includes cloud credits for hands-on practice.
                       </p>
 
                       <h4>Certification:</h4>
                       <p>
-                        Prepares for AWS Certified Data Analytics, Google Professional Data Engineer, and Microsoft Azure Data Scientist certifications. Includes our institute's professional certification.
+                        Prepares for AWS Certified Data Analytics, Google
+                        Professional Data Engineer, and Microsoft Azure Data
+                        Scientist certifications. Includes our institute's
+                        professional certification.
                       </p>
                     </div>
                   </div>
@@ -170,30 +265,42 @@ const Details = () => {
                   >
                     <div className="Roles-container">
                       <h3>💼 Career Opportunities</h3>
-                      <p>
-                        Graduates qualify for these high-demand positions:
-                      </p>
+                      <p>Graduates qualify for these high-demand positions:</p>
                       <ul>
                         <li>
-                          🔹 <strong>Cloud Data Engineer:</strong> Design and implement cloud data solutions. Average salary: $110,000 - $155,000
+                          🔹 <strong>Cloud Data Engineer:</strong> Design and
+                          implement cloud data solutions. Average salary:
+                          $110,000 - $155,000
                         </li>
                         <li>
-                          🔹 <strong>Big Data Analyst:</strong> Process and analyze large-scale datasets. Average salary: $95,000 - $135,000
+                          🔹 <strong>Big Data Analyst:</strong> Process and
+                          analyze large-scale datasets. Average salary: $95,000
+                          - $135,000
                         </li>
                         <li>
-                          🔹 <strong>Data Warehouse Specialist:</strong> Implement cloud data warehouse solutions. Average salary: $105,000 - $150,000
+                          🔹 <strong>Data Warehouse Specialist:</strong>{" "}
+                          Implement cloud data warehouse solutions. Average
+                          salary: $105,000 - $150,000
                         </li>
                         <li>
-                          🔹 <strong>BI Developer:</strong> Create cloud-based analytics solutions. Average salary: $90,000 - $130,000
+                          🔹 <strong>BI Developer:</strong> Create cloud-based
+                          analytics solutions. Average salary: $90,000 -
+                          $130,000
                         </li>
                         <li>
-                          🔹 <strong>Data Architect:</strong> Design multi-cloud data strategies. Average salary: $125,000 - $170,000
+                          🔹 <strong>Data Architect:</strong> Design multi-cloud
+                          data strategies. Average salary: $125,000 - $170,000
                         </li>
                         <li>
-                          🔹 <strong>Machine Learning Engineer:</strong> Deploy ML models on cloud platforms. Average salary: $115,000 - $160,000
+                          🔹 <strong>Machine Learning Engineer:</strong> Deploy
+                          ML models on cloud platforms. Average salary: $115,000
+                          - $160,000
                         </li>
                       </ul>
-                      <p>Cloud data professionals are among the highest-paid in the industry with explosive demand across all sectors.</p>
+                      <p>
+                        Cloud data professionals are among the highest-paid in
+                        the industry with explosive demand across all sectors.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -204,7 +311,10 @@ const Details = () => {
               <div className="text">
                 <h1>Cloud Data Analytics Professional Certification</h1>
                 <p>
-                  Become a certified cloud data analytics professional with this comprehensive training covering data engineering, warehousing, and advanced analytics on AWS, Azure, and Google Cloud platforms. Gain hands-on experience with real-world projects.
+                  Become a certified cloud data analytics professional with this
+                  comprehensive training covering data engineering, warehousing,
+                  and advanced analytics on AWS, Azure, and Google Cloud
+                  platforms. Gain hands-on experience with real-world projects.
                 </p>
               </div>
 
@@ -216,7 +326,10 @@ const Details = () => {
                   Certification
                 </h4>
                 <p>
-                  Prepares for AWS Certified Data Analytics, Google Professional Data Engineer, and Microsoft Azure Data Scientist certifications plus our institute's professional certification - comprehensive validation of your skills.
+                  Prepares for AWS Certified Data Analytics, Google Professional
+                  Data Engineer, and Microsoft Azure Data Scientist
+                  certifications plus our institute's professional certification
+                  - comprehensive validation of your skills.
                 </p>
               </div>
               <div className="text">
@@ -227,7 +340,9 @@ const Details = () => {
                   Duration
                 </h4>
                 <p>
-                  12-week program with 70 instructor-led hours and 100+ lab hours, including multi-cloud projects and certification preparation.
+                  12-week program with 70 instructor-led hours and 100+ lab
+                  hours, including multi-cloud projects and certification
+                  preparation.
                 </p>
               </div>
               <div className="text">
@@ -244,13 +359,15 @@ const Details = () => {
                       <span className="material-symbols-outlined">
                         done_all
                       </span>
-                      Hands-on experience with AWS, Azure, and Google Cloud platforms
+                      Hands-on experience with AWS, Azure, and Google Cloud
+                      platforms
                     </li>
                     <li>
                       <span className="material-symbols-outlined">
                         done_all
                       </span>
-                      Master big data processing and real-time analytics techniques
+                      Master big data processing and real-time analytics
+                      techniques
                     </li>
                     <li>
                       <span className="material-symbols-outlined">
@@ -281,7 +398,11 @@ const Details = () => {
                   Tools Covered
                 </h4>
                 <p>
-                  AWS Redshift, AWS EMR, AWS Kinesis, AWS SageMaker, Azure Synapse, Azure HDInsight, Azure Stream Analytics, Azure ML, Google BigQuery, Google Dataproc, Google Dataflow, Google AI Platform, Snowflake, Databricks, Apache Spark, Apache Kafka, Airflow, Tableau, Power BI, Looker, and data governance tools.
+                  AWS Redshift, AWS EMR, AWS Kinesis, AWS SageMaker, Azure
+                  Synapse, Azure HDInsight, Azure Stream Analytics, Azure ML,
+                  Google BigQuery, Google Dataproc, Google Dataflow, Google AI
+                  Platform, Snowflake, Databricks, Apache Spark, Apache Kafka,
+                  Airflow, Tableau, Power BI, Looker, and data governance tools.
                 </p>
               </div>
             </div>
@@ -295,7 +416,8 @@ const Details = () => {
               <div className="course-info">
                 <h4>Course Information</h4>
                 <p>
-                  Course fee: Ghc 8,500 payable as Ghc 3,500 initial deposit and Ghc 2,500 monthly installments.
+                  Course fee: Ghc 8,500 payable as Ghc 3,500 initial deposit and
+                  Ghc 2,500 monthly installments.
                 </p>
 
                 <div className="info-text">
@@ -327,7 +449,9 @@ const Details = () => {
                     </span>
                   </div>
                   <p>
-                    <b>Requirements:</b> Laptop with minimum 8GB RAM. Basic SQL knowledge recommended. All cloud accounts and credits provided.
+                    <b>Requirements:</b> Laptop with minimum 8GB RAM. Basic SQL
+                    knowledge recommended. All cloud accounts and credits
+                    provided.
                   </p>
                 </div>
 
@@ -368,15 +492,18 @@ const Details = () => {
               <div className="course-info">
                 <h4>Course Policies</h4>
                 <p>
-                  <strong>Non-refundable policy:</strong> Payments are final once made. Students are expected to review course details carefully before enrollment.
+                  <strong>Non-refundable policy:</strong> Payments are final
+                  once made. Students are expected to review course details
+                  carefully before enrollment.
                 </p>
                 <p>
-                  <strong>Rescheduling:</strong> We may reschedule with advance notice to participants in case of unforeseen circumstances.
+                  <strong>Rescheduling:</strong> We may reschedule with advance
+                  notice to participants in case of unforeseen circumstances.
                 </p>
                 <p>
-                  <strong>Minimum enrollment:</strong> 3 students required to commence class.
+                  <strong>Minimum enrollment:</strong> 3 students required to
+                  commence class.
                 </p>
-               
               </div>
             </div>
           </div>
