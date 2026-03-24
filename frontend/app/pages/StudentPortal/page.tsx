@@ -4,8 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-// import "bootstrap/dist/css/bootstrap.min.css";
-// import "bootstrap-icons/font/bootstrap-icons.css";
 import "./style/StudentPortal.css";
 import Logo from "./images/appcode.png";
 import PaymentInfo from "./PaymentInfo";
@@ -25,6 +23,7 @@ interface ProfileModalProps {
   studentData: any;
   fetchStudentData: () => void;
 }
+
 // Profile Modal Component
 const ProfileModal = ({
   isOpen,
@@ -39,7 +38,11 @@ const ProfileModal = ({
   const getUserFromStorage = () => {
     if (typeof window !== "undefined") {
       const userStr = localStorage.getItem("user");
-      return userStr ? JSON.parse(userStr) : null;
+      try {
+        return userStr ? JSON.parse(userStr) : null;
+      } catch {
+        return null;
+      }
     }
     return null;
   };
@@ -56,35 +59,8 @@ const ProfileModal = ({
     }
   }, [setIsOpen]);
 
-  useEffect(() => {
-    if (!user?.email) return;
-
-    const fetchStudentData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `http://localhost:5000/api/students/${user?.email}`,
-          {
-            headers: {
-              Authorization: token ? `Bearer ${token}` : "",
-            },
-          },
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch student data");
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStudentData();
-  }, [user?.email]);
-
   const [profileImage, setProfileImage] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
 
   // Phone number states
@@ -115,222 +91,181 @@ const ProfileModal = ({
 
   useEffect(() => {
     // Check for user data in localStorage
-const checkUserData = () => {
-  try {
-    // Safely get stored user
-    const userStr = localStorage.getItem("user");
-
-    let parsedUser: {
-      email?: string;
-      name?: string;
-      phone?: string;
-    } | null = null;
-
-    if (userStr) {
+    const checkUserData = () => {
       try {
-        parsedUser = JSON.parse(userStr);
-      } catch (e) {
-        console.error("Invalid JSON in user:", e);
+        let parsedUser: { email?: string } | null = null;
+
+        const userStr = localStorage.getItem("user");
+
+        if (userStr) {
+          try {
+            parsedUser = JSON.parse(userStr);
+          } catch (e) {
+            console.error("Invalid user JSON:", e);
+          }
+        }
+
+        const userEmail: string | null =
+          localStorage.getItem("userEmail") ||
+          localStorage.getItem("email") ||
+          parsedUser?.email ||
+          null;
+
+        const userDataStr =
+          localStorage.getItem("user") ||
+          localStorage.getItem("userData") ||
+          localStorage.getItem("studentData");
+
+        if (userDataStr) {
+          try {
+            const userData = JSON.parse(userDataStr);
+            setUserData(userData);
+            if (userData.email) {
+              setUserEmail(userData.email);
+              setNewEmail(userData.email);
+            }
+            if (userData.name) {
+              setUserName(userData.name);
+              setNewName(userData.name);
+            }
+            if (userData.phone) {
+              setPhoneNumber(userData.phone);
+              setNewPhone(userData.phone);
+            }
+          } catch (e) {
+            console.error("Error parsing user data:", e);
+          }
+        }
+
+        if (userEmail) {
+          setUserEmail(userEmail);
+          setNewEmail(userEmail);
+          fetchProfileData(userEmail);
+        } else {
+          setMessage("User email not found in storage. Please log in again.");
+        }
+      } catch (error) {
+        console.error("Error accessing localStorage:", error);
+        setMessage(
+          "Error accessing browser storage. Please check if cookies are enabled.",
+        );
       }
-    }
-
-    // Get email safely
-    const userEmail: string | null =
-      localStorage.getItem("userEmail") ||
-      localStorage.getItem("email") ||
-      parsedUser?.email ||
-      null;
-
-    // Get any stored data
-    const userDataStr =
-      localStorage.getItem("user") ||
-      localStorage.getItem("userData") ||
-      localStorage.getItem("studentData");
-
-    if (userDataStr) {
-      try {
-        const userData: {
-          email?: string;
-          name?: string;
-          phone?: string;
-        } = JSON.parse(userDataStr);
-
-        setUserData(userData);
-
-        if (userData.email) {
-          setUserEmail(userData.email);
-          setNewEmail(userData.email);
-        }
-
-        if (userData.name) {
-          setUserName(userData.name);
-          setNewName(userData.name);
-        }
-
-        if (userData.phone) {
-          setPhoneNumber(userData.phone);
-          setNewPhone(userData.phone);
-        }
-      } catch (e) {
-        console.error("Error parsing user data:", e);
-      }
-    }
-
-    if (userEmail) {
-      setUserEmail(userEmail);
-      setNewEmail(userEmail);
-      fetchProfileData(userEmail); // ✅ now guaranteed string
-    } else {
-      setMessage("User email not found in storage. Please log in again.");
-    }
-  } catch (error: any) {
-    console.error("Error accessing localStorage:", error);
-    setMessage(
-      error?.message ||
-        "Error accessing browser storage. Please check if cookies are enabled."
-    );
-  }
-};
+    };
 
     checkUserData();
   }, []);
 
-const fetchProfileData = async (email: string) => {
-  if (!email) {
-    setMessage("No email provided for fetching profile data");
-    return;
-  }
-
-  try {
-    setLoading(true);
-    const token = localStorage.getItem("token");
-
-    /* ================= USER PROFILE ================= */
+  const fetchProfileData = async (email: string | null) => {
+    if (!email) {
+      setMessage("No email provided for fetching profile data");
+      return;
+    }
 
     try {
-      const userResponse = await fetch(
-        `http://localhost:5000/api/profile/${email}`,
-        {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
+      setLoading(true);
+      const token = localStorage.getItem("token");
+
+      // Fetch user profile data
+      try {
+        const userResponse = await fetch(
+          `http://localhost:5000/api/profile/${email}`,
+          {
+            headers: {
+              Authorization: token ? `Bearer ${token}` : "",
+            },
           },
-        }
-      );
+        );
 
-      const userData: {
-        success: boolean;
-        user?: {
-          name?: string;
-          email?: string;
-        };
-      } = await userResponse.json();
+        const userData = await userResponse.json();
 
-      if (userData.success && userData.user) {
-        const userDataInfo = userData.user;
-
-        if (userDataInfo.name) {
+        if (userData.success) {
+          const userDataInfo = userData.user;
           setUserName(userDataInfo.name);
           setNewName(userDataInfo.name);
-        }
-
-        if (userDataInfo.email) {
           setUserEmail(userDataInfo.email);
           setNewEmail(userDataInfo.email);
-        }
 
-        // ✅ Safe localStorage update
-        try {
-          const existingStr = localStorage.getItem("user");
+          // Update localStorage with fresh data
+          try {
+            const userStr = localStorage.getItem("user");
 
-          if (existingStr) {
-            const existingData: {
-              name?: string;
-              email?: string;
-            } = JSON.parse(existingStr);
-
-            existingData.name = userDataInfo.name;
-            existingData.email = userDataInfo.email;
-
-            localStorage.setItem("user", JSON.stringify(existingData));
+            if (userStr) {
+              const existingData = JSON.parse(userStr);
+              existingData.name = userDataInfo.name;
+              existingData.email = userDataInfo.email;
+              localStorage.setItem("user", JSON.stringify(existingData));
+            }
+          } catch (e) {
+            console.error("Error updating localStorage:", e);
           }
-        } catch (e) {
-          console.error("Error updating localStorage:", e);
         }
+      } catch (userError) {
+        console.log("User endpoint might not be implemented yet:", userError);
       }
-    } catch (userError) {
-      console.log("User endpoint issue:", userError);
-    }
 
-    /* ================= PROFILE IMAGE ================= */
-
-    try {
-      const imageResponse = await fetch(
-        `http://localhost:5000/api/profile/profile-image/${email}`,
-        {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
+      // Fetch profile image
+      try {
+        const imageResponse = await fetch(
+          `http://localhost:5000/api/profile/profile-image/${email}`,
+          {
+            headers: {
+              Authorization: token ? `Bearer ${token}` : "",
+            },
           },
+        );
+
+        const imageData = await imageResponse.json();
+
+        if (imageData.success) {
+          setProfileImage(imageData.profileImage);
         }
-      );
-
-      const imageData: {
-        success: boolean;
-        profileImage?: string;
-      } = await imageResponse.json();
-
-      if (imageData.success && imageData.profileImage) {
-        setProfileImage(imageData.profileImage);
+      } catch (imageError) {
+        console.log("Image endpoint might not be implemented yet:", imageError);
       }
-    } catch (imageError) {
-      console.log("Image endpoint issue:", imageError);
-    }
 
-    /* ================= PHONE ================= */
-
-    try {
-      const phoneResponse = await fetch(
-        `http://localhost:5000/api/profile/phone/${email}`,
-        {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
+      // Fetch phone number
+      try {
+        const phoneResponse = await fetch(
+          `http://localhost:5000/api/profile/phone/${email}`,
+          {
+            headers: {
+              Authorization: token ? `Bearer ${token}` : "",
+            },
           },
+        );
+
+        const phoneData = await phoneResponse.json();
+
+        if (phoneData.success && phoneData.phone) {
+          setPhoneNumber(phoneData.phone);
+          setNewPhone(phoneData.phone);
         }
-      );
-
-      const phoneData: {
-        success: boolean;
-        phone?: string;
-      } = await phoneResponse.json();
-
-      if (phoneData.success && phoneData.phone) {
-        setPhoneNumber(phoneData.phone);
-        setNewPhone(phoneData.phone);
+      } catch (phoneError) {
+        console.log("Phone endpoint might not be implemented yet:", phoneError);
       }
-    } catch (phoneError) {
-      console.log("Phone endpoint issue:", phoneError);
+
+      setMessage("");
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+
+      if (error instanceof Error) {
+        if (error.message === "Failed to fetch") {
+          setMessage(
+            "Cannot connect to server. Please make sure the backend is running on port 5000.",
+          );
+        } else {
+          setMessage("Failed to fetch profile data: " + error.message);
+        }
+      } else {
+        setMessage("An unknown error occurred");
+      }
+    } finally {
+      setLoading(false);
     }
+  };
 
-    setMessage("");
-  } catch (error: any) {
-    console.error("Error fetching profile data:", error);
-
-    if (error?.message === "Failed to fetch") {
-      setMessage(
-        "Cannot connect to server. Make sure backend is running on port 5000."
-      );
-    } else {
-      setMessage(
-        "Failed to fetch profile data: " +
-          (error?.message || "Unknown error")
-      );
-    }
-  } finally {
-    setLoading(false);
-  }
-};
-
-  const handleFileSelect = (e) => {
-    const file = e.target.files[0];
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
       // Check file size (max 2MB)
       if (file.size > 2 * 1024 * 1024) {
@@ -350,7 +285,9 @@ const fetchProfileData = async (email: string) => {
       // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreview(reader.result);
+        if (typeof reader.result === "string") {
+          setPreview(reader.result);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -371,9 +308,9 @@ const fetchProfileData = async (email: string) => {
       setLoading(true);
       setMessage("");
 
-      // Convert image to base64 for storage
       const reader = new FileReader();
       reader.readAsDataURL(selectedFile);
+
       reader.onloadend = async () => {
         const base64Image = reader.result;
         const token = localStorage.getItem("token");
@@ -398,19 +335,24 @@ const fetchProfileData = async (email: string) => {
             setMessage("Profile image updated successfully!");
             setSelectedFile(null);
             setPreview("");
-            // Refresh parent data
+
             if (fetchStudentData) fetchStudentData();
           } else {
             setMessage(data.message || "Failed to update profile image");
           }
         } catch (error) {
           console.error("Error updating profile image:", error);
-          if (error.message === "Failed to fetch") {
-            setMessage(
-              "Cannot connect to server. Please make sure the backend is running.",
-            );
+
+          if (error instanceof Error) {
+            if (error.message === "Failed to fetch") {
+              setMessage(
+                "Cannot connect to server. Please make sure the backend is running.",
+              );
+            } else {
+              setMessage("Failed to update profile image: " + error.message);
+            }
           } else {
-            setMessage("Failed to update profile image: " + error.message);
+            setMessage("An unknown error occurred");
           }
         } finally {
           setLoading(false);
@@ -491,12 +433,18 @@ const fetchProfileData = async (email: string) => {
       }
     } catch (error) {
       console.error("Error updating phone number:", error);
-      if (error.message === "Failed to fetch") {
+
+      const message =
+        error instanceof Error
+          ? error.message
+          : "An unknown error occurred";
+
+      if (message === "Failed to fetch") {
         setMessage(
           "Cannot connect to server. Please make sure the backend is running.",
         );
       } else {
-        setMessage("Failed to update phone number: " + error.message);
+        setMessage("Failed to update phone number: " + message);
       }
     } finally {
       setLoading(false);
@@ -557,12 +505,17 @@ const fetchProfileData = async (email: string) => {
       }
     } catch (error) {
       console.error("Error updating name:", error);
-      if (error.message === "Failed to fetch") {
-        setMessage(
-          "Cannot connect to server. Please make sure the backend is running.",
-        );
+
+      if (error instanceof Error) {
+        if (error.message === "Failed to fetch") {
+          setMessage(
+            "Cannot connect to server. Please make sure the backend is running.",
+          );
+        } else {
+          setMessage("Failed to update name: " + error.message);
+        }
       } else {
-        setMessage("Failed to update name: " + error.message);
+        setMessage("An unknown error occurred");
       }
     } finally {
       setLoading(false);
@@ -631,12 +584,17 @@ const fetchProfileData = async (email: string) => {
       }
     } catch (error) {
       console.error("Error updating email:", error);
-      if (error.message === "Failed to fetch") {
-        setMessage(
-          "Cannot connect to server. Please make sure the backend is running.",
-        );
+
+      if (error instanceof Error) {
+        if (error.message === "Failed to fetch") {
+          setMessage(
+            "Cannot connect to server. Please make sure the backend is running.",
+          );
+        } else {
+          setMessage("Failed to update email: " + error.message);
+        }
       } else {
-        setMessage("Failed to update email: " + error.message);
+        setMessage("An unknown error occurred");
       }
     } finally {
       setLoading(false);
@@ -694,19 +652,24 @@ const fetchProfileData = async (email: string) => {
       }
     } catch (error) {
       console.error("Error updating password:", error);
-      if (error.message === "Failed to fetch") {
-        setMessage(
-          "Cannot connect to server. Please make sure the backend is running.",
-        );
+
+      if (error instanceof Error) {
+        if (error.message === "Failed to fetch") {
+          setMessage(
+            "Cannot connect to server. Please make sure the backend is running.",
+          );
+        } else {
+          setMessage("Failed to update password: " + error.message);
+        }
       } else {
-        setMessage("Failed to update password: " + error.message);
+        setMessage("An unknown error occurred");
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const cancelEdit = (field) => {
+  const cancelEdit = (field: string) => {
     switch (field) {
       case "name":
         setNewName(userName);
@@ -771,7 +734,7 @@ const fetchProfileData = async (email: string) => {
                     src={profileImage}
                     alt="Profile"
                     className="profile-img"
-                    onError={(e) => {
+                    onError={(e: any) => {
                       e.target.src = "/default-avatar.png";
                       setMessage(
                         "Error loading profile image. Showing default avatar.",
@@ -1092,7 +1055,11 @@ const StudentPortal = () => {
   const getUserFromStorage = () => {
     if (typeof window !== "undefined") {
       const userStr = localStorage.getItem("user");
-      return userStr ? JSON.parse(userStr) : null;
+      try {
+        return userStr ? JSON.parse(userStr) : null;
+      } catch {
+        return null;
+      }
     }
     return null;
   };
@@ -1137,9 +1104,9 @@ const StudentPortal = () => {
 
       const data = await response.json();
       setStudentData(data.student);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching student data:", err);
-      setError(err.message);
+      setError(err?.message || "Failed to fetch student data");
     } finally {
       setLoading(false);
     }
@@ -1192,17 +1159,17 @@ const StudentPortal = () => {
             className="sidebar-profile"
             onClick={() => setIsProfileModalOpen(true)}
           >
-            <img
+            {/* <img
               src={
                 studentData?.personalDetails?.profileImage ||
                 "/default-profile.png"
               }
               alt="Profile Icon"
               className="p-image"
-              onError={(e) => {
+              onError={(e: any) => {
                 e.target.src = "/default-profile.png";
               }}
-            />
+            /> */}
           </div>
           <p className="name">{user?.name}</p>
         </div>
@@ -1388,52 +1355,52 @@ const StudentPortal = () => {
         </div>
         {activeSection === "dashboard" && (
           <div className="md-4">
-            <Dashboard studentData={studentData} />
+            {/* <Dashboard studentData={studentData} /> */}
           </div>
         )}
         {activeSection === "paymentdetails" && (
           <div className="mb-4">
-            <PaymentInfo email={userEmail} />
+            {/* <PaymentInfo email={userEmail} /> */}
           </div>
         )}
         {activeSection === "feespayment" && (
           <div className="mb-4">
-            <FeesPayment studentData={studentData} />
+            {/* <FeesPayment studentData={studentData} /> */}
           </div>
         )}
         {activeSection === "course Module" && (
           <div className="section">
-            <CourseModule studentData={studentData} />
+            {/* <CourseModule studentData={studentData} /> */}
           </div>
         )}
         {activeSection === "course material" && (
           <div className="section">
-            <CourseMaterial studentData={studentData} />
+            {/* <CourseMaterial studentData={studentData} /> */}
           </div>
         )}
         {activeSection === "Performance" && (
           <div className="section">
-            <CoursePerformance studentData={studentData} />
+            {/* <CoursePerformance studentData={studentData} /> */}
           </div>
         )}
         {activeSection === "Grade" && (
           <div className="section">
-            <CourseGrade studentData={studentData} />
+            {/* <CourseGrade studentData={studentData} /> */}
           </div>
         )}
         {activeSection === "Assignment" && (
           <div className="section">
-            <CourseAssignment studentData={studentData} />
+            {/* <CourseAssignment studentData={studentData} /> */}
           </div>
         )}
         {activeSection === "quiz" && (
           <div className="section">
-            <CourseQuiz studentData={studentData} />
+            {/* <CourseQuiz studentData={studentData} /> */}
           </div>
         )}
         {activeSection === "settings" && (
           <div className="mb-4 section">
-            <Settings studentData={studentData} />
+            {/* <Settings studentData={studentData} /> */}
           </div>
         )}
         {/* Footer */}
