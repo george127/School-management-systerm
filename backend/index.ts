@@ -7,8 +7,13 @@ import studentFormsRoutes from './routes/studentforms.ts'; // Import student for
    
 const app = express();
 
-app.use(cors({  
-  origin: "http://localhost:3000",  
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://main.d2qiaka43ozgqd.amplifyapp.com/"
+];
+
+app.use(cors({
+  origin: allowedOrigins,
   credentials: true
 }));
  
