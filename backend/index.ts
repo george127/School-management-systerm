@@ -12,6 +12,11 @@ const allowedOrigins = [
   "https://main.d2qiaka43ozgqd.amplifyapp.com/"
 ];
 
+app.get('/', (req, res) => {
+  res.json({ message: 'School Management System API is running', status: 'ok' });
+});
+
+
 app.use(cors({
   origin: allowedOrigins,
   credentials: true
