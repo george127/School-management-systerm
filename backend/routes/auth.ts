@@ -1,6 +1,6 @@
 import express from 'express';
 import AWS from 'aws-sdk';
-import { prisma } from '../lib/prisma.ts';
+import { prisma } from '../lib/prisma';
 import jwt from 'jsonwebtoken';
 
 const router = express.Router();

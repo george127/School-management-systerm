@@ -121,7 +121,7 @@ router.post('/programApplyingFor', async (req, res) => {
       }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error saving program application:', error);
     
     // Handle specific Prisma errors
@@ -239,7 +239,7 @@ router.post('/educationalBackground', async (req, res) => {
       }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error saving educational background:', error);
     
     if (error.code === 'P2025') {
@@ -367,7 +367,7 @@ router.post('/guardianDetails', async (req, res) => {
       }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error saving guardian details:', error);
     
     if (error.code === 'P2025') {
@@ -418,7 +418,7 @@ router.get('/guardianDetails', async (req, res) => {
       guardianOccupation: student.guardianOccupation || ""
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching guardian details:', error);
     return res.status(500).json({ 
       message: 'Failed to fetch guardian details' 
@@ -525,11 +525,11 @@ router.post('/submitApplication', async (req, res) => {
       email: student.email
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Final submission error:', error);
     return res.status(500).json({ 
       message: 'Failed to submit application',
-      error: error.message 
+      error: error instanceof Error ? error.message : 'Unknown error' 
     });
   }
 });
