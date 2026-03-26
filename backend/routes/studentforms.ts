@@ -2,8 +2,21 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { v4 as uuidv4 } from 'uuid';
+
 const router = express.Router();
 const prisma = new PrismaClient();
+
+// Initialize S3 client
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION!,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+  },
+});
+
 
 // POST endpoint for saving personal details
 router.post('/personalDetails', async (req, res) => {
@@ -39,10 +52,105 @@ router.post('/personalDetails', async (req, res) => {
       });
     }
 
-    // Create student record
+    // Get the authenticated user ID from the request (assuming you have authentication)
+    // For now, let's handle the user creation properly
+    let userId: number;
+    
+    // Check if user exists with this email
+    let user = await prisma.user.findUnique({
+      where: { email: body.email }
+    });
+    
+    if (!user) {
+      // Create a new user with all required fields
+      try {
+        const newUser = await prisma.user.create({
+          data: {
+            email: body.email,
+            name: body.fullName,
+            role: 'student',
+            cognitoId: `temp_${uuidv4()}`, // Generate a temporary Cognito ID
+            // Add any other required fields from your User model
+            // For example, if you have these fields:
+            // emailVerified: false,
+            // status: 'active',
+            // createdAt: new Date(),
+            // updatedAt: new Date(),
+          }
+        });
+        userId = newUser.id;
+      } catch (userCreateError) {
+        console.error('Error creating user:', userCreateError);
+        return res.status(500).json({ 
+          message: 'Failed to create user account' 
+        });
+      }
+    } else {
+      userId = user.id;
+    }
+
+    // Handle profile image upload to S3
+    let profileImageUrl = body.profileImage;
+    
+    // Check if profileImage is base64 (starts with data:image)
+    if (body.profileImage && body.profileImage.startsWith('data:image')) {
+      try {
+        // Extract image data from base64
+        const matches = body.profileImage.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
+        
+        if (!matches || matches.length !== 3) {
+          return res.status(400).json({ 
+            message: 'Invalid image format' 
+          });
+        }
+
+        const imageType = matches[1];
+        const imageData = matches[2];
+        const buffer = Buffer.from(imageData, 'base64');
+
+        // Validate file size (max 5MB)
+        if (buffer.length > 5 * 1024 * 1024) {
+          return res.status(400).json({ 
+            message: 'File size too large. Maximum size is 5MB.' 
+          });
+        }
+
+        // Validate image type
+        const allowedTypes = ['jpeg', 'jpg', 'png', 'webp', 'gif'];
+        if (!allowedTypes.includes(imageType.toLowerCase())) {
+          return res.status(400).json({ 
+            message: 'Invalid file type. Only JPEG, PNG, WEBP, and GIF are allowed.' 
+          });
+        }
+
+        // Generate unique filename
+        const fileName = `profile-images/${uuidv4()}.${imageType}`;
+
+        // Upload to S3
+        const command = new PutObjectCommand({
+          Bucket: process.env.AWS_S3_BUCKET_NAME!,
+          Key: fileName,
+          Body: buffer,
+          ContentType: `image/${imageType}`,
+        });
+
+        await s3Client.send(command);
+
+        // Construct the S3 URL
+        profileImageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+        
+      } catch (s3Error) {
+        console.error('S3 Upload Error:', s3Error);
+        return res.status(500).json({ 
+          message: 'Failed to upload profile image to cloud storage' 
+        });
+      }
+    }
+
+    // Create student record with valid userId
     const student = await prisma.student.create({
       data: {
-        userId: 1,
+        userId: userId,
         fullName: body.fullName,
         email: body.email,
         phone: body.phone,
@@ -50,13 +158,16 @@ router.post('/personalDetails', async (req, res) => {
         nationality: body.nationality,
         dob: new Date(body.dob),
         gender: normalizedGender,
-        profileImage: body.profileImage,
+        profileImage: profileImageUrl,
       },
     });
 
     return res.json({
       message: 'Personal details saved successfully',
-      student,
+      student: {
+        ...student,
+        profileImage: profileImageUrl
+      },
     });
 
   } catch (error) {

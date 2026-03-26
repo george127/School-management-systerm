@@ -4,7 +4,8 @@ import express from 'express';import cors from "cors";
 import authRoute from "./routes/auth";
 import s3UploadRoutes from './routes/s3_upload';      
 import studentFormsRoutes from './routes/studentforms'; // Import student forms routes
-   
+import studentPortalRoutes from './routes/studentPortalRoutes';
+
 const app = express();
 
 const allowedOrigins = [
@@ -34,7 +35,7 @@ app.use(express.urlencoded({
 app.use("/api", authRoute);
 app.use("/api/upload", s3UploadRoutes);
 app.use("/api/forms", studentFormsRoutes); // Use student forms routes
-
+app.use('/api', studentPortalRoutes);
 
 
 app.listen(5000, () => {

@@ -209,68 +209,72 @@ function PersonalDetails({ onComplete, studentEmail, handleShowNext }: PersonalD
     }
   };
 
-  const handleSub = async (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSub = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (validateForm()) {
-      setLoading(true);
-      setError(null);
+  if (validateForm()) {
+    setLoading(true);
+    setError(null);
 
-      try {
-        let profileImageUrl = formData.profileImage;
+    try {
+      let profileImageUrl = formData.profileImage;
 
-        if (selectedFile && !profileImageUrl) {
-          profileImageUrl = await uploadFileToServer(selectedFile);
-        }
-
-        const submissionData = {
-          ...formData,
-          profileImage: profileImageUrl,
-        };
-
-        const response = await fetch("http://localhost:5000/api/forms/personalDetails", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(submissionData),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || "Failed to submit form");
-        }
-
-        setSuccessMessage("Personal details saved successfully!");
-        setSubmitError("");
-        setShowNextButton(true);
-        setFormSubmitted(true);
-        setFormData((prev) => ({ ...prev, profileImage: profileImageUrl }));
-        
-        // Save to localStorage
-        saveToLocalStorage(submissionData);
-        
-        // Call onComplete to notify parent component
-        if (onComplete) {
-          onComplete({ ...submissionData, completed: true });
-        }
-        
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : "An error occurred during form submission.";
-        console.error("Error:", error);
-        setSubmitError(errorMessage);
-        setError(errorMessage);
-      } finally {
-        setLoading(false);
+      if (selectedFile && !profileImageUrl) {
+        profileImageUrl = await uploadFileToServer(selectedFile);
       }
-    } else {
-      setSubmitError("Please correct the errors above.");
+
+      const submissionData = {
+        ...formData,
+        profileImage: profileImageUrl,
+      };
+
+      // Get the authentication token from localStorage or context
+      const token = localStorage.getItem('token'); // Adjust based on your auth implementation
+
+      const response = await fetch("http://localhost:5000/api/forms/personalDetails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // Add the authorization header
+        },
+        body: JSON.stringify(submissionData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to submit form");
+      }
+
+      setSuccessMessage("Personal details saved successfully!");
+      setSubmitError("");
+      setShowNextButton(true);
+      setFormSubmitted(true);
+      setFormData((prev) => ({ ...prev, profileImage: profileImageUrl }));
+      
+      // Save to localStorage
+      saveToLocalStorage(submissionData);
+      
+      // Call onComplete to notify parent component
+      if (onComplete) {
+        onComplete({ ...submissionData, completed: true });
+      }
+      
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An error occurred during form submission.";
+      console.error("Error:", error);
+      setSubmitError(errorMessage);
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
-  };
+  } else {
+    setSubmitError("Please correct the errors above.");
+  }
+};
 
   const handleNextClick = () => {
     if (onComplete) {

@@ -17,10 +17,23 @@ import CourseGrade from "./CourseGrade";
 import CourseQuiz from "./CourseQuiz";
 import Settings from "./Settings";
 
+// Define interfaces for type safety
+interface StudentData {
+  id?: number;
+  name?: string;
+  email?: string;
+  personalDetails?: {
+    profileImage?: string;
+    phone?: string;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
 interface ProfileModalProps {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
-  studentData: any;
+  studentData: StudentData | null;
   fetchStudentData: () => void;
 }
 
@@ -1044,7 +1057,7 @@ const ProfileModal = ({
 const StudentPortal = () => {
   const router = useRouter();
   const [activeSection, setActiveSection] = useState("dashboard");
-  const [studentData, setStudentData] = useState(null);
+  const [studentData, setStudentData] = useState<StudentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isPaymentDropdownOpen, setIsPaymentDropdownOpen] = useState(false);
@@ -1159,7 +1172,7 @@ const StudentPortal = () => {
             className="sidebar-profile"
             onClick={() => setIsProfileModalOpen(true)}
           >
-            {/* <img
+            <img
               src={
                 studentData?.personalDetails?.profileImage ||
                 "/default-profile.png"
@@ -1169,7 +1182,7 @@ const StudentPortal = () => {
               onError={(e: any) => {
                 e.target.src = "/default-profile.png";
               }}
-            /> */}
+            />
           </div>
           <p className="name">{user?.name}</p>
         </div>
@@ -1390,7 +1403,7 @@ const StudentPortal = () => {
         )}
         {activeSection === "Assignment" && (
           <div className="section">
-            {/* <CourseAssignment studentData={studentData} /> */}
+              {/* <CourseAssignment studentData={studentData} /> */}
           </div>
         )}
         {activeSection === "quiz" && (
