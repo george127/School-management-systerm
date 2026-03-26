@@ -15,7 +15,6 @@ import Navigation from "../components/Navigation/NavPage";
 import Footer from "../components/footer/Footer";
 
 const SignUpPage = () => {
-
   const router = useRouter();
 
   /* =====================
@@ -81,25 +80,24 @@ const SignUpPage = () => {
 
     if (!isPasswordValid(password)) {
       setError(
-        "Password must contain uppercase, lowercase, number and special character."
+        "Password must contain uppercase, lowercase, number and special character.",
       );
       setLoading(false);
       return;
     }
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/auth/signup",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: name.trim(),
-            email: email.toLowerCase().trim(),
-            password,
-          }),
-        }
-      );
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const response = await fetch(`${API_URL}/api/auth/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.toLowerCase().trim(),
+          password,
+        }),
+      });
 
       const data = await response.json();
 
@@ -109,7 +107,6 @@ const SignUpPage = () => {
       } else {
         setError(data.message || "Sign up failed.");
       }
-
     } catch {
       setError("Server connection error.");
     }
@@ -122,7 +119,6 @@ const SignUpPage = () => {
   ===================== */
 
   const handleVerify = async () => {
-
     if (verificationCode.length !== 6) {
       setError("Enter 6 digit verification code.");
       return;
@@ -131,18 +127,16 @@ const SignUpPage = () => {
     setLoading(true);
 
     try {
-
-      const response = await fetch(
-        "http://localhost:5000/api/auth/confirm",
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: email.toLowerCase(),
-            code: verificationCode,
-          }),
-        }
-      );
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const response = await fetch(`${API_URL}/api/auth/confirm`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.toLowerCase(),
+          code: verificationCode,
+        }),
+      });
 
       const data = await response.json();
 
@@ -152,7 +146,6 @@ const SignUpPage = () => {
       } else {
         setError(data.message || "Invalid verification code.");
       }
-
     } catch {
       setError("Verification failed.");
     }
@@ -170,9 +163,7 @@ const SignUpPage = () => {
       <div className="container navigate">
         <div className="items">
           <Link href="/">Home</Link>
-          <span className="material-symbols-outlined">
-            arrow_and_edge
-          </span>
+          <span className="material-symbols-outlined">arrow_and_edge</span>
         </div>
         <span>Sign Up</span>
       </div>
@@ -191,14 +182,8 @@ const SignUpPage = () => {
 
         <div className="signup-wrapper">
           <div className="signup-card">
-
             <div className="logo-container">
-              <Image
-                src={logoImage}
-                alt="Logo"
-                width={160}
-                height={50}
-              />
+              <Image src={logoImage} alt="Logo" width={160} height={50} />
             </div>
 
             <h2 className="signup-title">
@@ -207,19 +192,14 @@ const SignUpPage = () => {
                 : "Verify Your Email"}
             </h2>
 
-            {error && (
-              <div className="signup-alert error">{error}</div>
-            )}
+            {error && <div className="signup-alert error">{error}</div>}
 
-            {success && (
-              <div className="signup-alert success">{success}</div>
-            )}
+            {success && <div className="signup-alert success">{success}</div>}
 
             {/* ================= REGISTER FORM ================= */}
 
             {step === "register" && (
               <form onSubmit={handleSubmit} className="signup-form">
-
                 <div className="form-group">
                   <label className="form-label">Name</label>
                   <input
@@ -265,32 +245,22 @@ const SignUpPage = () => {
                     className="form-input"
                     placeholder="Re-enter your password"
                     value={confirmPassword}
-                    onChange={(e) =>
-                      setConfirmPassword(e.target.value)
-                    }
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                   <span
                     className="toggle-password"
-                    onClick={() =>
-                      setShowConfirmPassword(!showConfirmPassword)
-                    }
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
                     {showConfirmPassword ? "🙈" : "👁️"}
                   </span>
                 </div>
 
                 <div className="btn-container">
-                  <button
-                    className="btn btn-submit"
-                    disabled={loading}
-                  >
+                  <button className="btn btn-submit" disabled={loading}>
                     {loading ? "Creating Account..." : "Sign Up"}
-                    <span className="material-symbols-outlined">
-                      east
-                    </span>
+                    <span className="material-symbols-outlined">east</span>
                   </button>
                 </div>
-
               </form>
             )}
 
@@ -298,7 +268,6 @@ const SignUpPage = () => {
 
             {step === "verify" && (
               <div className="signup-form">
-
                 <div className="form-group">
                   <label className="form-label">
                     Enter 6-digit verification code
@@ -311,7 +280,7 @@ const SignUpPage = () => {
                     placeholder="Enter verification code"
                     onChange={(e) =>
                       setVerificationCode(
-                        e.target.value.replace(/\D/g, "").slice(0, 6)
+                        e.target.value.replace(/\D/g, "").slice(0, 6),
                       )
                     }
                   />
@@ -326,17 +295,13 @@ const SignUpPage = () => {
                     Verify Email
                   </button>
                 </div>
-
               </div>
             )}
 
             <div className="login-link">
               Already have an account?
-              <Link href="/login">
-                Login into Account
-              </Link>
+              <Link href="/login">Login into Account</Link>
             </div>
-
           </div>
         </div>
       </div>
