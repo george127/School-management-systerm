@@ -86,8 +86,9 @@ function GuardianDetails({ onComplete, handleShowNext, studentEmail, formData: p
       
       if (email) {
         try {
+          const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
           setLoadingSaved(true);
-          const response = await fetch(`http://localhost:5000/api/forms/guardianDetails?email=${email}`);
+          const response = await fetch(`${API_URL}/api/forms/guardianDetails?email=${email}`);
           
           if (response.ok) {
             const data = await response.json();
@@ -191,6 +192,7 @@ function GuardianDetails({ onComplete, handleShowNext, studentEmail, formData: p
       setLoading(true);
 
       try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
         const email = studentEmail || getEmailFromLocalStorage();
         
         if (!email) {
@@ -202,7 +204,7 @@ function GuardianDetails({ onComplete, handleShowNext, studentEmail, formData: p
           email,
         };
 
-        const response = await fetch("http://localhost:5000/api/forms/guardianDetails", {
+        const response = await fetch(`${API_URL}/api/forms/guardianDetails`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

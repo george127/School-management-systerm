@@ -89,9 +89,10 @@ function EducationalBackground({
 
       if (email) {
         try {
+          const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
           setLoadingSaved(true);
           const response = await fetch(
-            `http://localhost:5000/api/forms/educationalBackground?email=${email}`,
+            `${API_URL}/api/forms/educationalBackground?email=${email}`,
           );
 
           if (response.ok) {
@@ -197,6 +198,7 @@ function EducationalBackground({
       setLoading(true);
 
       try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
         // Get email
         const email = studentEmail || getEmailFromLocalStorage();
 
@@ -214,7 +216,7 @@ function EducationalBackground({
         };
 
         const response = await fetch(
-          "http://localhost:5000/api/forms/educationalBackground",
+          `${API_URL}/api/forms/educationalBackground`,
           {
             method: "POST",
             headers: {

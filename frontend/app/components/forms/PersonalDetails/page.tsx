@@ -66,6 +66,7 @@ function PersonalDetails({ onComplete, studentEmail, handleShowNext }: PersonalD
       setLoadingSaved(true);
       
       try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
         // First load from localStorage
         const savedData = localStorage.getItem("personalDetails");
         if (savedData) {
@@ -80,7 +81,7 @@ function PersonalDetails({ onComplete, studentEmail, handleShowNext }: PersonalD
         // Then try to load from API if email is available
         const email = studentEmail || getEmailFromLocalStorage();
         if (email) {
-          const response = await fetch(`http://localhost:5000/api/forms/personalDetails?email=${email}`);
+          const response = await fetch(`${API_URL}/api/forms/personalDetails?email=${email}`);
           if (response.ok) {
             const data = await response.json();
             setFormData(prev => ({ ...prev, ...data }));
@@ -185,12 +186,13 @@ function PersonalDetails({ onComplete, studentEmail, handleShowNext }: PersonalD
 
   const uploadFileToServer = async (file: File): Promise<string> => {
     try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       setIsUploading(true);
 
       const formData = new FormData();
       formData.append("profileImage", file);
 
-      const response = await fetch("http://localhost:5000/api/forms/upload", {
+      const response = await fetch(`${API_URL}/api/forms/upload`, {
         method: "POST",
         body: formData,
       });
@@ -217,6 +219,7 @@ const handleSub = async (e: React.FormEvent) => {
     setError(null);
 
     try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       let profileImageUrl = formData.profileImage;
 
       if (selectedFile && !profileImageUrl) {
@@ -231,7 +234,7 @@ const handleSub = async (e: React.FormEvent) => {
       // Get the authentication token from localStorage or context
       const token = localStorage.getItem('token'); // Adjust based on your auth implementation
 
-      const response = await fetch("http://localhost:5000/api/forms/personalDetails", {
+      const response = await fetch(`${API_URL}/api/forms/personalDetails`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

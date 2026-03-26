@@ -75,8 +75,10 @@ function ProgramApplyingFor({ onComplete, handleShowNext, studentEmail, formData
       
       if (email) {
         try {
+          const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
           setLoadingSaved(true);
-          const response = await fetch(`http://localhost:5000/api/forms/programApplyingFor?email=${email}`);
+          const response = await fetch(`${API_URL}/api/forms/programApplyingFor?email=${email}`);
           
           if (response.ok) {
             const data = await response.json();
@@ -162,6 +164,8 @@ function ProgramApplyingFor({ onComplete, handleShowNext, studentEmail, formData
       setLoading(true);
       
       try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
         // Get email from props or localStorage
         const email = studentEmail || getEmailFromLocalStorage();
         
@@ -175,7 +179,7 @@ function ProgramApplyingFor({ onComplete, handleShowNext, studentEmail, formData
           email, // Include email to identify the student
         };
 
-        const response = await fetch('http://localhost:5000/api/forms/programApplyingFor', {
+        const response = await fetch(`${API_URL}/api/forms/programApplyingFor`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

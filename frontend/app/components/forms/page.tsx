@@ -104,9 +104,10 @@ export default function StudentForm() {
     setSubmitMessage('Submitting your application...');
     
     try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       console.log('Submitting form data:', formData);
       
-      const response = await fetch('http://localhost:5000/api/forms/submitApplication', {
+      const response = await fetch(`${API_URL}/api/forms/submitApplication`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
