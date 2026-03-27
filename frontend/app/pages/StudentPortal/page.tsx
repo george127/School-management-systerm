@@ -180,14 +180,13 @@ const ProfileModal = ({
 
       // Fetch user profile data
       try {
-        const userResponse = await fetch(
-          `http://localhost:5000/api/profile/${email}`,
-          {
-            headers: {
-              Authorization: token ? `Bearer ${token}` : "",
-            },
+        const API_URL =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+        const userResponse = await fetch(`${API_URL}/api/profile/${email}`, {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
           },
-        );
+        });
 
         const userData = await userResponse.json();
 
@@ -218,8 +217,10 @@ const ProfileModal = ({
 
       // Fetch profile image
       try {
+        const API_URL =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
         const imageResponse = await fetch(
-          `http://localhost:5000/api/profile/profile-image/${email}`,
+          `${API_URL}/api/profile/profile-image/${email}`,
           {
             headers: {
               Authorization: token ? `Bearer ${token}` : "",
@@ -238,8 +239,10 @@ const ProfileModal = ({
 
       // Fetch phone number
       try {
+        const API_URL =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
         const phoneResponse = await fetch(
-          `http://localhost:5000/api/profile/phone/${email}`,
+          `${API_URL}/api/profile/phone/${email}`,
           {
             headers: {
               Authorization: token ? `Bearer ${token}` : "",
@@ -329,8 +332,10 @@ const ProfileModal = ({
         const token = localStorage.getItem("token");
 
         try {
+          const API_URL =
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
           const response = await fetch(
-            `http://localhost:5000/api/profile/profile-image/${userEmail}`,
+            `${API_URL}/api/profile/profile-image/${userEmail}`,
             {
               method: "PUT",
               headers: {
@@ -405,9 +410,10 @@ const ProfileModal = ({
       setLoading(true);
       setMessage("");
       const token = localStorage.getItem("token");
-
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const response = await fetch(
-        `http://localhost:5000/api/profile/phone/${userEmail}`,
+        `${API_URL}/api/profile/phone/${userEmail}`,
         {
           method: "PUT",
           headers: {
@@ -448,9 +454,7 @@ const ProfileModal = ({
       console.error("Error updating phone number:", error);
 
       const message =
-        error instanceof Error
-          ? error.message
-          : "An unknown error occurred";
+        error instanceof Error ? error.message : "An unknown error occurred";
 
       if (message === "Failed to fetch") {
         setMessage(
@@ -479,18 +483,16 @@ const ProfileModal = ({
       setLoading(true);
       setMessage("");
       const token = localStorage.getItem("token");
-
-      const response = await fetch(
-        `http://localhost:5000/api/profile/name/${userEmail}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-          body: JSON.stringify({ name: newName }),
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const response = await fetch(`${API_URL}/api/profile/name/${userEmail}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
         },
-      );
+        body: JSON.stringify({ name: newName }),
+      });
 
       const data = await response.json();
 
@@ -557,9 +559,10 @@ const ProfileModal = ({
       setLoading(true);
       setMessage("");
       const token = localStorage.getItem("token");
-
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const response = await fetch(
-        `http://localhost:5000/api/profile/email/${userEmail}`,
+        `${API_URL}/api/profile/email/${userEmail}`,
         {
           method: "PUT",
           headers: {
@@ -639,9 +642,10 @@ const ProfileModal = ({
       setLoading(true);
       setMessage("");
       const token = localStorage.getItem("token");
-
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const response = await fetch(
-        `http://localhost:5000/api/profile/password/${userEmail}`,
+        `${API_URL}/api/profile/password/${userEmail}`,
         {
           method: "PUT",
           headers: {
@@ -1102,15 +1106,14 @@ const StudentPortal = () => {
     if (!user?.email) return;
 
     try {
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:5000/api/students/${user?.email}`,
-        {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-          },
+      const response = await fetch(`${API_URL}/api/students/${user?.email}`, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
         },
-      );
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch student data");
       }
@@ -1372,9 +1375,7 @@ const StudentPortal = () => {
           </div>
         )}
         {activeSection === "paymentdetails" && (
-          <div className="mb-4">
-            {/* <PaymentInfo email={userEmail} /> */}
-          </div>
+          <div className="mb-4">{/* <PaymentInfo email={userEmail} /> */}</div>
         )}
         {activeSection === "feespayment" && (
           <div className="mb-4">
@@ -1403,7 +1404,7 @@ const StudentPortal = () => {
         )}
         {activeSection === "Assignment" && (
           <div className="section">
-              {/* <CourseAssignment studentData={studentData} /> */}
+            {/* <CourseAssignment studentData={studentData} /> */}
           </div>
         )}
         {activeSection === "quiz" && (
