@@ -94,9 +94,10 @@ export default function Header() {
 
       // Temporarily set stored user
       setUser(storedUser);
-
+const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const response = await fetch(
-        "http://localhost:5000/api/auth/check-auth",
+        "${API_URL}/api/auth/check-auth",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
