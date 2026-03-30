@@ -125,10 +125,10 @@ app.get("/api/db-tables", async (req, res) => {
 app.get("/api/delete-users", async (req, res) => {
   try {
     // Get users before deletion
-    const usersToDelete = await prisma.$queryRaw`SELECT * FROM User`;
+    const usersToDelete = await prisma.$queryRaw`SELECT * FROM "User"`;
     
     // Delete all users
-    await prisma.$queryRaw`DELETE FROM User`;
+    await prisma.$queryRaw`DELETE FROM "User"`;
     
     res.json({
       message: "Users deleted",
@@ -138,7 +138,7 @@ app.get("/api/delete-users", async (req, res) => {
     
   } catch (error) {
     res.status(500).json({ error: error.message });
-  }
+  } 
 });
 
 app.use("/api", authRoute);
