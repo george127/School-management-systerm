@@ -122,6 +122,25 @@ app.get("/api/db-tables", async (req, res) => {
   }
 });
 
+app.get("/api/delete-users", async (req, res) => {
+  try {
+    // Get users before deletion
+    const usersToDelete = await prisma.$queryRaw`SELECT * FROM users`;
+    
+    // Delete all users
+    await prisma.$queryRaw`DELETE FROM users`;
+    
+    res.json({
+      message: "Users deleted",
+      deletedUsers: usersToDelete,
+      count: Array.isArray(usersToDelete) ? usersToDelete.length : 0
+    });
+    
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.use("/api", authRoute);
 app.use("/api/upload", s3UploadRoutes);
 app.use("/api/forms", studentFormsRoutes);
