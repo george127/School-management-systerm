@@ -1,8 +1,14 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import "./style/DynamicDateTable.css";
 
-const CalendarAndClock = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
+interface CalendarAndClockProps {
+  // Add any props if needed, otherwise empty interface
+}
+
+const CalendarAndClock: React.FC<CalendarAndClockProps> = () => {
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
 
   // Update the clock every second
   useEffect(() => {
@@ -23,7 +29,6 @@ const CalendarAndClock = () => {
           <p>{currentTime.toLocaleTimeString()}</p>
         </div>
       </div>
-
 
       {/* Static Calendar */}
       <div className="calendar">

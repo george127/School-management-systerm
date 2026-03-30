@@ -25,6 +25,93 @@ interface CheckAuthResponse {
 }
 
 /* =========================
+   Helper Functions
+========================= */
+
+// Function to get initials from full name
+const getInitials = (fullName: string): string => {
+  if (!fullName) return "U";
+  
+  const names = fullName.trim().split(" ");
+  if (names.length === 1) return names[0].charAt(0).toUpperCase();
+  if (names.length >= 2) return (names[0].charAt(0) + names[1].charAt(0)).toUpperCase();
+  return "U";
+};
+
+// Function to get avatar URL - uses name for initials
+const getAvatarUrl = (user: User | null): string => {
+  // If no user at all → avatar
+  if (!user) {
+    return "https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=User";
+  }
+
+  // If real profile image exists → USE IT
+  if (user.profileImage && user.profileImage.trim() !== "") {
+    return user.profileImage;
+  }
+
+  // Otherwise generate avatar from name
+  const nameForAvatar = user.fullName || "User";
+
+  return `https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=${encodeURIComponent(nameForAvatar)}`;
+};
+
+// Function to fetch user profile data (same as StudentPortal)
+const fetchUserProfileData = async (email: string): Promise<{ name: string; email: string; profileImage?: string } | null> => {
+  try {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const token = localStorage.getItem("token");
+    
+    const response = await fetch(`${API_URL}/api/profile/${email}`, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+    
+    const data = await response.json();
+    
+    if (data.success && data.user) {
+      return {
+        name: data.user.name,
+        email: data.user.email,
+        profileImage: data.user.profileImage
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    return null;
+  }
+};
+
+// Function to fetch profile image only
+const fetchProfileImage = async (email: string): Promise<string | null> => {
+  try {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const token = localStorage.getItem("token");
+    
+    const response = await fetch(
+      `${API_URL}/api/profile/profile-image/${email}`,
+      {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      }
+    );
+    
+    const data = await response.json();
+    
+    if (data.success && data.profileImage) {
+      return data.profileImage;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching profile image:", error);
+    return null;
+  }
+};
+
+/* =========================
    Component
 ========================= */
 
@@ -37,6 +124,7 @@ export default function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [profileImage, setProfileImage] = useState<string>("");
 
   /* =========================
      Effects
@@ -45,6 +133,13 @@ export default function Header() {
   useEffect(() => {
     checkAuthStatus();
   }, []);
+
+  // Fetch profile data when user is loaded (same as StudentPortal)
+  useEffect(() => {
+    if (user?.email) {
+      loadUserProfileData(user.email);
+    }
+  }, [user]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -71,6 +166,40 @@ export default function Header() {
      Auth Logic
   ========================= */
 
+  // Load user profile data - same method as StudentPortal
+  const loadUserProfileData = async (email: string) => {
+    const profileData = await fetchUserProfileData(email);
+    
+    if (profileData) {
+      // Update user with fresh data from API
+      const updatedUser = {
+        ...user,
+        fullName: profileData.name,
+        email: profileData.email,
+        profileImage: profileData.profileImage || user?.profileImage
+      };
+      
+      setUser(updatedUser as User);
+      
+      // Update localStorage with fresh data
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      
+      // Load profile image separately if needed
+      if (profileData.profileImage) {
+        setProfileImage(profileData.profileImage);
+      } else {
+        // Try to fetch profile image from separate endpoint
+        const image = await fetchProfileImage(email);
+        if (image) {
+          setProfileImage(image);
+          const userWithImage = { ...updatedUser, profileImage: image };
+          setUser(userWithImage as User);
+          localStorage.setItem("user", JSON.stringify(userWithImage));
+        }
+      }
+    }
+  };
+
   const checkAuthStatus = async (): Promise<void> => {
     try {
       const storedUserRaw = localStorage.getItem("user");
@@ -88,22 +217,21 @@ export default function Header() {
       // Admin shortcut
       if (roleLower === "admin" || emailLower === "admin@appcode.com") {
         setUser(storedUser);
+        if (storedUser.profileImage) {
+          setProfileImage(storedUser.profileImage);
+        }
         setLoading(false);
         return;
       }
 
       // Temporarily set stored user
       setUser(storedUser);
-const API_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const response = await fetch(
-        "${API_URL}/api/auth/check-auth",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: storedUser.email }),
-        },
-      );
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const response = await fetch(`${API_URL}/api/auth/check-auth`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: storedUser.email }),
+      });
 
       if (!response.ok) {
         setLoading(false);
@@ -120,6 +248,9 @@ const API_URL =
 
         setUser(mergedUser);
         localStorage.setItem("user", JSON.stringify(mergedUser));
+        
+        // Fetch full profile data (name, etc.) from profile endpoint
+        await loadUserProfileData(mergedUser.email);
       } else {
         localStorage.removeItem("user");
         setUser(null);
@@ -151,7 +282,14 @@ const API_URL =
 
   const handleLogout = (): void => {
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("tokenExpiry");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userData");
+    localStorage.removeItem("studentData");
     setUser(null);
+    setProfileImage("");
     setIsDropdownOpen(false);
     router.push("/login");
   };
@@ -234,9 +372,15 @@ const API_URL =
                     role="button"
                   >
                     <img
-                      src={user.profileImage || "/default-avatar.png"}
-                      alt={user.fullName}
+                      src={getAvatarUrl({ ...user, profileImage })}
+                      alt={user.fullName || "User"}
                       className="profile-image"
+                      onError={(e) => {
+                        // Fallback to initials if image fails to load
+                        const target = e.target as HTMLImageElement;
+                        const initials = getInitials(user.fullName);
+                        target.src = `https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=${encodeURIComponent(initials)}`;
+                      }}
                     />
                     <span
                       className={`material-symbols-outlined arrow ${
@@ -251,12 +395,17 @@ const API_URL =
                     <div className="dropdown-Menu show">
                       <div className="dropdown-header">
                         <img
-                          src={user.profileImage || "/default-avatar.png"}
-                          alt={user.fullName}
+                          src={getAvatarUrl({ ...user, profileImage })}
+                          alt={user.fullName || "User"}
                           className="dropdown-profile-image"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            const initials = getInitials(user.fullName);
+                            target.src = `https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=${encodeURIComponent(initials)}`;
+                          }}
                         />
                         <div className="dropdown-user-info">
-                          <h4>{user.fullName}</h4>
+                          <h4>{user.fullName || "User"}</h4>
                           <p>{user.email}</p>
                         </div>
                       </div>
@@ -264,7 +413,7 @@ const API_URL =
                       <div className="dropdown-divider" />
 
                       <Link
-                        href="/StudentPortal?modal=profile"
+                        href="/pages/StudentPortal?modal=profile"
                         className="dropdown-item"
                         onClick={() => setIsDropdownOpen(false)}
                       >
@@ -272,7 +421,7 @@ const API_URL =
                       </Link>
 
                       <Link
-                        href="/StudentPortal"
+                        href="/pages/StudentPortal"
                         className="dropdown-item"
                         onClick={() => setIsDropdownOpen(false)}
                       >

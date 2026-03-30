@@ -12,7 +12,7 @@ interface PaymentStatus {
   };
 }
 
-interface UserData {
+ interface UserData {
   email: string;
   name?: string;
 }
@@ -49,9 +49,11 @@ const FeesDetailsPage = () => {
 
   const fetchPaymentStatus = async (userEmail: string) => {
     try {
+      const API_URL =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `https://acg-7euk.onrender.com/api/fees/payment-status/${userEmail}`,
+        `${API_URL}/api/fees/payment-status/${userEmail}`,
         {
           headers: {
             'Authorization': token ? `Bearer ${token}` : '',
@@ -81,10 +83,12 @@ const FeesDetailsPage = () => {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
+      const API_URL =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const data = { email, semester, installment, amount };
       const token = localStorage.getItem('token');
       
-      const response = await fetch("https://acg-7euk.onrender.com/api/fees/SaveFormData", {
+      const response = await fetch(`${API_URL}/api/fees/SaveFormData`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,8 +1,3 @@
-/**
- * Header Component Styles
- * Main site header with navigation, search, and user profile dropdown
- * All styles are scoped under .site-header parent class
- */
 
 /* ====================
    Main Header Container (.site-header)
@@ -209,7 +204,7 @@
   padding: 10px 0;                   /* Vertical padding only */
   margin-top: 10px;                  /* Space from profile image */
   animation: fadeIn 0.2s ease;       /* Quick fade in animation */
-  z-index: 1001;                     /* High z-index to appear above other content */
+  z-index: 99999;                     /* High z-index to appear above other content */
   border-radius: 8px;                /* Rounded corners */
 }
 

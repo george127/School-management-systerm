@@ -525,3 +525,8 @@ width: 100%;
 .password-toggle:hover {
   color: #333;
 }
+
+
+ .profile-manager-container .user-info-section .btn{
+   font-size: 0.9rem;
+ }

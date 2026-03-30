@@ -752,7 +752,8 @@ const ProfileModal = ({
                     alt="Profile"
                     className="profile-img"
                     onError={(e: any) => {
-                      e.target.src = "/default-avatar.png";
+                      e.target.src =
+                        "https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=User";
                       setMessage(
                         "Error loading profile image. Showing default avatar.",
                       );
@@ -1176,14 +1177,15 @@ const StudentPortal = () => {
             onClick={() => setIsProfileModalOpen(true)}
           >
             <img
-              src={
-                studentData?.personalDetails?.profileImage ||
-                "/default-profile.png"
+               src={
+                studentData?.personalDetails?.profileImage?.trim()
+                  ? studentData.personalDetails.profileImage
+                  : `https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=${encodeURIComponent(user?.name || "User")}`
               }
               alt="Profile Icon"
               className="p-image"
-              onError={(e: any) => {
-                e.target.src = "/default-profile.png";
+              onError={(e) => {
+                e.currentTarget.src = `https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=${encodeURIComponent(user?.name || "User")}`;
               }}
             />
           </div>
@@ -1371,7 +1373,7 @@ const StudentPortal = () => {
         </div>
         {activeSection === "dashboard" && (
           <div className="md-4">
-            {/* <Dashboard studentData={studentData} /> */}
+            <Dashboard />
           </div>
         )}
         {activeSection === "paymentdetails" && (
