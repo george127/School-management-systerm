@@ -122,23 +122,37 @@ app.get("/api/db-tables", async (req, res) => {
   }
 });
 
-app.get("/api/delete-users", async (req, res) => {
+app.get("/api/delete-all-data", async (req, res) => {
   try {
-    // Get users before deletion
-    const usersToDelete = await prisma.$queryRaw`SELECT * FROM "User"`;
+    const deletedData = {};
     
-    // Delete all users
-    await prisma.$queryRaw`DELETE FROM "User"`;
+    // Delete in order: child tables first, then parent tables
+    // Payment depends on Student? Check relationships
+    const tablesInOrder = ["Payment", "TrainingDetails", "Student", "User"];
+    
+    for (const table of tablesInOrder) {
+      const result = await prisma.$queryRawUnsafe(
+        `DELETE FROM "${table}" RETURNING *`
+      );
+      deletedData[table] = {
+        count: Array.isArray(result) ? result.length : 0,
+        data: result
+      };
+    }
     
     res.json({
-      message: "Users deleted",
-      deletedUsers: usersToDelete,
-      count: Array.isArray(usersToDelete) ? usersToDelete.length : 0
+      message: "All data deleted successfully",
+      deletedData,
+      timestamp: new Date().toISOString()
     });
     
   } catch (error) {
-    res.status(500).json({ error: error.message });
-  } 
+    console.error("Error deleting data:", error);
+    res.status(500).json({ 
+      error: error.message,
+      hint: "Check foreign key constraints - tables must be deleted in correct order"
+    });
+  }
 });
 
 app.use("/api", authRoute);
