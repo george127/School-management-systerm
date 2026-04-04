@@ -12,7 +12,7 @@ interface PaymentStatus {
   };
 }
 
- interface UserData {
+interface UserData {
   email: string;
   name?: string;
 }
@@ -26,6 +26,7 @@ const FeesDetailsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>({});
 
+  // Payment links mapping (same as your working code)
   const paymentLinks: Record<number, string> = {
     2000: "https://paystack.shop/pay/7faz2q19tm",
     1920: "https://paystack.shop/pay/7faz2q19tm",
@@ -49,8 +50,7 @@ const FeesDetailsPage = () => {
 
   const fetchPaymentStatus = async (userEmail: string) => {
     try {
-      const API_URL =
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const token = localStorage.getItem('token');
       const response = await fetch(
         `${API_URL}/api/fees/payment-status/${userEmail}`,
@@ -82,25 +82,26 @@ const FeesDetailsPage = () => {
 
   const handleSubmit = async () => {
     setIsLoading(true);
+    
     try {
-      const API_URL =
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const data = { email, semester, installment, amount };
-      const token = localStorage.getItem('token');
-      
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const token = localStorage.getItem("token");
+
+      // 1️⃣ Save pending payment in DB FIRST (same as your working code)
       const response = await fetch(`${API_URL}/api/fees/SaveFormData`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({ email, semester, installment, amount }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save form data');
+        throw new Error("Failed to save form data");
       }
-      
+
+      // 2️⃣ Get the payment link (same approach as your working React code)
       const paymentLink = paymentLinks[amount];
       if (!paymentLink) {
         console.error(`No payment link for amount: ${amount}`);
@@ -108,9 +109,14 @@ const FeesDetailsPage = () => {
         return;
       }
 
-      window.location.href = `${paymentLink}?metadata=${encodeURIComponent(
-        JSON.stringify({ email, semester, installment, amount })
+      // 3️⃣ Redirect with metadata as URL parameter (THIS IS THE KEY!)
+      const metadata = { email, semester, installment, amount };
+      const redirectUrl = `${paymentLink}?metadata=${encodeURIComponent(
+        JSON.stringify(metadata)
       )}`;
+      
+      window.location.href = redirectUrl;
+      
     } catch (error) {
       console.error("Payment initialization error:", error);
       setIsLoading(false);
@@ -346,7 +352,7 @@ const FeesDetailsPage = () => {
       {showModal && (
         <div className="modal">
           <div className="modal-content">
-           <div className="payment-summary">
+            <div className="payment-summary">
               <div className="summary-header">
                 <div className="summary-icon">
                   <span className="material-symbols-outlined">receipt_long</span>
@@ -389,14 +395,14 @@ const FeesDetailsPage = () => {
               <div className="summary-footer">
                 <div className="secure-notice">
                   <span className="material-symbols-outlined">lock</span>
-                  <span>Secure payment processed by Paystack</span>
+                  <span>Secure payment process</span>
                 </div>
               </div>
-           </div>
+            </div>
             <div className="btn-container">
               <button
                 onClick={handleSubmit}
-                className="btn btn-submit"
+                className="btn "
                 disabled={isLoading || !email}
               >
                 {isLoading ? "Processing..." : "Payment"}
@@ -404,7 +410,7 @@ const FeesDetailsPage = () => {
               </button>
               <button
                 onClick={() => setShowModal(false)}
-                className="btn btn-cancel"
+                className="btn "
                 disabled={isLoading}
               >
                 Cancel

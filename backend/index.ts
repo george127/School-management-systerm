@@ -8,6 +8,8 @@ import s3UploadRoutes from "./routes/s3_upload";
 import studentFormsRoutes from "./routes/studentforms";
 import studentPortalRoutes from "./routes/studentPortalRoutes";
 import feesPaymentRoutes from './routes/feesPaymentRoutes';
+import studentProfileRoutes from './routes/studentProfile';
+import forgotpasswordRoutes from './routes/forgotpassword';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -159,7 +161,9 @@ app.use("/api", authRoute);
 app.use("/api/upload", s3UploadRoutes);
 app.use("/api/forms", studentFormsRoutes);
 app.use("/api", studentPortalRoutes);
-app.use("/api", feesPaymentRoutes);
+app.use("/api/fees", feesPaymentRoutes);
+app.use("/api", studentProfileRoutes);
+app.use("/api", forgotpasswordRoutes);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

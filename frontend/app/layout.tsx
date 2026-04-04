@@ -40,8 +40,8 @@ export default function RootLayout({
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
           rel="stylesheet"
-        />
-
+        />  
+ 
         <link
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
           rel="stylesheet"
@@ -51,6 +51,7 @@ export default function RootLayout({
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
           rel="stylesheet"
         />
+        <script src="https://js.paystack.co/v1/inline.js"></script>
       </head>
       <body className={inter.className}>{children}</body>
     </html>

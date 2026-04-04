@@ -22,6 +22,7 @@ interface StudentData {
   id?: number;
   name?: string;
   email?: string;
+  profileImage?: string; // Add this
   personalDetails?: {
     profileImage?: string;
     phone?: string;
@@ -617,74 +618,93 @@ const ProfileModal = ({
     }
   };
 
-  const handlePasswordUpdate = async () => {
-    if (!userEmail) {
-      setMessage("User email not found. Please log in again.");
+const handlePasswordUpdate = async () => {
+  if (!userEmail) {
+    setMessage("User email not found. Please log in again.");
+    return;
+  }
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    setMessage("Please fill in all password fields");
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    setMessage("New passwords do not match");
+    return;
+  }
+
+  if (newPassword.length < 6) {
+    setMessage("Password must be at least 6 characters");
+    return;
+  }
+
+  try {
+    setLoading(true);
+    setMessage("");
+    
+    // Get the access token from localStorage
+    const accessToken = localStorage.getItem("accessToken");
+    
+    if (!accessToken) {
+      setMessage("Session expired. Please log in again.");
       return;
     }
 
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      setMessage("Please fill in all password fields");
-      return;
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const response = await fetch(`${API_URL}/api/profile/password/${userEmail}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ 
+        currentPassword, 
+        newPassword,
+        accessToken  // 👈 Send access token to backend
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      setEditPassword(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setMessage("Password updated successfully! Please login again with your new password.");
+      
+      // Clear stored tokens and redirect to login after 3 seconds
+      setTimeout(() => {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("tokenExpiry");
+        localStorage.removeItem("userEmail");
+        localStorage.removeItem("userData");
+        localStorage.removeItem("studentData");
+        window.location.href = "/login";
+      }, 3000);
+    } else {
+      setMessage(data.message || "Failed to update password");
     }
+  } catch (error) {
+    console.error("Error updating password:", error);
 
-    if (newPassword !== confirmPassword) {
-      setMessage("New passwords do not match");
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      setMessage("Password must be at least 6 characters");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setMessage("");
-      const token = localStorage.getItem("token");
-      const API_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const response = await fetch(
-        `${API_URL}/api/profile/password/${userEmail}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-          body: JSON.stringify({ currentPassword, newPassword }),
-        },
-      );
-
-      const data = await response.json();
-
-      if (data.success) {
-        setEditPassword(false);
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-        setMessage("Password updated successfully!");
+    if (error instanceof Error) {
+      if (error.message === "Failed to fetch") {
+        setMessage(
+          "Cannot connect to server. Please make sure the backend is running.",
+        );
       } else {
-        setMessage(data.message || "Failed to update password");
+        setMessage("Failed to update password: " + error.message);
       }
-    } catch (error) {
-      console.error("Error updating password:", error);
-
-      if (error instanceof Error) {
-        if (error.message === "Failed to fetch") {
-          setMessage(
-            "Cannot connect to server. Please make sure the backend is running.",
-          );
-        } else {
-          setMessage("Failed to update password: " + error.message);
-        }
-      } else {
-        setMessage("An unknown error occurred");
-      }
-    } finally {
-      setLoading(false);
+    } else {
+      setMessage("An unknown error occurred");
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
   const cancelEdit = (field: string) => {
     switch (field) {
@@ -752,17 +772,16 @@ const ProfileModal = ({
                     alt="Profile"
                     className="profile-img"
                     onError={(e: any) => {
-                      e.target.src =
-                        "https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=User";
-                      setMessage(
-                        "Error loading profile image. Showing default avatar.",
-                      );
+                      e.target.src = `https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=${encodeURIComponent(user?.name || "User")}`;
                     }}
                   />
                 ) : (
                   <div className="no-image">
-                    <p>No profile image set</p>
-                    <div className="default-avatar"></div>
+                    <img
+                      src={`https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=${encodeURIComponent(user?.name || "User")}`}
+                      alt="Default Avatar"
+                      className="profile-img"
+                    />
                   </div>
                 )}
               </div>
@@ -1103,31 +1122,54 @@ const StudentPortal = () => {
     setIsCoursesDropdownOpen(!isCoursesDropdownOpen);
   };
 
-  const fetchStudentData = useCallback(async () => {
-    if (!user?.email) return;
 
-    try {
-      const API_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/api/students/${user?.email}`, {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch student data");
-      }
+// Update the fetchStudentData function
+// Update the fetchStudentData function - SIMPLIFIED
+const fetchStudentData = useCallback(async () => {
+  if (!user?.email) return;
 
-      const data = await response.json();
-      setStudentData(data.student);
-    } catch (err: any) {
-      console.error("Error fetching student data:", err);
-      setError(err?.message || "Failed to fetch student data");
-    } finally {
-      setLoading(false);
+  try {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const token = localStorage.getItem("token");
+    
+    console.log("Fetching profile image for:", user.email);
+    
+    // Fetch profile image directly
+    let profileImage = null;
+    const imageResponse = await fetch(`${API_URL}/api/profile/profile-image/${user.email}`, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+    const imageData = await imageResponse.json();
+    console.log("Profile image response:", imageData);
+    
+    if (imageData.success && imageData.profileImage) {
+      profileImage = imageData.profileImage;
     }
-  }, [user?.email]);
+    
+    // Set student data with profile image
+    setStudentData({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      profileImage: profileImage,
+    });
+    
+  } catch (err: any) {
+    console.error("Error fetching student data:", err);
+    setError(err?.message || "Failed to fetch student data");
+  } finally {
+    setLoading(false);
+  }
+}, [user?.email]);
+
+// Refresh data when modal closes
+useEffect(() => {
+  if (!isProfileModalOpen && user?.email) {
+    fetchStudentData();
+  }
+}, [isProfileModalOpen, fetchStudentData]);
 
   useEffect(() => {
     fetchStudentData();
@@ -1177,9 +1219,9 @@ const StudentPortal = () => {
             onClick={() => setIsProfileModalOpen(true)}
           >
             <img
-               src={
-                studentData?.personalDetails?.profileImage?.trim()
-                  ? studentData.personalDetails.profileImage
+              src={
+                studentData?.profileImage && studentData.profileImage.trim()
+                  ? studentData.profileImage
                   : `https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=${encodeURIComponent(user?.name || "User")}`
               }
               alt="Profile Icon"
@@ -1381,7 +1423,7 @@ const StudentPortal = () => {
         )}
         {activeSection === "feespayment" && (
           <div className="mb-4">
-            {/* <FeesPayment studentData={studentData} /> */}
+            <FeesPayment />
           </div>
         )}
         {activeSection === "course Module" && (

@@ -41,7 +41,7 @@ model User {
   updatedAt     DateTime  @updatedAt
 
   studentProfile Student?
-  payments      Payment[]
+  payments      Payment[]  // Now this will work since Payment has userId
 }
 
 //////////////////////////
@@ -50,8 +50,8 @@ model User {
 
 model Student {
   id              Int      @id @default(autoincrement())
-  userId          Int      @unique
-  user            User     @relation(fields: [userId], references: [id])
+  userId          Int?     @unique
+  user            User?    @relation(fields: [userId], references: [id])
 
   fullName        String
   email           String   @unique
@@ -82,41 +82,31 @@ model Student {
 }
 
 //////////////////////////
-// PAYMENT (Paystack Records)
+// PAYMENT (Paystack Records) - SUPPORTS BOTH GUEST & REGISTERED USERS
 //////////////////////////
 
 model Payment {
   id             Int      @id @default(autoincrement())
-  userId         Int
-  user           User     @relation(fields: [userId], references: [id])
-
+  userId         Int?     // 👈 OPTIONAL - NULL for guest payments, REQUIRED for registered users
+  email          String   // 👈 REQUIRED for ALL payments (guest + registered)
   semester       String
   installment    String
   firstName      String?
   lastName       String?
   phoneNumber    String?
-  status         String?
+  status         String?  @default("pending")
   amount         Float?
   amountPaid     Float?
-  transactionId  String?
-
+  transactionId  String?  @unique
+  paidAt         DateTime?
   createdAt      DateTime @default(now())
-}
+  updatedAt      DateTime @updatedAt
 
-//////////////////////////
-// TRAINING DETAILS
-//////////////////////////
+  // Optional relation to User (only for registered users)
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-model TrainingDetails {
-  id               Int      @id @default(autoincrement())
-  email            String   @unique
-  modeOfTraining   String?
-  courseDate       String?
-  courseTime       String?
-  participants     Int?
-  sponsorship      String?
-  certificateName  String?
-
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  @@index([email])
+  @@index([userId])
+  @@index([status])
+  @@index([transactionId])
 }

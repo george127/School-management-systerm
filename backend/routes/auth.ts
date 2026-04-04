@@ -14,7 +14,7 @@ AWS.config.update({
 const cognito = new AWS.CognitoIdentityServiceProvider();
 
 // Cognito configuration object
-const COGNITO_CONFIG = {
+const COGNITO_CONFIG = { 
   clientId: process.env.COGNITO_CLIENT_ID!,
   userPoolId: process.env.COGNITO_USER_POOL_ID!
 };

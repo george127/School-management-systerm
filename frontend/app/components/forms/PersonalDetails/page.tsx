@@ -184,98 +184,69 @@ function PersonalDetails({ onComplete, studentEmail, handleShowNext }: PersonalD
     }
   };
 
-  const uploadFileToServer = async (file: File): Promise<string> => {
-    try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      setIsUploading(true);
 
-      const formData = new FormData();
-      formData.append("profileImage", file);
-
-      const response = await fetch(`${API_URL}/api/forms/upload`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to upload image");
-      }
-
-      const data = await response.json();
-      return data.imageUrl;
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      throw error;
-    } finally {
-      setIsUploading(false);
-    }
-  };
 
 const handleSub = async (e: React.FormEvent) => {
   e.preventDefault();
 
-  if (validateForm()) {
-    setLoading(true);
-    setError(null);
+  if (!validateForm()) {
+    setSubmitError("Please correct the errors above.");
+    return;
+  }
 
-    try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      let profileImageUrl = formData.profileImage;
+  setLoading(true);
+  setError(null);
 
-      if (selectedFile && !profileImageUrl) {
-        profileImageUrl = await uploadFileToServer(selectedFile);
-      }
+  try {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    let profileImageUrl = formData.profileImage;
 
-      const submissionData = {
-        ...formData,
-        profileImage: profileImageUrl,
-      };
+    if (selectedFile) {
+      const uploadData = new FormData();
+      uploadData.append("profileImage", selectedFile);
 
-      // Get the authentication token from localStorage or context
-      const token = localStorage.getItem('token'); // Adjust based on your auth implementation
-
-      const response = await fetch(`${API_URL}/api/forms/personalDetails`, {
+      const uploadRes = await fetch(`${API_URL}/api/upload`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // Add the authorization header
-        },
-        body: JSON.stringify(submissionData),
+        body: uploadData,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to submit form");
+      if (!uploadRes.ok) {
+        const data = await uploadRes.json();
+        throw new Error(data.message || "Failed to upload image");
       }
 
-      setSuccessMessage("Personal details saved successfully!");
-      setSubmitError("");
-      setShowNextButton(true);
-      setFormSubmitted(true);
-      setFormData((prev) => ({ ...prev, profileImage: profileImageUrl }));
-      
-      // Save to localStorage
-      saveToLocalStorage(submissionData);
-      
-      // Call onComplete to notify parent component
-      if (onComplete) {
-        onComplete({ ...submissionData, completed: true });
-      }
-      
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "An error occurred during form submission.";
-      console.error("Error:", error);
-      setSubmitError(errorMessage);
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
+      const data = await uploadRes.json();
+      profileImageUrl = data.imageUrl;
     }
-  } else {
-    setSubmitError("Please correct the errors above.");
+
+    const submissionData = { ...formData, profileImage: profileImageUrl };
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(`${API_URL}/api/forms/personalDetails`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(submissionData),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Failed to submit form");
+
+    setSuccessMessage("Personal details saved successfully!");
+    setShowNextButton(true);
+    setFormSubmitted(true);
+    setFormData((prev) => ({ ...prev, profileImage: profileImageUrl }));
+    localStorage.setItem("personalDetails", JSON.stringify(submissionData));
+
+    if (onComplete) onComplete({ ...submissionData, completed: true });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "An error occurred";
+    setSubmitError(errorMessage);
+    setError(errorMessage);
+  } finally {
+    setLoading(false);
   }
 };
 

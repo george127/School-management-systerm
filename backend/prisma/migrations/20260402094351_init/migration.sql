@@ -23,7 +23,7 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Student" (
     "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "userId" INTEGER,
     "fullName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
@@ -53,35 +53,22 @@ CREATE TABLE "Student" (
 -- CreateTable
 CREATE TABLE "Payment" (
     "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "userId" INTEGER,
+    "email" TEXT NOT NULL,
     "semester" TEXT NOT NULL,
     "installment" TEXT NOT NULL,
     "firstName" TEXT,
     "lastName" TEXT,
     "phoneNumber" TEXT,
-    "status" TEXT,
+    "status" TEXT DEFAULT 'pending',
     "amount" DOUBLE PRECISION,
     "amountPaid" DOUBLE PRECISION,
     "transactionId" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "Payment_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "TrainingDetails" (
-    "id" SERIAL NOT NULL,
-    "email" TEXT NOT NULL,
-    "modeOfTraining" TEXT,
-    "courseDate" TEXT,
-    "courseTime" TEXT,
-    "participants" INTEGER,
-    "sponsorship" TEXT,
-    "certificateName" TEXT,
+    "paidAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "TrainingDetails_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Payment_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -100,10 +87,22 @@ CREATE UNIQUE INDEX "Student_userId_key" ON "Student"("userId");
 CREATE UNIQUE INDEX "Student_email_key" ON "Student"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "TrainingDetails_email_key" ON "TrainingDetails"("email");
+CREATE UNIQUE INDEX "Payment_transactionId_key" ON "Payment"("transactionId");
+
+-- CreateIndex
+CREATE INDEX "Payment_email_idx" ON "Payment"("email");
+
+-- CreateIndex
+CREATE INDEX "Payment_userId_idx" ON "Payment"("userId");
+
+-- CreateIndex
+CREATE INDEX "Payment_status_idx" ON "Payment"("status");
+
+-- CreateIndex
+CREATE INDEX "Payment_transactionId_idx" ON "Payment"("transactionId");
 
 -- AddForeignKey
-ALTER TABLE "Student" ADD CONSTRAINT "Student_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Student" ADD CONSTRAINT "Student_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Payment" ADD CONSTRAINT "Payment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Payment" ADD CONSTRAINT "Payment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;

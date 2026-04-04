@@ -16,42 +16,118 @@ interface UserData {
   studentId?: string;
 }
 
-interface PersonalDetails {
-  profileImage: string;
+interface StudentProfileData {
   email: string;
+  programName: string;
   phone: string;
   nationality: string;
+  fullName: string;
+  profileImage: string;
 }
 
-interface ProgramApplyingFor {
-  programName: string;
-}
-
-interface StudentData {
-  personalDetails: PersonalDetails;
-  programApplyingFor: ProgramApplyingFor;
-}
-
-// Define props interface
-interface DashboardProps {
-  studentData?: StudentData | null;
-}
-
-const Dashboard: React.FC<DashboardProps> = ({ studentData }) => {
+const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [user, setUser] = useState<UserData | null>(null);
+  const [studentProfile, setStudentProfile] = useState<StudentProfileData | null>(null);
+  const [studentId, setStudentId] = useState<string | null>(null);
   const [greeting, setGreeting] = useState("");
 
-  // Get user from localStorage
+  // Fetch studentId separately from User table
+  const fetchStudentId = async (email: string) => {
+    try {
+      const API_URL =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const response = await fetch(`${API_URL}/api/student/student-id/${encodeURIComponent(email)}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("Student ID data:", data);
+      setStudentId(data.studentId);
+    } catch (error) {
+      console.error("Error fetching student ID:", error);
+      setStudentId(null);
+    }
+  };
+
+  const fetchStudentProfile = async (email: string) => {
+    try {
+      console.log("Fetching profile for email:", email);
+      const API_URL =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const response = await fetch(`${API_URL}/api/student/profile/${encodeURIComponent(email)}`);
+      
+      console.log("Response status:", response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("Received data:", data);
+      
+      // Handle both response formats
+      if (data.success && data.student) {
+        // If response is wrapped in success/student
+        setStudentProfile({
+          email: data.student.email,
+          programName: data.student.programName,
+          phone: data.student.phone,
+          nationality: data.student.nationality,
+          fullName: data.student.fullName,
+          profileImage: data.student.profileImage
+        });
+      } else {
+        // If response is direct
+        setStudentProfile({
+          email: data.email,
+          programName: data.programName,
+          phone: data.phone,
+          nationality: data.nationality,
+          fullName: data.fullName,
+          profileImage: data.profileImage
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching student profile:", error);
+      setError("Failed to load student profile");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get user from localStorage and fetch data
   useEffect(() => {
     const userData = localStorage.getItem("user");
+    console.log("Raw user data from localStorage:", userData);
+    
     if (userData) {
       try {
-        setUser(JSON.parse(userData));
+        const parsedUser = JSON.parse(userData);
+        console.log("Parsed user:", parsedUser);
+        setUser(parsedUser);
+        
+        if (parsedUser.email) {
+          console.log("Email being sent to API:", parsedUser.email);
+          fetchStudentProfile(parsedUser.email);
+          fetchStudentId(parsedUser.email); // Fetch studentId separately
+        } else {
+          console.log("No email found in user data");
+          setLoading(false);
+          setError("User email not found");
+        }
       } catch (error) {
         console.error("Error parsing user data:", error);
-      }
+        setLoading(false);
+        setError("Error loading user data");
+      } 
+    } else {
+      console.log("No user data in localStorage");
+      setLoading(false);
+      setError("No user data found");
     }
   }, []);
 
@@ -67,13 +143,8 @@ const Dashboard: React.FC<DashboardProps> = ({ studentData }) => {
     }
   }, []);
 
-  // Set loading to false once we have data or determine no data needed
-  useEffect(() => {
-    setLoading(false);
-  }, [studentData]);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading) return <div className="text-center p-5">Loading...</div>;
+  if (error) return <div className="text-center p-5 text-danger">Error: {error}</div>;
 
   return (
     <div className="dashboard-section">
@@ -84,7 +155,7 @@ const Dashboard: React.FC<DashboardProps> = ({ studentData }) => {
               <span role="img" aria-label="wave">
                 👋
               </span>{" "}
-              {greeting}, <span className="user-name">{user?.name}</span>
+              {greeting}, <span className="user-name">{studentProfile?.fullName || user?.name}</span>
             </div>
             <h1>
               <div className="banner-item"></div>
@@ -174,22 +245,22 @@ const Dashboard: React.FC<DashboardProps> = ({ studentData }) => {
             <img
               className="profile-image"
               src={
-                studentData?.personalDetails?.profileImage?.trim()
-                  ? studentData.personalDetails.profileImage
-                  : `https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=${encodeURIComponent(user?.name || "User")}`
+                studentProfile?.profileImage?.trim()
+                  ? studentProfile.profileImage
+                  : `https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=${encodeURIComponent(studentProfile?.fullName || user?.name || "User")}`
               }
               alt="Profile Icon"
               onError={(e) => {
-                e.currentTarget.src = `https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=${encodeURIComponent(user?.name || "User")}`;
+                e.currentTarget.src = `https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=${encodeURIComponent(studentProfile?.fullName || user?.name || "User")}`;
               }}
             />
             <div className="student-profile-header">
               <h2 className="student-name">
-                <i className="fas fa-user-graduate"></i> {user?.name}
+                <i className="fas fa-user-graduate"></i> {studentProfile?.fullName || user?.name}
               </h2>
               <p className="student-id">
                 <i className="fas fa-id-badge"></i> Student ID:{" "}
-                {user?.studentId || "N/A"}
+                {studentId || "N/A"}
               </p>
             </div>
           </div>
@@ -206,7 +277,7 @@ const Dashboard: React.FC<DashboardProps> = ({ studentData }) => {
               </div>
               <div className="info-text">
                 <strong>Email</strong>
-                <p>{studentData?.personalDetails?.email}</p>
+                <p>{studentProfile?.email || "N/A"}</p>
               </div>
             </div>
 
@@ -216,7 +287,7 @@ const Dashboard: React.FC<DashboardProps> = ({ studentData }) => {
               </div>
               <div className="info-text">
                 <strong>Program Name</strong>
-                <p>{studentData?.programApplyingFor?.programName}</p>
+                <p>{studentProfile?.programName || "Not enrolled"}</p>
               </div>
             </div>
 
@@ -226,7 +297,7 @@ const Dashboard: React.FC<DashboardProps> = ({ studentData }) => {
               </div>
               <div className="info-text">
                 <strong>Phone Number</strong>
-                <p>{studentData?.personalDetails?.phone}</p>
+                <p>{studentProfile?.phone || "N/A"}</p>
               </div>
             </div>
 
@@ -236,7 +307,7 @@ const Dashboard: React.FC<DashboardProps> = ({ studentData }) => {
               </div>
               <div className="info-text">
                 <strong>Country</strong>
-                <p>{studentData?.personalDetails?.nationality}</p>
+                <p>{studentProfile?.nationality || "N/A"}</p>
               </div>
             </div>
           </div>

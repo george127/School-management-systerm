@@ -1,6 +1,6 @@
 // backend/routes/studentforms.ts
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Gender } from '@prisma/client'; 
 
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from 'uuid';
@@ -18,7 +18,8 @@ const s3Client = new S3Client({
 });
 
 
-// POST endpoint for saving personal details
+
+
 router.post('/personalDetails', async (req, res) => {
   try {
     const body = req.body;
@@ -34,74 +35,26 @@ router.post('/personalDetails', async (req, res) => {
     // Validate gender value
     const validGenders = ['male', 'female', 'other'];
     const normalizedGender = body.gender.toLowerCase();
-    
     if (!validGenders.includes(normalizedGender)) {
-      return res.status(400).json({ 
-        message: 'Gender must be either male, female, or other' 
-      });
+      return res.status(400).json({ message: 'Gender must be either male, female, or other' });
     }
 
     // Check if student with this email already exists
     const existingStudent = await prisma.student.findUnique({
       where: { email: body.email },
     });
-
     if (existingStudent) {
-      return res.status(409).json({ 
-        message: 'Student with this email already exists' 
-      });
-    }
-
-    // Get the authenticated user ID from the request (assuming you have authentication)
-    // For now, let's handle the user creation properly
-    let userId: number;
-    
-    // Check if user exists with this email
-    let user = await prisma.user.findUnique({
-      where: { email: body.email }
-    });
-    
-    if (!user) {
-      // Create a new user with all required fields
-      try {
-        const newUser = await prisma.user.create({
-          data: {
-            email: body.email,
-            name: body.fullName,
-            role: 'student',
-            cognitoId: `temp_${uuidv4()}`, // Generate a temporary Cognito ID
-            // Add any other required fields from your User model
-            // For example, if you have these fields:
-            // emailVerified: false,
-            // status: 'active',
-            // createdAt: new Date(),
-            // updatedAt: new Date(),
-          }
-        });
-        userId = newUser.id;
-      } catch (userCreateError) {
-        console.error('Error creating user:', userCreateError);
-        return res.status(500).json({ 
-          message: 'Failed to create user account' 
-        });
-      }
-    } else {
-      userId = user.id;
+      return res.status(409).json({ message: 'Student with this email already exists' });
     }
 
     // Handle profile image upload to S3
     let profileImageUrl = body.profileImage;
-    
-    // Check if profileImage is base64 (starts with data:image)
+
     if (body.profileImage && body.profileImage.startsWith('data:image')) {
       try {
-        // Extract image data from base64
         const matches = body.profileImage.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
-        
         if (!matches || matches.length !== 3) {
-          return res.status(400).json({ 
-            message: 'Invalid image format' 
-          });
+          return res.status(400).json({ message: 'Invalid image format' });
         }
 
         const imageType = matches[1];
@@ -110,17 +63,13 @@ router.post('/personalDetails', async (req, res) => {
 
         // Validate file size (max 5MB)
         if (buffer.length > 5 * 1024 * 1024) {
-          return res.status(400).json({ 
-            message: 'File size too large. Maximum size is 5MB.' 
-          });
+          return res.status(400).json({ message: 'File size too large. Maximum size is 5MB.' });
         }
 
         // Validate image type
         const allowedTypes = ['jpeg', 'jpg', 'png', 'webp', 'gif'];
         if (!allowedTypes.includes(imageType.toLowerCase())) {
-          return res.status(400).json({ 
-            message: 'Invalid file type. Only JPEG, PNG, WEBP, and GIF are allowed.' 
-          });
+          return res.status(400).json({ message: 'Invalid file type. Only JPEG, PNG, WEBP, and GIF are allowed.' });
         }
 
         // Generate unique filename
@@ -138,43 +87,40 @@ router.post('/personalDetails', async (req, res) => {
 
         // Construct the S3 URL
         profileImageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
-        
       } catch (s3Error) {
         console.error('S3 Upload Error:', s3Error);
-        return res.status(500).json({ 
-          message: 'Failed to upload profile image to cloud storage' 
-        });
+        return res.status(500).json({ message: 'Failed to upload profile image to cloud storage' });
       }
     }
 
-    // Create student record with valid userId
+    // Map string gender to Gender enum
+    let genderEnum: Gender;
+    if (normalizedGender === 'male') genderEnum = Gender.male;
+    else if (normalizedGender === 'female') genderEnum = Gender.female;
+    else genderEnum = Gender.other;
+
+    // Create student record
     const student = await prisma.student.create({
       data: {
-        userId: userId,
         fullName: body.fullName,
         email: body.email,
         phone: body.phone,
         address: body.address,
         nationality: body.nationality,
         dob: new Date(body.dob),
-        gender: normalizedGender,
+        gender: genderEnum, // Use the enum value
         profileImage: profileImageUrl,
       },
     });
 
-    return res.json({
+    return res.status(201).json({
       message: 'Personal details saved successfully',
-      student: {
-        ...student,
-        profileImage: profileImageUrl
-      },
+      student: student,
     });
 
   } catch (error) {
     console.error('Error saving personal details:', error);
-    return res.status(500).json({ 
-      message: 'Failed to save personal details' 
-    });
+    return res.status(500).json({ message: 'Failed to save personal details', error: error.message });
   }
 });
 
@@ -573,6 +519,7 @@ router.get('/formStatus/:email', async (req, res) => {
 });
 
 // ==================== FINAL SUBMISSION (ALL FORMS AT ONCE) ====================
+// ==================== FINAL SUBMISSION (ALL FORMS AT ONCE) ====================
 router.post('/submitApplication', async (req, res) => {
   try {
     const { personalDetails, programDetails, educationDetails, guardianDetails } = req.body;
@@ -595,6 +542,13 @@ router.post('/submitApplication', async (req, res) => {
       });
     }
 
+    // Validate gender
+    const validGenders = ['male', 'female', 'other'];
+    const normalizedGender = personalDetails.gender?.toLowerCase();
+    if (!validGenders.includes(normalizedGender)) {
+      return res.status(400).json({ message: 'Gender must be either male, female, or other' });
+    }
+
     // Create complete student record with all data
     const student = await prisma.student.create({
       data: {
@@ -605,7 +559,7 @@ router.post('/submitApplication', async (req, res) => {
         address: personalDetails.address,
         nationality: personalDetails.nationality,
         dob: new Date(personalDetails.dob),
-        gender: personalDetails.gender,
+        gender: normalizedGender, // Use the normalized gender string
         profileImage: personalDetails.profileImage,
         
         // Program Details
@@ -626,7 +580,8 @@ router.post('/submitApplication', async (req, res) => {
         guardianEmail: guardianDetails?.guardianEmail,
         guardianOccupation: guardianDetails?.guardianOccupation,
         
-        userId: 1, // From your auth system
+        // REMOVE this line since userId is optional in your schema
+        // userId: 1, // From your auth system - COMMENT THIS OUT
       },
     });
 

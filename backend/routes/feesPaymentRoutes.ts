@@ -1,372 +1,257 @@
-// routes/feesPaymentRoutes.ts
-import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { Router, Request, Response } from "express";
+import { PrismaClient } from "@prisma/client";
 
 const router = Router();
 const prisma = new PrismaClient();
 
-// Helper to ensure email is a string
+// Helper function to ensure email is a string
 const getEmailString = (email: string | string[] | undefined): string | null => {
   if (!email) return null;
   return Array.isArray(email) ? email[0] : email;
 };
 
-// Helper to ensure id is a number
-const getNumberId = (id: string | string[] | undefined): number | null => {
-  if (!id) return null;
-  const idStr = Array.isArray(id) ? id[0] : id;
-  const numId = parseInt(idStr);
-  return isNaN(numId) ? null : numId;
-};
-
-// ==================== PAYMENT ENDPOINTS ====================
-
-// POST: Save form data when user initiates payment
-router.post('/SaveFormData', async (req: Request, res: Response) => {
-  const { email, semester, installment } = req.body;
-
+// =============================
+// 1️⃣ SAVE PAYMENT BEFORE PAYSTACK
+// =============================
+router.post("/SaveFormData", async (req: Request, res: Response) => {
   try {
-    if (!email || !semester || !installment) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Email, semester, and installment are required' 
-      });
+    const { email, semester, installment, firstName, lastName, phoneNumber, amount } = req.body;
+
+    // Only require semester and installment
+    if (!semester || !installment) {
+      return res.status(400).json({ message: "Semester and installment are required" });
     }
 
-    // Check if user exists
-    const user = await prisma.user.findUnique({
-      where: { email }
-    });
-
-    if (!user) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'User not found' 
-      });
-    }
-
-    // Check if payment record already exists for this semester and installment
-    const existingPayment = await prisma.payment.findFirst({
-      where: {
-        userId: user.id,
+    // Create a unique session ID for this payment attempt
+    const sessionId = `${semester}_${installment}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+    
+    // Create payment record with session ID
+    const payment = await prisma.payment.create({
+      data: {
+        userId: null,
+        email: "",  // Will be updated by webhook
         semester,
-        installment
-      }
+        installment,
+        status: "pending",
+        firstName: firstName || null,
+        lastName: lastName || null,
+        phoneNumber: phoneNumber || null,
+        transactionId: sessionId, // Store session ID temporarily
+      },
     });
 
-    if (existingPayment) {
-      // Update existing record (don't include updatedAt - Prisma handles it automatically)
-      const updatedPayment = await prisma.payment.update({
-        where: { id: existingPayment.id },
-        data: {
-          status: 'pending'
-        }
-      });
-
-      return res.status(200).json({
-        success: true,
-        message: 'Form data updated successfully',
-        payment: updatedPayment
-      });
-    } else {
-      // Create new payment record
-      const newPayment = await prisma.payment.create({
-        data: {
-          userId: user.id,
-          semester,
-          installment,
-          status: 'pending'
-        }
-      });
-
-      return res.status(200).json({
-        success: true,
-        message: 'Form data saved successfully',
-        payment: newPayment
-      });
-    }
-  } catch (error) {
-    console.error('Error saving form data:', error);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Failed to save form data' 
+    return res.json({ 
+      success: true, 
+      message: "Payment data saved successfully",
+      paymentId: payment.id,
+      sessionId: sessionId
     });
+  } catch (err) {
+    console.error("SaveFormData error:", err);
+    res.status(500).json({ message: "Failed to save form data" });
   }
 });
 
-// POST: Paystack webhook handler
-router.post('/webhook', async (req: Request, res: Response) => {
+// =============================
+// 2️⃣ PAYSTACK WEBHOOK - FIXED (Updates existing record, doesn't create new)
+// =============================
+router.post("/webhook", async (req: Request, res: Response) => {
   try {
-    console.log("Webhook received:", req.body);
-
+    console.log("Webhook received:", JSON.stringify(req.body, null, 2));
+    
     const { event, data } = req.body;
-
-    // Only handle charge.success events
+    
+    // Always respond quickly to webhook
+    res.sendStatus(200);
+    
+    // Only handle "charge.success" events
     if (event === "charge.success") {
       const { customer, reference, status, amount } = data;
       const { email, first_name, last_name, phone } = customer;
-
-      if (!email) {
-        return res.status(400).json({ 
-          success: false, 
-          message: "Email is required" 
+      
+      console.log("Processing successful payment for email:", email);
+      
+      // Get metadata from webhook
+      const metadata = data.metadata || {};
+      let semester = metadata.semester;
+      let installment = metadata.installment;
+      
+      // If metadata is a string, parse it
+      if (typeof metadata === 'string') {
+        try {
+          const parsed = JSON.parse(metadata);
+          semester = parsed.semester;
+          installment = parsed.installment;
+        } catch (e) {}
+      }
+      
+      console.log("Looking for payment with:", { semester, installment, reference });
+      
+      // FIRST: Try to find by transactionId (if it was stored)
+      let payment = null;
+      if (reference) {
+        payment = await prisma.payment.findFirst({
+          where: {
+            OR: [
+              { transactionId: reference },
+              { transactionId: { startsWith: `${semester}_${installment}_` } } // Find by session pattern
+            ]
+          },
         });
       }
-
-      // Find user by email
-      const user = await prisma.user.findUnique({
-        where: { email }
-      });
-
-      if (!user) {
-        return res.status(404).json({ 
-          success: false, 
-          message: "User not found" 
+      
+      // SECOND: If not found, find by semester and installment (most recent pending)
+      if (!payment && semester && installment) {
+        payment = await prisma.payment.findFirst({
+          where: {
+            semester: semester,
+            installment: installment,
+            status: "pending",
+          },
+          orderBy: { createdAt: "desc" },
         });
       }
-
-      // Find the most recent pending payment for this user
-      const pendingPayment = await prisma.payment.findFirst({
-        where: {
-          userId: user.id,
-          status: 'pending'
-        },
-        orderBy: {
-          createdAt: 'desc'
-        }
-      });
-
-      if (pendingPayment) {
-        // Update existing payment record
+      
+      // THIRD: If still not found, find any pending payment without email
+      if (!payment) {
+        payment = await prisma.payment.findFirst({
+          where: {
+            email: "",
+            status: "pending",
+          },
+          orderBy: { createdAt: "desc" },
+        });
+      }
+      
+      if (payment) {
+        // Find if user exists in database
+        const user = await prisma.user.findUnique({ where: { email } });
+        
+        // UPDATE existing payment (DON'T CREATE NEW)
         const updatedPayment = await prisma.payment.update({
-          where: { id: pendingPayment.id },
+          where: { id: payment.id },
           data: {
-            firstName: first_name,
-            lastName: last_name,
-            phoneNumber: phone,
-            status: status === "success" ? "paid" : "failed",
-            amount: amount / 100,
-            amountPaid: amount / 100,
-            transactionId: reference
-          }
+            userId: user?.id || null,
+            email: email,  // Update with real email from Paystack
+            firstName: first_name || payment.firstName,
+            lastName: last_name || payment.lastName,
+            phoneNumber: phone || payment.phoneNumber,
+            status: "paid",
+            amount: parseFloat(amount) / 100,
+            amountPaid: parseFloat(amount) / 100,
+            transactionId: reference,
+            paidAt: new Date(),
+          },
         });
-
-        return res.status(200).json({
-          success: true,
-          message: "Transaction details updated successfully",
-          payment: updatedPayment
-        });
+        
+        console.log("✅ Payment UPDATED successfully for email:", email, "Payment ID:", updatedPayment.id);
       } else {
-        // Create new payment record for successful payment
+        console.log("⚠️ No pending payment found to update for:", { email, semester, installment });
+        // Only create new if absolutely necessary (should not happen)
+        const user = await prisma.user.findUnique({ where: { email } });
+        
         const newPayment = await prisma.payment.create({
           data: {
-            userId: user.id,
-            firstName: first_name,
-            lastName: last_name,
-            phoneNumber: phone,
+            userId: user?.id || null,
+            email: email,
+            semester: semester || "Unknown",
+            installment: installment || "Unknown",
+            firstName: first_name || "",
+            lastName: last_name || "",
+            phoneNumber: phone || "",
             status: "paid",
-            amount: amount / 100,
-            amountPaid: amount / 100,
+            amount: parseFloat(amount) / 100,
+            amountPaid: parseFloat(amount) / 100,
             transactionId: reference,
-            semester: "Unknown",
-            installment: "Unknown"
-          }
+            paidAt: new Date(),
+          },
         });
-
-        return res.status(200).json({
-          success: true,
-          message: "Transaction details saved successfully",
-          payment: newPayment
-        });
+        
+        console.log("⚠️ New payment CREATED (fallback):", newPayment.id);
       }
     }
-
-    return res.status(200).json({ 
-      success: true, 
-      message: "Webhook received" 
-    });
   } catch (error) {
     console.error("Error processing webhook:", error);
-    return res.status(500).json({ 
-      success: false,
-      message: "An error occurred while processing the webhook",
-      error: error instanceof Error ? error.message : "Unknown error"
+  }
+});
+// =============================
+// 3️⃣ GET PAYMENT STATUS (Works for both users & guests)
+// =============================
+router.get("/payment-status/:email", async (req: Request, res: Response) => {
+  try {
+    const emailParam = req.params.email;
+    const email = getEmailString(emailParam);
+    
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+    
+    // Find all payments for this email (works for both users and guests)
+    const payments = await prisma.payment.findMany({
+      where: { email: email },
     });
+
+    const result: any = {};
+
+    payments.forEach((p) => {
+      if (!result[p.semester]) result[p.semester] = {};
+      result[p.semester][p.installment] = p.status;
+    });
+
+    res.json(result);
+  } catch (err) {
+    console.error("Error fetching payments:", err);
+    res.status(500).json({ message: "Error fetching payments" });
   }
 });
 
-// GET: Get payment details by email
-router.get('/payment-details/:email', async (req: Request, res: Response) => {
-  const { email } = req.params;
-  const emailStr = getEmailString(email);
-
+// =============================
+// 4️⃣ GET PAYMENT DETAILS BY EMAIL
+// =============================
+router.get("/payment-details/:email", async (req: Request, res: Response) => {
   try {
-    if (!emailStr) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Email is required' 
-      });
+    const emailParam = req.params.email;
+    const email = getEmailString(emailParam);
+    
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
     }
-
-    const user = await prisma.user.findUnique({
-      where: { email: emailStr },
-      include: {
-        payments: {
-          orderBy: { createdAt: 'desc' }
-        }
-      }
+    
+    const payments = await prisma.payment.findMany({
+      where: { email: email },
+      orderBy: { createdAt: "desc" },
     });
-
-    if (!user) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'User not found' 
-      });
+    
+    if (!payments || payments.length === 0) {
+      return res.status(404).json({ message: "No payment data found for this email" });
     }
-
-    res.status(200).json({
-      success: true,
-      data: {
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email
-        },
-        payments: user.payments
-      }
+    
+    res.status(200).json({ 
+      email: email,
+      payments: payments
     });
   } catch (error) {
     console.error("Error fetching payment details:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Failed to fetch payment details" 
-    });
+    res.status(500).json({ message: "Failed to fetch payment details" });
   }
 });
 
-// GET: Get payment status for fees page (formatted for frontend)
-router.get('/payment-status/:email', async (req: Request, res: Response) => {
-  const { email } = req.params;
-  const emailStr = getEmailString(email);
-
+// =============================
+// 5️⃣ GET ALL PAYMENTS (Admin only)
+// =============================
+router.get("/payments", async (req: Request, res: Response) => {
   try {
-    if (!emailStr) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Email is required' 
-      });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: emailStr },
-      include: {
-        payments: true
-      }
+    const payments = await prisma.payment.findMany({
+      orderBy: { createdAt: "desc" },
     });
 
-    if (!user) {
-      return res.status(200).json({});
-    }
-
-    // Transform payments into status object for frontend
-    const paymentStatus: Record<string, Record<string, string>> = {};
-
-    user.payments.forEach(payment => {
-      if (payment.semester && payment.installment) {
-        if (!paymentStatus[payment.semester]) {
-          paymentStatus[payment.semester] = {};
-        }
-        paymentStatus[payment.semester][payment.installment] = 
-          payment.status === "paid" ? "paid" : "pending";
-      }
-    });
-
-    return res.status(200).json(paymentStatus);
-  } catch (error) {
-    console.error("Error fetching payment status:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Failed to fetch payment status" 
-    });
-  }
-});
-
-// GET: Get all payments for a user
-router.get('/payments/:email', async (req: Request, res: Response) => {
-  const { email } = req.params;
-  const emailStr = getEmailString(email);
-
-  try {
-    if (!emailStr) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Email is required' 
-      });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: emailStr },
-      include: {
-        payments: {
-          orderBy: { createdAt: 'desc' }
-        }
-      }
-    });
-
-    if (!user) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'User not found' 
-      });
-    }
-
-    res.status(200).json({
+    res.json({
       success: true,
-      payments: user.payments
+      payments: payments,
     });
-  } catch (error) {
-    console.error("Error fetching payments:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Failed to fetch payments" 
-    });
-  }
-});
-
-// PUT: Update payment record
-router.put('/payments/:id', async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const idNum = getNumberId(id);
-  const { status, amountPaid, transactionId } = req.body;
-
-  try {
-    if (!idNum) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Valid payment ID is required' 
-      });
-    }
-
-    const payment = await prisma.payment.update({
-      where: { id: idNum },
-      data: {
-        status,
-        amountPaid: amountPaid ? parseFloat(amountPaid) : undefined,
-        transactionId
-      }
-    });
-
-    res.status(200).json({
-      success: true,
-      message: 'Payment updated successfully',
-      payment
-    });
-  } catch (error) {
-    console.error("Error updating payment:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Failed to update payment" 
-    });
+  } catch (err) {
+    console.error("Error fetching payments:", err);
+    res.status(500).json({ message: "Error fetching payments" });
   }
 });
 

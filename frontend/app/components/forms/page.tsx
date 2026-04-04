@@ -3,9 +3,9 @@
 
 import { useState, useEffect } from "react";
 import PersonalDetails from "../forms/PersonalDetails/page";
-import EducationalBackground from '../forms/EducationalBackground/page';
-import ProgramApplyingFor from '../forms/ProgramApplyingFor/page';
-import GuardianDetails from '../forms/GuardianDetails/page';
+import EducationalBackground from "../forms/EducationalBackground/page";
+import ProgramApplyingFor from "../forms/ProgramApplyingFor/page";
+import GuardianDetails from "../forms/GuardianDetails/page";
 import "../forms/style/forms.css";
 
 // Define TypeScript interfaces
@@ -27,13 +27,13 @@ interface StepLabels {
 export default function StudentForm() {
   // Track current step (1-4)
   const [currentStep, setCurrentStep] = useState<number>(1);
-  
+
   // Central state for all form data
   const [formData, setFormData] = useState<FormData>({
     personalDetails: {},
     programDetails: {},
     educationDetails: {},
-    guardianDetails: {}
+    guardianDetails: {},
   });
 
   // Track submission states
@@ -44,11 +44,11 @@ export default function StudentForm() {
   // Load saved data from localStorage on mount
   useEffect(() => {
     try {
-      const savedData = localStorage.getItem('studentFormData');
+      const savedData = localStorage.getItem("studentFormData");
       if (savedData) {
         const parsed = JSON.parse(savedData);
         setFormData(parsed);
-        
+
         // Determine current step based on saved data
         if (parsed.personalDetails?.fullName) setCurrentStep(2);
         if (parsed.programDetails?.programName) setCurrentStep(3);
@@ -58,42 +58,42 @@ export default function StudentForm() {
         }
       }
     } catch (error) {
-      console.error('Error loading from localStorage:', error);
+      console.error("Error loading from localStorage:", error);
     }
   }, []);
 
   // Save to localStorage whenever formData changes
   useEffect(() => {
     try {
-      localStorage.setItem('studentFormData', JSON.stringify(formData));
+      localStorage.setItem("studentFormData", JSON.stringify(formData));
     } catch (error) {
-      console.error('Error saving to localStorage:', error);
+      console.error("Error saving to localStorage:", error);
     }
   }, [formData]);
 
   // Handle completion of each step
   const handleStepComplete = (stepData: any) => {
     const stepKeys: StepKeys = {
-      1: 'personalDetails',
-      2: 'programDetails',
-      3: 'educationDetails',
-      4: 'guardianDetails'
+      1: "personalDetails",
+      2: "programDetails",
+      3: "educationDetails",
+      4: "guardianDetails",
     };
 
     console.log(`Step ${currentStep} completed with data:`, stepData);
 
     // Update form data with the completed step
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [stepKeys[currentStep]]: stepData
+      [stepKeys[currentStep]]: stepData,
     }));
 
     // Move to next step or submit if last step
     if (currentStep < 4) {
-      setCurrentStep(prev => prev + 1);
+      setCurrentStep((prev) => prev + 1);
     } else {
       // All steps completed, ready to submit
-      console.log('🎯 All steps completed, submitting to database...');
+      console.log("🎯 All steps completed, submitting to database...");
       submitAllForms();
     }
   };
@@ -101,16 +101,17 @@ export default function StudentForm() {
   // Submit all forms to backend
   const submitAllForms = async () => {
     setIsSubmitting(true);
-    setSubmitMessage('Submitting your application...');
-    
+    setSubmitMessage("Submitting your application...");
+
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      console.log('Submitting form data:', formData);
-      
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      console.log("Submitting form data:", formData);
+
       const response = await fetch(`${API_URL}/api/forms/submitApplication`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
@@ -118,41 +119,32 @@ export default function StudentForm() {
       const data = await response.json();
 
       if (response.ok) {
-        console.log('✅ Database save successful:', data.message);
-        setSubmitMessage('Application submitted successfully!');
+        console.log("✅ Database save successful:", data.message);
+        setSubmitMessage("Application submitted successfully!");
         setShowSuccess(true);
-        
+
         // Show countdown message
-        setSubmitMessage('Application submitted! Clearing local data in 15 seconds...');
-        
-        // Set a timer for 15 seconds before clearing localStorage
+        setSubmitMessage(
+          "Application submitted! Clearing local data in 15 seconds...",
+        );
+
+        // ⭐ CLEAR LOCAL STORAGE IMMEDIATELY
+        localStorage.clear();
+        console.log("🧹 LocalStorage cleared instantly");
+
+        // optional short delay just for UX animation
         setTimeout(() => {
-          // Clear ALL localStorage items
-          localStorage.removeItem('studentFormData');
-          localStorage.removeItem('personalDetails');
-          localStorage.removeItem('programApplyingFor');
-          localStorage.removeItem('educationalBackground');
-          localStorage.removeItem('guardianDetails');
-          localStorage.removeItem('allFormsCompleted');
-          
-          console.log('✅ LocalStorage cleared - data saved to database');
-          setSubmitMessage('Redirecting to payment page...');
-          
-          // Redirect to payment page after 2 more seconds
-          setTimeout(() => {
-            window.location.href = '/fees-payment';
-          }, 2000);
-          
-        }, 15000); // 15 seconds delay
-        
+          window.location.href = "/fees-payment";
+        }, 1500);
       } else {
-        console.error('❌ Server error:', data.message);
         setSubmitMessage(`Error: ${data.message}`);
         setIsSubmitting(false);
       }
     } catch (error) {
-      console.error('❌ Submission failed:', error);
-      setSubmitMessage('Network error. Please check if backend server is running.');
+      console.error("❌ Submission failed:", error);
+      setSubmitMessage(
+        "Network error. Please check if backend server is running.",
+      );
       setIsSubmitting(false);
     }
   };
@@ -164,7 +156,7 @@ export default function StudentForm() {
       studentEmail: formData.personalDetails?.email || "",
     };
 
-    switch(currentStep) {
+    switch (currentStep) {
       case 1:
         return <PersonalDetails {...commonProps} />;
       case 2:
@@ -184,9 +176,9 @@ export default function StudentForm() {
       <div className="progress-container">
         <div className="progress-steps">
           {[1, 2, 3, 4].map((step: number) => (
-            <div 
+            <div
               key={step}
-              className={`step ${currentStep >= step ? 'active' : ''} ${getStepCompleted(step, formData) ? 'completed' : ''}`}
+              className={`step ${currentStep >= step ? "active" : ""} ${getStepCompleted(step, formData) ? "completed" : ""}`}
             >
               <div className="step-number">{step}</div>
               <div className="step-label">{getStepLabel(step)}</div>
@@ -204,7 +196,9 @@ export default function StudentForm() {
           <div className="submission-modal">
             <div className="spinner"></div>
             <p>{submitMessage}</p>
-            {!showSuccess && <p className="timer-note">Please do not close this window</p>}
+            {!showSuccess && (
+              <p className="timer-note">Please do not close this window</p>
+            )}
             {showSuccess && (
               <div className="success-check">
                 <span className="material-symbols-outlined">check_circle</span>
@@ -220,23 +214,23 @@ export default function StudentForm() {
 // Helper function to check if a step is completed
 function getStepCompleted(step: number, formData: FormData): boolean {
   const stepKeys: StepKeys = {
-    1: 'personalDetails',
-    2: 'programDetails',
-    3: 'educationDetails',
-    4: 'guardianDetails'
+    1: "personalDetails",
+    2: "programDetails",
+    3: "educationDetails",
+    4: "guardianDetails",
   };
-  
+
   const stepData = formData[stepKeys[step] as keyof FormData];
-  
-  switch(step) {
+
+  switch (step) {
     case 1:
-      return !!(stepData?.fullName);
+      return !!stepData?.fullName;
     case 2:
-      return !!(stepData?.programName);
+      return !!stepData?.programName;
     case 3:
-      return !!(stepData?.qualification);
+      return !!stepData?.qualification;
     case 4:
-      return !!(stepData?.guardianFullName);
+      return !!stepData?.guardianFullName;
     default:
       return false;
   }
@@ -245,10 +239,10 @@ function getStepCompleted(step: number, formData: FormData): boolean {
 // Helper function to get step label
 function getStepLabel(step: number): string {
   const labels: StepLabels = {
-    1: 'Personal Details',
-    2: 'Program Details',
-    3: 'Education',
-    4: 'Guardian'
+    1: "Personal Details",
+    2: "Program Details",
+    3: "Education",
+    4: "Guardian",
   };
   return labels[step];
 }

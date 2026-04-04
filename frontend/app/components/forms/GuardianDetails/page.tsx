@@ -244,14 +244,31 @@ function GuardianDetails({ onComplete, handleShowNext, studentEmail, formData: p
     }
   };
 
-  const handlePaymentClick = () => {
-    setShowModal(false);
-    router.push("/pages/feeSelection");
-  };
+const clearAllFormStorage = () => {
+  try {
+    localStorage.removeItem("studentFormData");
+    localStorage.removeItem("personalDetails");
+    localStorage.removeItem("programApplyingFor");
+    localStorage.removeItem("educationalBackground");
+    localStorage.removeItem("guardianDetails");
+    localStorage.removeItem("allFormsCompleted");
+
+    console.log("🧹 All form data cleared from localStorage");
+  } catch (error) {
+    console.error("Error clearing localStorage:", error);
+  }
+};
+
+const handlePaymentClick = () => {
+  clearAllFormStorage(); 
+  setShowModal(false);
+  router.push("/pages/feeSelection");
+};
 
   const handleCloseModal = () => {
+    clearAllFormStorage(); 
     setShowModal(false);
-    router.push("pages/apply");
+    router.push("/pages/apply");
   };
 
    if (loadingSaved) {

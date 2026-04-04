@@ -81,12 +81,14 @@ const PaymentInfo = ({ email }: PaymentInfoProps) => {
         }
 
         if (userEmail) {
+          const API_URL =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
           const [detailsRes, progressRes] = await Promise.all([
-            fetch(`https://acg-7euk.onrender.com/api/fees/${userEmail}`, {
+            fetch(`${API_URL}/api/fees/${userEmail}`, {
               headers: { Authorization: token ? `Bearer ${token}` : "" },
             }),
             fetch(
-              `https://acg-7euk.onrender.com/api/progress/payment-progress/${userEmail}`,
+              `${API_URL}/api/progress/payment-progress/${userEmail}`,
               {
                 headers: { Authorization: token ? `Bearer ${token}` : "" },
               }

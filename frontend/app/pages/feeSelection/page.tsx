@@ -29,6 +29,7 @@ function FeeSelectionPage() {
   const [semester, setSemester] = useState("");
   const [installment, setInstallment] = useState("");
   const [amount, setAmount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>({});
 
   const paymentLinks: Record<number, string> = {
@@ -54,14 +55,15 @@ function FeeSelectionPage() {
 
   const fetchPaymentStatus = async (userEmail: string) => {
     try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `https://acg-7euk.onrender.com/api/fees/payment-status/${userEmail}`,
+        `${API_URL}/api/fees/payment-status/${userEmail}`,
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
           },
-        },
+        }
       );
 
       if (!response.ok) {
@@ -89,24 +91,63 @@ function FeeSelectionPage() {
     setShowModal(true);
   };
 
-  // MODIFIED: Direct Paystack redirect without backend call
-  const handleSubmit = () => {
-    console.log("Redirecting to Paystack...", { email, semester, installment, amount });
+const handleSubmit = async () => {
+  setIsLoading(true);
+  
+  try {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const token = localStorage.getItem("token");
     
+    // Save payment data
+    const saveResponse = await fetch(`${API_URL}/api/fees/SaveFormData`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify({ 
+        semester, 
+        installment,
+        amount 
+      }),
+    });
+
+    if (!saveResponse.ok) {
+      throw new Error("Failed to save payment data");
+    }
+
+    const saveResult = await saveResponse.json();
+    console.log("Payment data saved:", saveResult);
+
+    // Redirect to Paystack with metadata including the session ID
     const paymentLink = paymentLinks[amount];
     if (!paymentLink) {
       console.error(`No payment link for amount: ${amount}`);
+      setIsLoading(false);
       return;
     }
 
-    // Add metadata to track the payment
+    // Include session ID in metadata to help webhook find the payment
+    const metadata = { 
+      semester, 
+      installment, 
+      amount,
+      paymentId: saveResult.paymentId,
+      sessionId: saveResult.sessionId
+    };
+    
     const redirectUrl = `${paymentLink}?metadata=${encodeURIComponent(
-      JSON.stringify({ email, semester, installment, amount }),
+      JSON.stringify(metadata),
     )}`;
     
-    console.log("Redirecting to:", redirectUrl);
+    console.log("Redirecting to Paystack:", redirectUrl);
     window.location.href = redirectUrl;
-  };
+    
+  } catch (error) {
+    console.error("Payment initialization error:", error);
+    setIsLoading(false);
+  }
+};
 
   // Check if installment is paid
   const isInstallmentPaid = (
@@ -391,7 +432,7 @@ function FeeSelectionPage() {
               <div className="summary-footer">
                 <div className="secure-notice">
                   <span className="material-symbols-outlined">lock</span>
-                  <span>Secure payment processed by Paystack</span>
+                  <span>Secure Payment</span>
                 </div>
               </div>
             </div>
@@ -400,13 +441,15 @@ function FeeSelectionPage() {
               <button
                 onClick={handleSubmit}
                 className="btn btn-submit"
+                disabled={isLoading}
               >
-                Proceed to Paystack
+                {isLoading ? "Processing..." : "Proceed"}
                 <span className="material-symbols-outlined">east</span>
               </button>
               <button
                 onClick={() => setShowModal(false)}
                 className="btn btn-cancel"
+                disabled={isLoading}
               >
                 Cancel
               </button>
