@@ -1419,7 +1419,7 @@ useEffect(() => {
           </div>
         )}
         {activeSection === "paymentdetails" && (
-          <div className="mb-4">{/* <PaymentInfo email={userEmail} /> */}</div>
+          <div className="mb-4">{<PaymentInfo />}</div>
         )}
         {activeSection === "feespayment" && (
           <div className="mb-4">

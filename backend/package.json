@@ -5,7 +5,11 @@
   "scripts": {
     "dev": "nodemon --watch \"./**/*.ts\" --exec ts-node index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "postinstall": "npx prisma generate",
+    "migrate": "npx prisma migrate deploy"
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.992.0",
