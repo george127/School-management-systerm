@@ -3,14 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "nodemon --watch \"./**/*.ts\" --exec ts-node index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "postinstall": "npx prisma generate",
-    "migrate": "npx prisma migrate deploy"
-  },
+  "dev": "nodemon --watch \"./**/*.ts\" --exec ts-node index.ts",
+  "build": "tsc",
+  "start": "npm run migrate && node dist/index.js",
+  "migrate": "prisma migrate deploy",
+  "postinstall": "prisma generate"
+},
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.992.0",
     "@aws-sdk/client-s3": "^3.1004.0",

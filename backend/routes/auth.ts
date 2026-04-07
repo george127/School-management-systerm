@@ -8,7 +8,7 @@ const router = express.Router();
 // Set AWS region
 AWS.config.update({
   region: process.env.AWS_REGION || 'us-east-1'
-});
+}); 
 
 // Create Cognito service instance
 const cognito = new AWS.CognitoIdentityServiceProvider();
