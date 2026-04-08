@@ -131,7 +131,7 @@ app.get("/api/delete-all-data", async (req, res) => {
     
     // Delete in order: child tables first, then parent tables
     // Payment depends on Student? Check relationships
-    const tablesInOrder = ["Payment", "TrainingDetails", "Student", "User"];
+    const tablesInOrder = ["Payment", "Student", "User"];
     
     for (const table of tablesInOrder) {
       const result = await prisma.$queryRawUnsafe(
