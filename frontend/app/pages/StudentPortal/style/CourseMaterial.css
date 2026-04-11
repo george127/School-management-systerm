@@ -1,11 +1,18 @@
+/* Course Material Component - Updated with Brand Colors */
+
+/* Primary Orange: #e9691e */
+/* White: #fff */
+/* Dark Gray: #495057 / #333 */
+/* Light Orange: #ffeee4 */
+
 /* Header Section */
 .course-material-container .material-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #e9691e 0%, #d55a1a 100%);
   border-radius: 16px;
   padding: 40px;
   color: white;
   margin-bottom: 30px;
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 32px rgba(233, 105, 30, 0.3);
 }
 
 .course-material-container .header-content h1 {
@@ -73,7 +80,7 @@
   left: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: #666;
+  color: #495057;
   font-size: 1.1rem;
 }
 
@@ -89,8 +96,8 @@
 
 .course-material-container .search-box input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #e9691e;
+  box-shadow: 0 0 0 3px rgba(233, 105, 30, 0.1);
 }
 
 .course-material-container .filter-options {
@@ -111,9 +118,9 @@
 
 .course-material-container .sort-btn {
   padding: 15px 25px;
-  border: 2px solid #667eea;
+  border: 2px solid #e9691e;
   background: white;
-  color: #667eea;
+  color: #e9691e;
   border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
@@ -124,7 +131,7 @@
 }
 
 .course-material-container .sort-btn:hover {
-  background: #667eea;
+  background: #e9691e;
   color: white;
 }
 
@@ -171,14 +178,14 @@
 }
 
 .course-material-container .category-item:hover {
-  background: #f8f9ff;
-  border-color: #667eea;
+  background: #ffeee4;
+  border-color: #e9691e;
 }
 
 .course-material-container .category-item.active {
-  background: #667eea;
+  background: #e9691e;
   color: white;
-  border-color: #667eea;
+  border-color: #e9691e;
 }
 
 .course-material-container .category-icon {
@@ -226,7 +233,7 @@
 }
 
 .course-material-container .recent-item:hover {
-  background: #e9ecef;
+  background: #ffeee4;
   transform: translateX(5px);
 }
 
@@ -236,7 +243,7 @@
 
 .course-material-container .recent-title {
   font-size: 0.9rem;
-  color: #666;
+  color: #495057;
   flex: 1;
   white-space: nowrap;
   overflow: hidden;
@@ -261,7 +268,8 @@
 
 .course-material-container .material-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 30px rgba(233, 105, 30, 0.12);
+  border-color: #e9691e;
 }
 
 .course-material-container .card-header {
@@ -269,7 +277,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  background: #f8f9fa;
+  background: #ffeee4;
 }
 
 .course-material-container .type-badge {
@@ -300,15 +308,16 @@
 }
 
 .course-material-container .favorite-btn.favorited {
-  color: #ff6b6b;
+  color: #e9691e;
 }
 
 .course-material-container .favorite-btn:hover {
   transform: scale(1.2);
+  color: #e9691e;
 }
 
 .course-material-container .new-badge {
-  background: #ff6b6b;
+  background: #e9691e;
   color: white;
   padding: 4px 8px;
   border-radius: 12px;
@@ -334,7 +343,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(233, 105, 30, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -358,7 +367,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 1.5rem;
-  color: #667eea;
+  color: #e9691e;
 }
 
 .course-material-container .play-btn:hover {
@@ -379,7 +388,7 @@
 }
 
 .course-material-container .material-description {
-  color: #666;
+  color: #495057;
   font-size: 0.9rem;
   line-height: 1.5;
   margin-bottom: 15px;
@@ -400,7 +409,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #666;
+  color: #495057;
   font-size: 0.85rem;
 }
 
@@ -410,8 +419,8 @@
 }
 
 .course-material-container .due-date {
-  background: #fff3cd;
-  color: #856404;
+  background: #ffeee4;
+  color: #e9691e;
   padding: 8px 12px;
   border-radius: 8px;
   font-size: 0.85rem;
@@ -419,7 +428,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  border-left: 4px solid #ffc107;
+  border-left: 4px solid #e9691e;
 }
 
 .course-material-container .material-stats {
@@ -432,7 +441,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  color: #666;
+  color: #495057;
   font-size: 0.8rem;
 }
 
@@ -447,7 +456,7 @@
   align-items: center;
   margin-bottom: 8px;
   font-size: 0.85rem;
-  color: #666;
+  color: #495057;
 }
 
 .course-material-container .progress-bar {
@@ -459,7 +468,7 @@
 
 .course-material-container .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #4CAF50, #45a049);
+  background: #e9691e;
   border-radius: 3px;
   transition: width 0.3s ease;
 }
@@ -493,16 +502,17 @@
 }
 
 .course-material-container .download-btn:hover {
-  background: #dee2e6;
+  background: #ffeee4;
+  color: #e9691e;
 }
 
 .course-material-container .view-btn {
-  background: #667eea;
+  background: #e9691e;
   color: white;
 }
 
 .course-material-container .view-btn:hover {
-  background: #5a6fd8;
+  background: #d55a1a;
 }
 
 /* No Results */
@@ -510,7 +520,7 @@
   grid-column: 1 / -1;
   text-align: center;
   padding: 60px 20px;
-  color: #666;
+  color: #495057;
 }
 
 .course-material-container .no-results i {
@@ -550,9 +560,9 @@
   flex: 1;
   min-width: 200px;
   padding: 20px;
-  border: 2px solid #667eea;
+  border: 2px solid #e9691e;
   background: white;
-  color: #667eea;
+  color: #e9691e;
   border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
@@ -565,7 +575,7 @@
 }
 
 .course-material-container .quick-btn:hover {
-  background: #667eea;
+  background: #e9691e;
   color: white;
   transform: translateY(-2px);
 }
@@ -616,7 +626,7 @@
 }
 
 @media (max-width: 480px) {
-  .course-material-container .course-material-container {
+  .course-material-container {
     padding: 15px;
   }
   

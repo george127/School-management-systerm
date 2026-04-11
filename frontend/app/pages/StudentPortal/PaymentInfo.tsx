@@ -15,6 +15,7 @@ interface PaymentRecord {
   status: string;
   transactionId: string;
   date: string;
+  time?: string; // Added time field
 }
 
 interface PaymentDetails {
@@ -39,14 +40,16 @@ interface PaymentInfoProps {
 }
 
 const PaymentInfo = ({ email }: PaymentInfoProps) => {
-  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<UserData | null>(null);
   const [paymentProgress, setPaymentProgress] = useState<PaymentProgress>({
     "First Semester": 0,
     "Second Semester": 0,
-    "Third Semester": 0
+    "Third Semester": 0,
   });
   const [totalPaid, setTotalPaid] = useState(0);
   const [remainingBalance, setRemainingBalance] = useState(0);
@@ -82,26 +85,33 @@ const PaymentInfo = ({ email }: PaymentInfoProps) => {
         }
 
         if (userEmail) {
-          const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+          const API_URL =
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
           const token = localStorage.getItem("token");
-          
+
           const headers: HeadersInit = {};
           if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-          } 
+            headers["Authorization"] = `Bearer ${token}`;
+          }
 
           // Fetch both payment details and progress in parallel
           const [detailsResponse, progressResponse] = await Promise.all([
             fetch(`${API_URL}/api/payment-info/fees/${userEmail}`, { headers }),
-            fetch(`${API_URL}/api/payment-info/payment-progress/${userEmail}`, { headers })
+            fetch(`${API_URL}/api/payment-info/payment-progress/${userEmail}`, {
+              headers,
+            }),
           ]);
 
           if (!detailsResponse.ok) {
-            throw new Error(`Failed to fetch payment details: ${detailsResponse.statusText}`);
+            throw new Error(
+              `Failed to fetch payment details: ${detailsResponse.statusText}`,
+            );
           }
-          
+
           if (!progressResponse.ok) {
-            throw new Error(`Failed to fetch payment progress: ${progressResponse.statusText}`);
+            throw new Error(
+              `Failed to fetch payment progress: ${progressResponse.statusText}`,
+            );
           }
 
           const detailsData = await detailsResponse.json();
@@ -126,7 +136,11 @@ const PaymentInfo = ({ email }: PaymentInfoProps) => {
 
   // Calculate total paid and remaining balance
   const calculateTotals = (paymentData: any) => {
-    if (!paymentData || !paymentData.paystack || !paymentData.paystack.records) {
+    if (
+      !paymentData ||
+      !paymentData.paystack ||
+      !paymentData.paystack.records
+    ) {
       setTotalPaid(0);
       setRemainingBalance(0);
       return;
@@ -134,7 +148,7 @@ const PaymentInfo = ({ email }: PaymentInfoProps) => {
 
     const totalAmountPaid = paymentData.paystack.records.reduce(
       (sum: number, record: PaymentRecord) => sum + (record.amountPaid || 0),
-      0
+      0,
     );
 
     setTotalPaid(totalAmountPaid);
@@ -144,6 +158,25 @@ const PaymentInfo = ({ email }: PaymentInfoProps) => {
     const totalExpected = 5920 * 3; // 5920 per semester * 3 semesters = 17,760
     const remaining = totalExpected - totalAmountPaid;
     setRemainingBalance(remaining > 0 ? remaining : 0);
+  };
+
+  // Format date and time helper function
+  const formatDateTime = (dateTimeString: string) => {
+    if (!dateTimeString) return { date: "Date not available", time: "" };
+
+    const date = new Date(dateTimeString);
+    const formattedDate = date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+    const formattedTime = date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+    return { date: formattedDate, time: formattedTime };
   };
 
   // Loading state
@@ -168,22 +201,36 @@ const PaymentInfo = ({ email }: PaymentInfoProps) => {
 
   // Group records by semester and then by installments
   const groupRecordsBySemester = () => {
-    const semesters = ["First Semester", "Second Semester", "Third Semester"] as const;
-    const grouped: Record<string, {
-      First: PaymentRecord[];
-      Second: PaymentRecord[];
-      Third: PaymentRecord[];
-    }> = {};
+    const semesters = [
+      "First Semester",
+      "Second Semester",
+      "Third Semester",
+    ] as const;
+    const grouped: Record<
+      string,
+      {
+        First: PaymentRecord[];
+        Second: PaymentRecord[];
+        Third: PaymentRecord[];
+      }
+    > = {};
 
-    semesters.forEach(semester => {
-      const semesterRecords = paymentDetails?.paystack?.records?.filter(
-        record => record.semester === semester
-      ) || [];
+    semesters.forEach((semester) => {
+      const semesterRecords =
+        paymentDetails?.paystack?.records?.filter(
+          (record) => record.semester === semester,
+        ) || [];
 
       grouped[semester] = {
-        First: semesterRecords.filter(record => record.installment === "First Installment"),
-        Second: semesterRecords.filter(record => record.installment === "Second Installment"),
-        Third: semesterRecords.filter(record => record.installment === "Third Installment")
+        First: semesterRecords.filter(
+          (record) => record.installment === "First Installment",
+        ),
+        Second: semesterRecords.filter(
+          (record) => record.installment === "Second Installment",
+        ),
+        Third: semesterRecords.filter(
+          (record) => record.installment === "Third Installment",
+        ),
       };
     });
 
@@ -200,7 +247,7 @@ const PaymentInfo = ({ email }: PaymentInfoProps) => {
       Third: PaymentRecord[];
     },
     currentInstallment: string,
-    currentIndex: number
+    currentIndex: number,
   ): number => {
     let total = 0;
     const installmentOrder = ["First", "Second", "Third"] as const;
@@ -218,7 +265,7 @@ const PaymentInfo = ({ email }: PaymentInfoProps) => {
           // Add all amounts from this installment group
           total += records.reduce(
             (sum, record) => sum + (record.amountPaid || 0),
-            0
+            0,
           );
         }
       }
@@ -239,12 +286,13 @@ const PaymentInfo = ({ email }: PaymentInfoProps) => {
       <div className="Payment-details">
         <div className="payment-summary-card">
           <div className="payment-header">
-            <h3>Congratulations, {user?.name || 'Student'}!</h3>
+            <h3>Congratulations, {user?.name || "Student"}!</h3>
             <p>
-              You&apos;ve successfully made payments toward your education. Keep up the great
-              progress! Your commitment and dedication are truly commendable. We
-              are excited to have you on this journey with us, and each payment
-              is an important step toward your educational goals.
+              You&apos;ve successfully made payments toward your education. Keep
+              up the great progress! Your commitment and dedication are truly
+              commendable. We are excited to have you on this journey with us,
+              and each payment is an important step toward your educational
+              goals.
             </p>
           </div>
           <div className="summary-details">
@@ -256,10 +304,14 @@ const PaymentInfo = ({ email }: PaymentInfoProps) => {
               </div>
             </div>
             <div className="detail">
-              <span className="icon material-symbols-outlined">account_balance_wallet</span>
+              <span className="icon material-symbols-outlined">
+                account_balance_wallet
+              </span>
               <div className="detail-content">
                 <span className="label">Remaining Balance:</span>
-                <span className="value">Ghc {remainingBalance.toLocaleString()}</span>
+                <span className="value">
+                  Ghc {remainingBalance.toLocaleString()}
+                </span>
               </div>
             </div>
             <div className="detail">
@@ -285,7 +337,9 @@ const PaymentInfo = ({ email }: PaymentInfoProps) => {
             />
             <div className="progress-label">
               <div className="percentage-display">
-                <span className="progress-percentage">{Math.round(calculateOverallProgress())}</span>
+                <span className="progress-percentage">
+                  {Math.round(calculateOverallProgress())}
+                </span>
                 <span className="percent-symbol">%</span>
               </div>
               <span className="progress-text">Overall Completion</span>
@@ -298,7 +352,9 @@ const PaymentInfo = ({ email }: PaymentInfoProps) => {
 
           <div className="payment-progress-section">
             <div className="payment-history-details">
-              {(["First Semester", "Second Semester", "Third Semester"] as const).map((semester) => (
+              {(
+                ["First Semester", "Second Semester", "Third Semester"] as const
+              ).map((semester) => (
                 <div key={semester} className="history-details">
                   <span className="level">{semester}</span>
                   <div className="progress-text">
@@ -323,72 +379,103 @@ const PaymentInfo = ({ email }: PaymentInfoProps) => {
           <div key={semester} className="semester-column">
             <h3 className="semester-title">{semester}</h3>
             <div className="installments-row">
-              {Object.entries(installmentGroups).map(([installment, records]) => (
-                <div key={`${semester}-${installment}`} className="installment-card">
-                  <div className="installment-header">
-                    <h4>{installment} Installment</h4>
-                    <span className="material-symbols-outlined">stat_minus_3</span>
-                  </div>
-                  <div className="installment-content">
-                    {records.length > 0 ? (
-                      records.map((record: PaymentRecord, index: number) => {
-                        const grantTotal = calculateGrantTotal(
-                          installmentGroups as any,
-                          installment,
-                          index
-                        );
+              {Object.entries(installmentGroups).map(
+                ([installment, records]) => (
+                  <div
+                    key={`${semester}-${installment}`}
+                    className="installment-card"
+                  >
+                    <div className="installment-header">
+                      <h4>{installment} Installment</h4>
+                      <span className="material-symbols-outlined">
+                        stat_minus_3
+                      </span>
+                    </div>
+                    <div className="installment-content">
+                      {records.length > 0 ? (
+                        records.map((record: PaymentRecord, index: number) => {
+                          const grantTotal = calculateGrantTotal(
+                            installmentGroups as any,
+                            installment,
+                            index,
+                          );
+                          const { date, time } = formatDateTime(record.date);
 
-                        return (
-                          <div key={index} className="payment-record">
-                            <div className="payment-row">
-                              <span className="label">
-                                <span className="material-symbols-outlined">event</span>
-                                Status:
-                              </span>
-                              <span className={`status ${record.status?.toLowerCase() || 'pending'}`}>
-                                {record.status || "Pending"}
-                              </span>
+                          return (
+                            <div key={index} className="payment-record">
+                              <div className="payment-row">
+                                <span className="label">
+                                  <span className="material-symbols-outlined">
+                                    event
+                                  </span>
+                                  Status:
+                                </span>
+                                <span
+                                  className={`status ${record.status?.toLowerCase() || "pending"}`}
+                                >
+                                  {record.status || "Pending"}
+                                </span>
+                              </div>
+                              <div className="payment-row">
+                                <span className="label">
+                                  <span className="material-symbols-outlined">
+                                    receipt
+                                  </span>
+                                  Transaction ID:
+                                </span>
+                                <span className="value">
+                                  {record.transactionId || "N/A"}
+                                </span>
+                              </div>
+                              <div className="payment-row">
+                                <span className="label">
+                                  <span className="material-symbols-outlined">
+                                    credit_card
+                                  </span>
+                                  Amount Paid:
+                                </span>
+                                <span className="value cash">
+                                  Ghc{" "}
+                                  {record.amountPaid
+                                    ? record.amountPaid.toLocaleString()
+                                    : "N/A"}
+                                </span>
+                              </div>
+                              <div className="payment-row">
+                                <span className="label">
+                                  <span className="material-symbols-outlined">
+                                    attach_money
+                                  </span>
+                                  Cumulative Total:
+                                </span>
+                                <span className="value cash">
+                                  Ghc {grantTotal.toLocaleString()}
+                                </span>
+                              </div>
+                              <div className="payment-row">
+                                
+                                <span className="date-time chip">
+                                  <span className="date-icon">📅</span>
+                                  {date}
+                                  <span className="time-icon">⏰</span>
+                                  {time && `${time}`}
+                                </span>
+                              </div>
                             </div>
-                            <div className="payment-row">
-                              <span className="label">
-                                <span className="material-symbols-outlined">receipt</span>
-                                Transaction ID:
-                              </span>
-                              <span className="value">{record.transactionId || "N/A"}</span>
-                            </div>
-                            <div className="payment-row">
-                              <span className="label">
-                                <span className="material-symbols-outlined">credit_card</span>
-                                Amount Paid:
-                              </span>
-                              <span className="value cash">
-                                Ghc {record.amountPaid ? record.amountPaid.toLocaleString() : "N/A"}
-                              </span>
-                            </div>
-                            <div className="payment-row">
-                              <span className="label">
-                                <span className="material-symbols-outlined">attach_money</span>
-                                Cumulative Total:
-                              </span>
-                              <span className="value cash">
-                                Ghc {grantTotal.toLocaleString()}
-                              </span>
-                            </div>
-                            <div className="payment-row">
-                              <span className="date">{record.date || "Date not available"}</span>
-                            </div>
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <div className="no-records">
-                        <span className="material-symbols-outlined">info</span>
-                        <p>No payment records yet</p>
-                      </div>
-                    )}
+                          );
+                        })
+                      ) : (
+                        <div className="no-records">
+                          <span className="material-symbols-outlined">
+                            info
+                          </span>
+                          <p>No payment records yet</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ),
+              )}
             </div>
           </div>
         ))}

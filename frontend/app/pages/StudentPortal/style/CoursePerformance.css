@@ -1,3 +1,10 @@
+/* Course Performance Component - Updated with Brand Colors */
+
+/* Primary Orange: #e9691e */
+/* White: #fff */
+/* Dark Gray: #495057 / #333 */
+/* Light Orange: #ffeee4 */
+
 /* Header Section */
 .course-performance-container .performance-header {
   display: flex;
@@ -17,7 +24,7 @@
 
 .course-performance-container .header-content p {
   font-size: 1.1rem;
-  color: #666;
+  color: #495057;
   max-width: 500px;
 }
 
@@ -27,7 +34,8 @@
   align-items: center;
 }
 
-.course-performance-container .time-filter, .course-performance-container .course-filter {
+.course-performance-container .time-filter, 
+.course-performance-container .course-filter {
   padding: 12px 20px;
   border: 2px solid #e9ecef;
   border-radius: 10px;
@@ -38,9 +46,10 @@
   transition: all 0.3s ease;
 }
 
-.course-performance-container .time-filter:focus, .course-performance-container .course-filter:focus {
+.course-performance-container .time-filter:focus, 
+.course-performance-container .course-filter:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #e9691e;
 }
 
 /* Overall Stats */
@@ -68,7 +77,7 @@
 }
 
 .course-performance-container .stat-card.primary {
-  border-left-color: #667eea;
+  border-left-color: #e9691e;
 }
 
 .course-performance-container .stat-card.success {
@@ -90,8 +99,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(102, 126, 234, 0.1);
+  background: #ffeee4;
   border-radius: 12px;
+}
+
+.course-performance-container .stat-card.primary .stat-icon {
+  background: #ffeee4;
 }
 
 .course-performance-container .stat-card.success .stat-icon {
@@ -114,7 +127,7 @@
 }
 
 .course-performance-container .stat-content p {
-  color: #666;
+  color: #495057;
   margin-bottom: 8px;
   font-weight: 500;
 }
@@ -163,7 +176,7 @@
 }
 
 .course-performance-container .overall-progress {
-  background: #667eea;
+  background: #e9691e;
   color: white;
   padding: 6px 12px;
   border-radius: 20px;
@@ -172,7 +185,7 @@
 }
 
 .course-performance-container .section-subtitle {
-  color: #666;
+  color: #495057;
   font-size: 0.9rem;
 }
 
@@ -191,8 +204,8 @@
 }
 
 .course-performance-container .course-progress-item:hover {
-  border-color: #667eea;
-  background: #f8f9ff;
+  border-color: #e9691e;
+  background: #ffeee4;
 }
 
 .course-performance-container .course-info h4 {
@@ -203,7 +216,7 @@
 
 .course-performance-container .course-info p {
   margin: 0;
-  color: #666;
+  color: #495057;
   font-size: 0.9rem;
 }
 
@@ -221,7 +234,7 @@
 
 .course-performance-container .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: #e9691e;
   border-radius: 4px;
   transition: width 0.5s ease;
 }
@@ -255,7 +268,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  color: #666;
+  color: #495057;
   font-size: 0.85rem;
 }
 
@@ -274,8 +287,8 @@
 }
 
 .course-performance-container .skill-item:hover {
-  border-color: #667eea;
-  background: #f8f9ff;
+  border-color: #e9691e;
+  background: #ffeee4;
 }
 
 .course-performance-container .skill-header {
@@ -313,17 +326,20 @@
 }
 
 /* Progress Chart */
+/* Progress Chart - Minimalist Version */
+
 .course-performance-container .progress-chart {
-  margin-top: 20px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
 }
 
 .course-performance-container .chart-bars {
   display: flex;
   align-items: flex-end;
-  gap: 15px;
-  height: 200px;
+  gap: 20px;
+  height: 240px;
   margin-bottom: 20px;
-  padding: 0 10px;
 }
 
 .course-performance-container .chart-bar-container {
@@ -337,46 +353,83 @@
 .course-performance-container .chart-bar-group {
   display: flex;
   align-items: flex-end;
-  gap: 4px;
+  gap: 6px;
   height: 100%;
   width: 100%;
 }
 
 .course-performance-container .chart-bar {
-  border-radius: 4px 4px 0 0;
-  transition: all 0.3s ease;
-  min-height: 20px;
+  width: 100%;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
 }
 
 .course-performance-container .progress-bar {
-  background: linear-gradient(180deg, #667eea, #764ba2);
+  background: #e9691e;
   flex: 1;
 }
 
 .course-performance-container .score-bar {
-  background: linear-gradient(180deg, #4CAF50, #45a049);
+  background: #495057;
   flex: 1;
 }
 
-.course-performance-container .chart-label {
-  margin-top: 8px;
-  font-size: 0.8rem;
-  color: #666;
-  font-weight: 500;
+.course-performance-container .chart-bar:hover {
+  filter: brightness(0.9);
+  transform: translateY(-2px);
 }
 
+/* Simple Tooltip */
+.course-performance-container .chart-bar::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  white-space: nowrap;
+  display: none;
+  margin-bottom: 4px;
+}
+
+.course-performance-container .chart-bar:hover::after {
+  display: block;
+}
+
+/* Labels */
+.course-performance-container .chart-label {
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #495057;
+}
+
+.course-performance-container .chart-bar-container:hover .chart-label {
+  color: #e9691e;
+  font-weight: 600;
+}
+
+/* Legend */
 .course-performance-container .chart-legend {
   display: flex;
   gap: 20px;
   justify-content: center;
+  padding-top: 16px;
+  border-top: 1px solid #ffeee4;
 }
 
 .course-performance-container .legend-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.85rem;
-  color: #666;
+  font-size: 12px;
+  color: #495057;
 }
 
 .course-performance-container .legend-color {
@@ -386,11 +439,37 @@
 }
 
 .course-performance-container .progress-color {
-  background: #667eea;
+  background: #e9691e;
 }
 
 .course-performance-container .score-color {
-  background: #4CAF50;
+  background: #495057;
+}
+
+/* Animation */
+@keyframes growUp {
+  from { height: 0; }
+  to { height: var(--target-height); }
+}
+
+.course-performance-container .progress-bar {
+  animation: growUp 0.4s ease-out;
+}
+
+.course-performance-container .score-bar {
+  animation: growUp 0.4s ease-out 0.1s both;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .course-performance-container .chart-bars {
+    gap: 12px;
+    height: 200px;
+  }
+  
+  .course-performance-container .chart-label {
+    font-size: 10px;
+  }
 }
 
 /* Assignment Performance */
@@ -411,8 +490,8 @@
 }
 
 .course-performance-container .assignment-item:hover {
-  border-color: #667eea;
-  background: #f8f9ff;
+  border-color: #e9691e;
+  background: #ffeee4;
 }
 
 .course-performance-container .assignment-info {
@@ -435,8 +514,8 @@
 }
 
 .course-performance-container .assignment-type.assignment {
-  background: #E3F2FD;
-  color: #1976D2;
+  background: #ffeee4;
+  color: #e9691e;
 }
 
 .course-performance-container .assignment-type.exam {
@@ -482,12 +561,12 @@
 }
 
 .course-performance-container .your-score {
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: #e9691e;
   z-index: 2;
 }
 
 .course-performance-container .average-score {
-  background: rgba(102, 126, 234, 0.3);
+  background: rgba(233, 105, 30, 0.3);
   z-index: 1;
 }
 
@@ -558,7 +637,7 @@
 .course-performance-container .day-label {
   margin-top: 8px;
   font-size: 0.8rem;
-  color: #666;
+  color: #495057;
   font-weight: 500;
 }
 
@@ -593,8 +672,9 @@
 }
 
 .course-performance-container .recommendation-card:hover {
-  border-color: #667eea;
+  border-color: #e9691e;
   transform: translateY(-3px);
+  background: #ffeee4;
 }
 
 .course-performance-container .rec-icon {
@@ -609,14 +689,14 @@
 }
 
 .course-performance-container .recommendation-card p {
-  color: #666;
+  color: #495057;
   font-size: 0.9rem;
   line-height: 1.5;
   margin-bottom: 15px;
 }
 
 .course-performance-container .rec-action {
-  background: #667eea;
+  background: #e9691e;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -627,7 +707,7 @@
 }
 
 .course-performance-container .rec-action:hover {
-  background: #5a6fd8;
+  background: #d55a1a;
   transform: translateY(-2px);
 }
 
@@ -671,7 +751,7 @@
 }
 
 @media (max-width: 480px) {
-  .course-performance-container .course-performance-container {
+  .course-performance-container {
     padding: 15px;
   }
   
@@ -685,7 +765,8 @@
     gap: 15px;
   }
   
-  .course-performance-container .chart-bars, .activity-chart {
+  .course-performance-container .chart-bars, 
+  .course-performance-container .activity-chart {
     gap: 8px;
   }
 }

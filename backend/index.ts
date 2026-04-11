@@ -11,6 +11,8 @@ import feesPaymentRoutes from './routes/feesPaymentRoutes';
 import studentProfileRoutes from './routes/studentProfile';
 import forgotpasswordRoutes from './routes/forgotpassword';
 import paymentInfoRoutes from './routes/paymentInfo';
+import adminRoutes from './routes/adminRoute/adminRoutes';
+
 
 const app = express();
 const prisma = new PrismaClient();
@@ -166,6 +168,7 @@ app.use("/api/fees", feesPaymentRoutes);
 app.use("/api", studentProfileRoutes);
 app.use("/api", forgotpasswordRoutes);
 app.use("/api/payment-info", paymentInfoRoutes);
+app.use('/api/admin', adminRoutes);  
 
 
 // Error handling middleware

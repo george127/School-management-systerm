@@ -1428,37 +1428,37 @@ useEffect(() => {
         )}
         {activeSection === "course Module" && (
           <div className="section">
-            {/* <CourseModule studentData={studentData} /> */}
+            <CourseModule />
           </div>
         )}
         {activeSection === "course material" && (
           <div className="section">
-            {/* <CourseMaterial studentData={studentData} /> */}
+            <CourseMaterial />
           </div>
         )}
         {activeSection === "Performance" && (
           <div className="section">
-            {/* <CoursePerformance studentData={studentData} /> */}
+            <CoursePerformance />
           </div>
         )}
         {activeSection === "Grade" && (
           <div className="section">
-            {/* <CourseGrade studentData={studentData} /> */}
+            <CourseGrade />
           </div>
         )}
         {activeSection === "Assignment" && (
           <div className="section">
-            {/* <CourseAssignment studentData={studentData} /> */}
+            <CourseAssignment />
           </div>
         )}
         {activeSection === "quiz" && (
           <div className="section">
-            {/* <CourseQuiz studentData={studentData} /> */}
+            <CourseQuiz />
           </div>
         )}
         {activeSection === "settings" && (
           <div className="mb-4 section">
-            {/* <Settings studentData={studentData} /> */}
+            <Settings />
           </div>
         )}
         {/* Footer */}

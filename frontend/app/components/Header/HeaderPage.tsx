@@ -4,7 +4,7 @@ import "../Header/HeaderPage.css";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef, MouseEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import logo from "./appcode.png";
 
 /* =========================
@@ -22,13 +22,13 @@ interface User {
 interface CheckAuthResponse {
   success: boolean;
   user?: User;
+  message?: string;
 }
 
 /* =========================
    Helper Functions
 ========================= */
 
-// Function to get initials from full name
 const getInitials = (fullName: string): string => {
   if (!fullName) return "U";
   
@@ -38,37 +38,62 @@ const getInitials = (fullName: string): string => {
   return "U";
 };
 
-// Function to get avatar URL - uses name for initials
-const getAvatarUrl = (user: User | null): string => {
-  // If no user at all → avatar
+const getAvatarUrl = (user: User | null, profileImageUrl?: string): string => {
   if (!user) {
     return "https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=User";
   }
 
-  // If real profile image exists → USE IT
+  if (profileImageUrl && profileImageUrl.trim() !== "") {
+    return profileImageUrl;
+  }
+
   if (user.profileImage && user.profileImage.trim() !== "") {
     return user.profileImage;
   }
 
-  // Otherwise generate avatar from name
   const nameForAvatar = user.fullName || "User";
-
   return `https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=${encodeURIComponent(nameForAvatar)}`;
 };
 
-// Function to fetch user profile data (same as StudentPortal)
+// Utility function to safely fetch JSON
+const fetchJSON = async <T,>(
+  url: string,
+  options?: RequestInit
+): Promise<T> => {
+  const response = await fetch(url, options);
+  
+  // Check if response is ok
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`API Error (${response.status}):`, errorText.substring(0, 200));
+    throw new Error(`API returned ${response.status}: ${response.statusText}`);
+  }
+  
+  // Check content type
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
+    const text = await response.text();
+    console.error("Expected JSON but got:", contentType);
+    console.error("Response preview:", text.substring(0, 300));
+    throw new Error("Invalid response format from server (expected JSON)");
+  }
+  
+  return response.json();
+};
+
 const fetchUserProfileData = async (email: string): Promise<{ name: string; email: string; profileImage?: string } | null> => {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
     const token = localStorage.getItem("token");
     
-    const response = await fetch(`${API_URL}/api/profile/${email}`, {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-    });
-    
-    const data = await response.json();
+    const data = await fetchJSON<{ success: boolean; user?: { name: string; email: string; profileImage?: string } }>(
+      `${API_URL}/api/profile/${email}`,
+      {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      }
+    );
     
     if (data.success && data.user) {
       return {
@@ -84,13 +109,12 @@ const fetchUserProfileData = async (email: string): Promise<{ name: string; emai
   }
 };
 
-// Function to fetch profile image only
 const fetchProfileImage = async (email: string): Promise<string | null> => {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
     const token = localStorage.getItem("token");
     
-    const response = await fetch(
+    const data = await fetchJSON<{ success: boolean; profileImage?: string }>(
       `${API_URL}/api/profile/profile-image/${email}`,
       {
         headers: {
@@ -98,8 +122,6 @@ const fetchProfileImage = async (email: string): Promise<string | null> => {
         },
       }
     );
-    
-    const data = await response.json();
     
     if (data.success && data.profileImage) {
       return data.profileImage;
@@ -117,6 +139,7 @@ const fetchProfileImage = async (email: string): Promise<string | null> => {
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -125,23 +148,25 @@ export default function Header() {
   const [loading, setLoading] = useState<boolean>(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [profileImage, setProfileImage] = useState<string>("");
+  const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
 
   /* =========================
      Effects
   ========================= */
 
   useEffect(() => {
-    checkAuthStatus();
-  }, []);
+    // Only check auth if not logging out
+    if (!isLoggingOut) {
+      checkAuthStatus();
+    }
+  }, [pathname, isLoggingOut]);
 
-  // Fetch profile data when user is loaded (same as StudentPortal)
   useEffect(() => {
-    if (user?.email) {
+    if (user?.email && !isLoggingOut) {
       loadUserProfileData(user.email);
     }
-  }, [user]);
+  }, [user, isLoggingOut]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | globalThis.MouseEvent) => {
       if (
@@ -166,12 +191,12 @@ export default function Header() {
      Auth Logic
   ========================= */
 
-  // Load user profile data - same method as StudentPortal
   const loadUserProfileData = async (email: string) => {
+    if (isLoggingOut) return;
+    
     const profileData = await fetchUserProfileData(email);
     
-    if (profileData) {
-      // Update user with fresh data from API
+    if (profileData && user) {
       const updatedUser = {
         ...user,
         fullName: profileData.name,
@@ -180,15 +205,11 @@ export default function Header() {
       };
       
       setUser(updatedUser as User);
-      
-      // Update localStorage with fresh data
       localStorage.setItem("user", JSON.stringify(updatedUser));
       
-      // Load profile image separately if needed
       if (profileData.profileImage) {
         setProfileImage(profileData.profileImage);
       } else {
-        // Try to fetch profile image from separate endpoint
         const image = await fetchProfileImage(email);
         if (image) {
           setProfileImage(image);
@@ -201,64 +222,111 @@ export default function Header() {
   };
 
   const checkAuthStatus = async (): Promise<void> => {
+    // Don't check auth if logging out
+    if (isLoggingOut) {
+      console.log("Skipping auth check - logging out");
+      setLoading(false);
+      return;
+    }
+
     try {
+      const token = localStorage.getItem("token");
       const storedUserRaw = localStorage.getItem("user");
 
-      if (!storedUserRaw) {
-        setLoading(false);
-        return;
-      }
-
-      const storedUser: User = JSON.parse(storedUserRaw);
-
-      const roleLower = storedUser.role?.toLowerCase() ?? "";
-      const emailLower = storedUser.email?.toLowerCase() ?? "";
-
-      // Admin shortcut
-      if (roleLower === "admin" || emailLower === "admin@appcode.com") {
-        setUser(storedUser);
-        if (storedUser.profileImage) {
-          setProfileImage(storedUser.profileImage);
-        }
-        setLoading(false);
-        return;
-      }
-
-      // Temporarily set stored user
-      setUser(storedUser);
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const response = await fetch(`${API_URL}/api/auth/check-auth`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: storedUser.email }),
-      });
-
-      if (!response.ok) {
-        setLoading(false);
-        return;
-      }
-
-      const data: CheckAuthResponse = await response.json();
-
-      if (data.success && data.user) {
-        const mergedUser: User = {
-          ...data.user,
-          role: storedUser.role || data.user.role || "student",
-        };
-
-        setUser(mergedUser);
-        localStorage.setItem("user", JSON.stringify(mergedUser));
-        
-        // Fetch full profile data (name, etc.) from profile endpoint
-        await loadUserProfileData(mergedUser.email);
-      } else {
-        localStorage.removeItem("user");
+      // If no token and no stored user, not authenticated
+      if (!token && !storedUserRaw) {
         setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      // If we have a stored user but no token (or vice versa), clear everything
+      if (!token || !storedUserRaw) {
+        localStorage.clear();
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      let storedUser: User;
+      try {
+        storedUser = JSON.parse(storedUserRaw);
+      } catch (parseError) {
+        console.error("Error parsing stored user:", parseError);
+        localStorage.clear();
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      // Check with backend to validate session
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      
+      try {
+        // Try to validate with backend
+        const data = await fetchJSON<CheckAuthResponse>(`${API_URL}/api/auth/check-auth`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({ email: storedUser.email }),
+        });
+
+        if (data.success && data.user) {
+          // Session is valid - update user data if needed
+          const mergedUser: User = {
+            ...storedUser,
+            ...data.user,
+            role: storedUser.role || data.user.role || "student",
+          };
+
+          setUser(mergedUser);
+          localStorage.setItem("user", JSON.stringify(mergedUser));
+          
+          if (mergedUser.profileImage) {
+            setProfileImage(mergedUser.profileImage);
+          }
+        } else {
+          // Session is invalid - clear everything
+          console.log("Auth check failed:", data.message);
+          localStorage.clear();
+          sessionStorage.clear();
+          setUser(null);
+          setProfileImage("");
+        }
+      } catch (fetchError: any) {
+        // Handle 404 specifically - endpoint doesn't exist
+        if (fetchError.message?.includes("404")) {
+          console.warn("Auth check endpoint not found (404). Using local session only.");
+          // Since the endpoint doesn't exist, just use the stored user data
+          // This is typical for development or when backend auth isn't fully implemented
+          setUser(storedUser);
+          if (storedUser.profileImage) {
+            setProfileImage(storedUser.profileImage);
+          }
+        } else {
+          console.error("Fetch error during auth check:", fetchError);
+          // For other errors, keep existing user data but log the error
+          if (storedUser) {
+            console.log("Keeping existing session due to API error");
+            setUser(storedUser);
+          } else {
+            setUser(null);
+          }
+        }
       }
     } catch (error) {
       console.error("Auth error:", error);
-      localStorage.removeItem("user");
-      setUser(null);
+      // Don't clear on error to prevent logout loops
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        // Network error - keep existing user data
+        console.log("Network error - keeping existing session");
+      } else {
+        // Only clear on actual auth errors
+        localStorage.removeItem("user");
+        setUser(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -280,18 +348,62 @@ export default function Header() {
     setIsDropdownOpen((prev) => !prev);
   };
 
-  const handleLogout = (): void => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("tokenExpiry");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userData");
-    localStorage.removeItem("studentData");
+  const handleLogout = async (e?: React.MouseEvent): Promise<void> => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    console.log("Starting logout process...");
+    
+    // Set logging out flag to prevent re-authentication
+    setIsLoggingOut(true);
+    
+    try {
+      // Call logout endpoint if it exists
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const token = localStorage.getItem("token");
+      
+      if (token) {
+        try {
+          await fetch(`${API_URL}/api/auth/logout`, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "application/json"
+            }
+          });
+        } catch (err) {
+          // Ignore logout API errors - it's optional
+          console.log("Logout API not available, proceeding with client-side logout");
+        }
+      }
+    } catch (error) {
+      console.error("Error calling logout API:", error);
+    }
+    
+    // Clear all localStorage
+    localStorage.clear();
+    
+    // Clear sessionStorage
+    sessionStorage.clear();
+    
+    // Clear all cookies
+    document.cookie.split(";").forEach((cookie) => {
+      const [name] = cookie.split("=");
+      if (name.trim()) {
+        document.cookie = `${name.trim()}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        document.cookie = `${name.trim()}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`;
+      }
+    });
+    
+    // Reset all state
     setUser(null);
     setProfileImage("");
     setIsDropdownOpen(false);
-    router.push("/login");
+    
+    // Force hard redirect to login page
+    window.location.replace("/login");
   };
 
   /* =========================
@@ -320,7 +432,6 @@ export default function Header() {
         </Link>
 
         <div className="header-contact">
-          {/* Search */}
           <div className="search-bar-container">
             {!isSearchVisible ? (
               <button
@@ -348,16 +459,15 @@ export default function Header() {
             )}
           </div>
 
-          {/* Auth Section */}
           <div className="login-container">
             {user ? (
               isAdmin ? (
                 <div className="btn-container">
-                  <Link href="/AdminDashboard" className="btn admin-btn">
+                  <Link href="/pages/AdminDashboard" className="btn admin-btn">
                     Admin
                   </Link>
                   <button
-                    onClick={handleLogout}
+                    onClick={(e) => handleLogout(e)}
                     className="btn logout-btn"
                     type="button"
                   >
@@ -370,13 +480,14 @@ export default function Header() {
                     className="profile-tri"
                     onClick={toggleDropdown}
                     role="button"
+                    onKeyDown={(e) => e.key === "Enter" && toggleDropdown()}
+                    tabIndex={0}
                   >
                     <img
-                      src={getAvatarUrl({ ...user, profileImage })}
+                      src={getAvatarUrl(user, profileImage)}
                       alt={user.fullName || "User"}
                       className="profile-image"
                       onError={(e) => {
-                        // Fallback to initials if image fails to load
                         const target = e.target as HTMLImageElement;
                         const initials = getInitials(user.fullName);
                         target.src = `https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=${encodeURIComponent(initials)}`;
@@ -395,7 +506,7 @@ export default function Header() {
                     <div className="dropdown-Menu show">
                       <div className="dropdown-header">
                         <img
-                          src={getAvatarUrl({ ...user, profileImage })}
+                          src={getAvatarUrl(user, profileImage)}
                           alt={user.fullName || "User"}
                           className="dropdown-profile-image"
                           onError={(e) => {
@@ -431,7 +542,11 @@ export default function Header() {
                       <div className="dropdown-divider" />
 
                       <button
-                        onClick={handleLogout}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleLogout(e);
+                        }}
                         className="dropdown-item"
                         type="button"
                       >

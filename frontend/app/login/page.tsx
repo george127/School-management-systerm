@@ -102,7 +102,7 @@ const LoginPage = () => {
       // Determine redirect based on role
       const roleFromResponse = data?.user?.role;
       const isAdmin = roleFromResponse === "admin";
-      const destination = isAdmin ? "/AdminDashboard" : "pages/StudentPortal";
+      const destination = isAdmin ? "pages/AdminDashboard" : "pages/StudentPortal";
 
       // Short timeout to show success message before redirect
       setTimeout(() => router.push(destination), 600);

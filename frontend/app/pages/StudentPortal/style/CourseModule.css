@@ -1,7 +1,9 @@
-/* Course Module Container */
-.course-module-container {
-  /* Container styles if needed */
-}
+/* Course Module Container - Updated with Brand Colors */
+
+/* Primary Orange: #e9691e */
+/* White: #fff */
+/* Dark Gray: #495057 / #333 */
+/* Light Orange: #ffeee4 */
 
 .course-module-container .course-header {
   margin-bottom: 30px;
@@ -13,7 +15,7 @@
 .course-module-container .course-banner {
   position: relative;
   height: 200px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #e9691e 0%, #d55a1a 100%);
 }
 
 .course-module-container .banner-image {
@@ -61,11 +63,11 @@
   align-items: center;
   gap: 10px;
   font-size: 0.9rem;
-  color: #666;
+  color: #495057;
 }
 
 .course-module-container .meta-item i {
-  color: #667eea;
+  color: #e9691e;
 }
 
 /* Progress Section */
@@ -99,7 +101,7 @@
 
 .course-module-container .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #4CAF50, #45a049);
+  background: #e9691e;
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -118,12 +120,12 @@
 .course-module-container .stat strong {
   display: block;
   font-size: 1.5rem;
-  color: #333;
+  color: #e9691e;
   margin-bottom: 5px;
 }
 
 .course-module-container .stat span {
-  color: #666;
+  color: #495057;
   font-size: 0.9rem;
 }
 
@@ -167,17 +169,18 @@
 }
 
 .course-module-container .module-item:hover {
-  border-color: #667eea;
+  border-color: #e9691e;
   transform: translateY(-2px);
+  background: #ffeee4;
 }
 
 .course-module-container .module-item.active {
-  border-color: #667eea;
-  background: #f8f9ff;
+  border-color: #e9691e;
+  background: #ffeee4;
 }
 
 .course-module-container .module-item.completed {
-  border-color: #4CAF50;
+  border-color: #e9691e;
 }
 
 .course-module-container .module-status {
@@ -186,7 +189,7 @@
 }
 
 .course-module-container .module-item.completed .module-status {
-  color: #4CAF50;
+  color: #e9691e;
 }
 
 .course-module-container .module-info {
@@ -200,12 +203,12 @@
 }
 
 .course-module-container .module-info span {
-  color: #666;
+  color: #495057;
   font-size: 0.8rem;
 }
 
 .course-module-container .module-arrow {
-  color: #666;
+  color: #495057;
 }
 
 /* Module Details */
@@ -237,12 +240,12 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  color: #666;
+  color: #495057;
   font-size: 0.9rem;
 }
 
 .course-module-container .completed-badge {
-  color: #4CAF50 !important;
+  color: #e9691e !important;
   font-weight: 600;
 }
 
@@ -279,9 +282,10 @@
 }
 
 .course-module-container .material-card:hover {
-  border-color: #667eea;
+  border-color: #e9691e;
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(233, 105, 30, 0.1);
+  background: #ffeee4;
 }
 
 .course-module-container .material-header {
@@ -297,7 +301,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f8f9ff;
+  background: #ffeee4;
   border-radius: 10px;
   flex-shrink: 0;
 }
@@ -311,7 +315,7 @@
 }
 
 .course-module-container .material-type {
-  color: #666;
+  color: #495057;
   font-size: 0.85rem;
 }
 
@@ -327,7 +331,7 @@
 }
 
 .course-module-container .start-btn {
-  background: #667eea;
+  background: #e9691e;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -339,7 +343,7 @@
 }
 
 .course-module-container .start-btn:hover {
-  background: #5a6fd8;
+  background: #d55a1a;
   transform: translateY(-1px);
 }
 
@@ -356,8 +360,8 @@
 }
 
 .course-module-container .material-item:hover {
-  border-color: #667eea;
-  background: #f8f9ff;
+  border-color: #e9691e;
+  background: #ffeee4;
 }
 
 .course-module-container .material-item .material-icon {
@@ -377,12 +381,12 @@
 }
 
 .course-module-container .material-item .material-info span {
-  color: #666;
+  color: #495057;
   font-size: 0.8rem;
 }
 
 .course-module-container .material-item .start-btn {
-  background: #667eea;
+  background: #e9691e;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -393,7 +397,7 @@
 }
 
 .course-module-container .material-item .start-btn:hover {
-  background: #5a6fd8;
+  background: #d55a1a;
 }
 
 /* Module Progress */
@@ -449,7 +453,7 @@
 }
 
 .course-module-container .status-dot.completed {
-  background: #4CAF50;
+  background: #e9691e;
 }
 
 .course-module-container .status-dot.in-progress {
@@ -473,7 +477,7 @@
 }
 
 .course-module-container .resource-card {
-  background: #f8f9ff;
+  background: #ffeee4;
   padding: 20px;
   border-radius: 8px;
   text-align: center;
@@ -484,12 +488,13 @@
 
 .course-module-container .resource-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 15px rgba(233, 105, 30, 0.1);
+  border-color: #e9691e;
 }
 
 .course-module-container .resource-card i {
   font-size: 2rem;
-  color: #667eea;
+  color: #e9691e;
   margin-bottom: 10px;
 }
 
@@ -499,7 +504,7 @@
 }
 
 .course-module-container .resource-card p {
-  color: #666;
+  color: #495057;
   font-size: 0.9rem;
   margin: 0;
 }
@@ -517,23 +522,30 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  border: 2px solid #667eea;
+  border: 2px solid #e9691e;
   border-radius: 8px;
   background: white;
-  color: #667eea;
+  color: #e9691e;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
 }
 
 .course-module-container .action-btn.primary {
-  background: #667eea;
+  background: #e9691e;
   color: white;
 }
 
 .course-module-container .action-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 5px 15px rgba(233, 105, 30, 0.3);
+  background: #ffeee4;
+  color: #e9691e;
+}
+
+.course-module-container .action-btn.primary:hover {
+  background: #d55a1a;
+  color: white;
 }
 
 /* Responsive Design */
@@ -580,12 +592,12 @@
     display: block;
     font-size: 1.5rem;
     font-weight: 700;
-    color: #667eea;
+    color: #e9691e;
     margin-bottom: 5px;
   }
   
   .course-module-container .stat span {
     font-size: 0.85rem;
-    color: #666;
+    color: #495057;
   }
 }

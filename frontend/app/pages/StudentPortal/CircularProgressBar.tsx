@@ -1,7 +1,20 @@
-// React Component
+// components/CircularProgressBar.tsx
+"use client";
+
+import React from "react";
+import Image from "next/image";
+import Strawberry from "./images/strawBerry.png";
 import "./style/CircularProgressBar.css";
-import Strawberry from "./images/strawBerry.png"
-const CircularProgressBar = ({
+
+interface CircularProgressBarProps {
+  percentage: number;
+  size?: number;
+  strokeWidth?: number;
+  trackColor?: string;
+  progressColor?: string;
+}
+
+const CircularProgressBar: React.FC<CircularProgressBarProps> = ({
   percentage,
   size = 120,
   strokeWidth = 10,
@@ -40,7 +53,7 @@ const CircularProgressBar = ({
         />
       </svg>
       <div className="percentage-text">
-        <img src={Strawberry} alt="" />
+        <Image src={Strawberry} alt="Strawberry" width={24} height={24} />
         <span>{percentage}%</span>
       </div>
     </div>
@@ -48,5 +61,3 @@ const CircularProgressBar = ({
 };
 
 export default CircularProgressBar;
-
-

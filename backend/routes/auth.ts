@@ -410,5 +410,89 @@ router.post('/auth/reset-password', async (req, res) => {
     res.status(500).json({ message: error.message || 'Failed to reset password' });
   }
 });
+ 
+// Backend route
+// Check Auth Route - Verify user session
+router.post('/auth/check-auth', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')[1];
+    
+    // Validate token presence
+    if (!token) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'No token provided' 
+      });
+    }
+    
+    // Verify JWT token
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    } catch (jwtError) {
+      console.error('JWT verification failed:', jwtError);
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Invalid or expired token' 
+      });
+    }
+    
+    // Fetch user from database using Prisma
+    const user = await prisma.user.findUnique({
+      where: { email: email?.toLowerCase() || decodedToken.email?.toLowerCase() }
+    });
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'User not found' 
+      });
+    }
+    
+    // Optional: Verify Cognito token with AWS if you want additional validation
+    // This is optional and adds an extra layer of security
+    let cognitoValid = true;
+    if (process.env.VERIFY_COGNITO_TOKEN === 'true') {
+      try {
+        const cognitoParams = {
+          AccessToken: token
+        };
+        await cognito.getUser(cognitoParams).promise();
+      } catch (cognitoError) {
+        console.error('Cognito token validation failed:', cognitoError);
+        cognitoValid = false;
+      }
+    }
+    
+    if (!cognitoValid) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Invalid Cognito session' 
+      });
+    }
+    
+    // Return user data
+    return res.json({
+      success: true,
+      user: {
+        id: user.id,
+        fullName: user.name,
+        email: user.email,
+        role: user.role,
+        studentId: user.studentId,
+        cognitoId: user.cognitoId
+      }
+    });
+    
+  } catch (error: any) {
+    console.error('Check auth error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Server error during authentication check' 
+    });
+  }
+});
 
 export default router;

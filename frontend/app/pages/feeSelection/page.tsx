@@ -34,6 +34,8 @@ function FeeSelectionPage() {
 
   const paymentLinks: Record<number, string> = {
     2000: "https://paystack.shop/pay/7faz2q19tm",
+    // 2000: "https://paystack.shop/pay/1kcg01rayo",
+    // https://paystack.shop/pay/1kcg01rayo
     1920: "https://paystack.shop/pay/7faz2q19tm",
   };
 
