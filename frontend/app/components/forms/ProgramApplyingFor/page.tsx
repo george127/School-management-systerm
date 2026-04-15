@@ -263,8 +263,8 @@ function ProgramApplyingFor({ onComplete, handleShowNext, studentEmail, formData
               <option value="Cloud Computing">Cloud Computing</option>
               <option value="Cyber Security">Cyber Security</option>
               <option value="Data Analytics">Data Analytics</option>
-              <option value="AI & Machine Learning">AI & Machine Learning</option>
-              <option value="DevOps">DevOps</option>
+              <option value="Digital Marketing">Digital Marketing</option>
+              <option value="Forex Trading">Forex Trading</option>
             </Form.Select>
             <Form.Control.Feedback type="invalid">
               {errors.programName}

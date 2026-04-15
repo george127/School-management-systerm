@@ -49,7 +49,7 @@ router.post('/auth/signup', async (req, res) => {
       return res.status(500).json({ 
         message: 'Server configuration error: Cognito credentials not properly configured' 
       });
-    }
+    } 
 
     // Register user in Cognito
     const signUpParams = {

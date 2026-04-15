@@ -1,10 +1,11 @@
-/* Course Module Container - Updated with Brand Colors */
+/* Course Module Container - Main Wrapper */
+.course-module-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
 
-/* Primary Orange: #e9691e */
-/* White: #fff */
-/* Dark Gray: #495057 / #333 */
-/* Light Orange: #ffeee4 */
-
+/* Course Header */
 .course-module-container .course-header {
   margin-bottom: 30px;
   border-radius: 12px;
@@ -50,86 +51,408 @@
   max-width: 600px;
 }
 
-.course-module-container .course-meta {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-  padding: 20px;
-  background: white;
-}
 
-.course-module-container .meta-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.9rem;
-  color: #495057;
-}
-
-.course-module-container .meta-item i {
-  color: #e9691e;
-}
 
 /* Progress Section */
 .course-module-container .progress-section {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
+  background: linear-gradient(135deg, #e9691e 0%, #d55a1a 100%);
+  border-radius: 20px;
+  padding: 28px 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 10px 30px rgba(233, 105, 30, 0.25);
+  position: relative;
+  overflow: hidden;
+  animation: pulse 2s ease-in-out;
+}
+
+.course-module-container .progress-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 1%, transparent 1%);
+  background-size: 50px 50px;
+  animation: progressPattern 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes progressPattern {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(50px, 50px);
+  }
 }
 
 .course-module-container .progress-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
 }
 
-.course-module-container .progress-header h3 {
+.course-module-container .progress-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.course-module-container .progress-title i {
+  font-size: 28px;
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 10px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.course-module-container .progress-title h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
   margin: 0;
-  color: #333;
 }
 
+.course-module-container .progress-percentage {
+  text-align: right;
+}
+
+.course-module-container .percentage-number {
+  font-size: 36px;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+}
+
+.course-module-container .percentage-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-left: 8px;
+}
+
+/* Progress Bar Container */
+.course-module-container .progress-bar-container {
+  position: relative;
+  margin-bottom: 40px;
+  padding: 0 4px;
+}
+
+/* Main Progress Bar Track */
 .course-module-container .progress-bar {
   height: 8px;
-  background: #e9ecef;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
   overflow: hidden;
-  margin-bottom: 20px;
+  position: relative;
+  cursor: pointer;
 }
 
+/* Progress Fill - The moving part */
 .course-module-container .progress-fill {
   height: 100%;
-  background: #e9691e;
-  border-radius: 4px;
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
+  background-size: 200% 100%;
+  border-radius: 20px;
+  position: relative;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(255, 165, 0, 0.5);
+  animation: gradientShift 2s ease infinite, slideIn 0.8s ease-out;
 }
 
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Glow effect that slides across the progress bar */
+.course-module-container .progress-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 20%,
+    rgba(255, 255, 255, 0.8) 40%,
+    rgba(255, 255, 255, 0.8) 60%,
+    rgba(255, 255, 255, 0.4) 80%,
+    transparent 100%
+  );
+  animation: progressGlow 2s ease-in-out infinite;
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+
+@keyframes progressGlow {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+/* Pulsing effect at the end of progress */
+.course-module-container .progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translate(50%, -50%);
+  width: 16px;
+  height: 16px;
+  background: #FFD700;
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+  animation: pulse 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(50%, -50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(50%, -50%) scale(1.4);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Hover effect */
+.course-module-container .progress-bar:hover .progress-fill {
+  filter: brightness(1.1);
+}
+
+.course-module-container .progress-bar:hover .progress-glow {
+  animation-duration: 1s;
+}
+
+/* Milestones Container */
+.course-module-container .progress-milestones {
+  position: relative;
+  margin-top: 12px;
+  height: 30px;
+  border-radius: 4px;
+}
+
+/* Connecting line between milestones */
+.course-module-container .progress-milestones::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+/* Individual Milestone */
+.course-module-container .milestone {
+  position: absolute;
+  transform: translateX(-50%);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Milestone Dot */
+.course-module-container .milestone-dot {
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid #FFD700;
+  border-radius: 50%;
+  margin: 0 auto 6px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+/* Milestone Label */
+.course-module-container .milestone span {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+/* Milestone Hover Effects */
+.course-module-container .milestone:hover .milestone-dot {
+  transform: scale(1.3);
+  background: #FFD700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.course-module-container .milestone:hover span {
+  color: white;
+  font-weight: 700;
+}
+
+/* Active milestone (when progress reaches or passes it) */
+.course-module-container .milestone.active .milestone-dot {
+  background: #FFD700;
+  border-color: white;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
+.course-module-container .milestone.active span {
+  color: #FFD700;
+  font-weight: 700;
+}
+
+/* Completed milestone */
+.course-module-container .milestone.completed .milestone-dot {
+  background: #4CAF50;
+  border-color: white;
+}
+
+.course-module-container .milestone.completed span {
+  color: #4CAF50;
+}
+
+/* Progress Stats Grid */
 .course-module-container .progress-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
-.course-module-container .stat {
-  padding: 10px;
+/* Stat Cards */
+.course-module-container .stat-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.course-module-container .stat strong {
+.course-module-container .stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.course-module-container .stat-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Stat Icons */
+.course-module-container .stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.course-module-container .stat-icon.completed-modules {
+  background: rgba(76, 175, 80, 0.25);
+  color: #4CAF50;
+}
+
+.course-module-container .stat-icon.completed-lessons {
+  background: rgba(33, 150, 243, 0.25);
+  color: #2196F3;
+}
+
+.course-module-container .stat-icon.total-lessons {
+  background: rgba(255, 193, 7, 0.25);
+  color: #FFC107;
+}
+
+/* Stat Info */
+.course-module-container .stat-info {
+  flex: 1;
+  display: flex;
+  gap: 10px;
+}
+
+.course-module-container .stat-info strong {
   display: block;
-  font-size: 1.5rem;
-  color: #e9691e;
-  margin-bottom: 5px;
+  font-size: 28px;
+  font-weight: 700;
+  color: rgb(61, 63, 71);
+  line-height: 1.2;
+  position: relative;
+  display: inline-block;
+  animation: countUp 0.8s ease-out;
 }
 
-.course-module-container .stat span {
-  color: #495057;
-  font-size: 0.9rem;
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Course Content */
+.course-module-container .stat-info span {
+  font-size: 13px;
+  color: rgba(51, 59, 78, 0.9);
+  font-weight: 500;
+}
+
+/* Stat Trend */
+.course-module-container .stat-trend {
+  font-size: 14px;
+  color: #4CAF50;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.course-module-container .stat-trend i {
+  font-size: 14px;
+}
+
+.course-module-container .stat-trend span {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Course Content Layout */
 .course-module-container .course-content {
   display: grid;
   grid-template-columns: 350px 1fr;
@@ -269,6 +592,7 @@
   margin-top: 20px;
 }
 
+/* Material Card */
 .course-module-container .material-card {
   background: white;
   border: 1px solid #e9ecef;
@@ -347,7 +671,7 @@
   transform: translateY(-1px);
 }
 
-/* Material Item (old style) */
+/* Material Item (Alternative style) */
 .course-module-container .material-item {
   display: flex;
   align-items: center;
@@ -400,7 +724,7 @@
   background: #d55a1a;
 }
 
-/* Module Progress */
+/* Module Progress Section */
 .course-module-container .module-progress {
   margin-top: 30px;
   padding-top: 20px;
@@ -444,6 +768,11 @@
 .course-module-container .progress-status {
   font-size: 0.8rem;
   font-weight: 600;
+}
+
+.course-module-container .progress-indicator {
+  display: flex;
+  align-items: center;
 }
 
 .course-module-container .status-dot {
@@ -515,6 +844,7 @@
   gap: 15px;
   justify-content: center;
   flex-wrap: wrap;
+  margin-top: 30px;
 }
 
 .course-module-container .action-btn {
@@ -548,8 +878,96 @@
   color: white;
 }
 
+/* Keyframe Animations */
+@keyframes progressPattern {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(50px, 50px);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes progressGlow {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(50%, -50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(50%, -50%) scale(1.4);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    width: 0 !important;
+  }
+  to {
+    width: var(--progress-width);
+  }
+}
+
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .course-module-container .progress-section {
+    padding: 24px;
+  }
+  
+  .course-module-container .progress-stats {
+    gap: 16px;
+  }
+  
+  .course-module-container .stat-card {
+    padding: 16px;
+  }
+  
+  .course-module-container .stat-info strong {
+    font-size: 24px;
+  }
+}
+
 @media (max-width: 768px) {
+  .course-module-container {
+    padding: 15px;
+  }
+  
   .course-module-container .course-content {
     grid-template-columns: 1fr;
   }
@@ -560,6 +978,60 @@
   
   .course-module-container .course-meta {
     grid-template-columns: 1fr;
+  }
+  
+  .course-module-container .progress-section {
+    padding: 20px;
+  }
+  
+  .course-module-container .progress-title h3 {
+    font-size: 18px;
+  }
+  
+  .course-module-container .progress-title i {
+    font-size: 22px;
+    padding: 8px;
+  }
+  
+  .course-module-container .percentage-number {
+    font-size: 28px;
+  }
+  
+  .course-module-container .percentage-label {
+    font-size: 12px;
+  }
+  
+  .course-module-container .progress-stats {
+    gap: 12px;
+  }
+  
+  .course-module-container .stat-card {
+    padding: 12px;
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+  
+  .course-module-container .stat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+  
+  .course-module-container .stat-info strong {
+    font-size: 22px;
+  }
+  
+  .course-module-container .stat-info span {
+    font-size: 11px;
+  }
+  
+  .course-module-container .stat-trend {
+    display: none;
+  }
+  
+  .course-module-container .progress-milestones {
+    display: none;
   }
   
   .course-module-container .resources-grid {
@@ -600,4 +1072,54 @@
     font-size: 0.85rem;
     color: #495057;
   }
+}
+
+@media (max-width: 480px) {
+  .course-module-container .progress-stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .course-module-container .stat-card {
+    flex-direction: row;
+    text-align: left;
+    padding: 14px;
+  }
+  
+  .course-module-container .stat-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+  
+  .course-module-container .stat-info strong {
+    font-size: 20px;
+  }
+  
+  .course-module-container .milestone span {
+    display: none;
+  }
+  
+  .course-module-container .milestone-dot {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .course-module-container .progress-milestones {
+    margin-top: 10px;
+    height: 15px;
+  }
+}
+
+/* Utility Classes */
+.course-module-container .text-center {
+  text-align: center;
+}
+
+.course-module-container .mt-20 {
+  margin-top: 20px;
+}
+
+.course-module-container .mb-20 {
+  margin-bottom: 20px;
 }

@@ -1,22 +1,22 @@
-// app/pages/StudentPortal/CourseModule.tsx
 "use client";
 
 import { useState } from "react";
 import "./style/CourseModule.css";
-
+import Image from "next/image";
+import love from "./images/hardware-engineer-developers.avif";
 // Types
 interface Material {
   id: number;
   type: string;
   title: string;
-  duration: string;
+  duration?: string; // Only videos will have duration
   status: "completed" | "in-progress" | "not-started";
+  fileUrl?: string;
 }
 
 interface Module {
   id: number;
   title: string;
-  duration: string;
   lessons: number;
   completed: boolean;
   materials: Material[];
@@ -26,7 +26,6 @@ interface CourseData {
   title: string;
   instructor: string;
   description: string;
-  duration: string;
   level: string;
   enrolledStudents: number;
   rating: number;
@@ -45,14 +44,13 @@ type StatusTexts = {
 
 const CourseModule = () => {
   const [selectedModule, setSelectedModule] = useState<number>(0);
-  const [progress] = useState<number>(35); // Example progress percentage
+  const [progress] = useState<number>(35);
 
-  // Generic course data structure that works for any subject
+  // Course data structure - NO durations on modules, only videos have duration
   const courseData: CourseData = {
     title: "Course Title",
     instructor: "Instructor Name",
     description: "Course description and overview of what students will learn.",
-    duration: "8 weeks",
     level: "Beginner",
     enrolledStudents: 1247,
     rating: 4.8,
@@ -60,14 +58,13 @@ const CourseModule = () => {
       {
         id: 1,
         title: "Module 1: Introduction",
-        duration: "2 hours",
         lessons: 3,
         completed: true,
         materials: [
           { 
             id: 1,
             type: "video", 
-            title: "Welcome and Course Overview", 
+            title: "Welcome and Course Overview",
             duration: "15 min",
             status: "completed"
           },
@@ -75,14 +72,12 @@ const CourseModule = () => {
             id: 2,
             type: "document", 
             title: "Course Syllabus and Requirements", 
-            duration: "10 min read",
             status: "completed"
           },
           { 
             id: 3,
-            type: "quiz", 
-            title: "Introduction Quiz", 
-            duration: "10 min",
+            type: "assignment", 
+            title: "Introduction Assignment", 
             status: "completed"
           }
         ]
@@ -90,14 +85,13 @@ const CourseModule = () => {
       {
         id: 2,
         title: "Module 2: Core Concepts",
-        duration: "3 hours",
-        lessons: 4,
+        lessons: 3,
         completed: true,
         materials: [
           { 
             id: 4,
             type: "video", 
-            title: "Key Concepts Lecture", 
+            title: "Key Concepts Lecture",
             duration: "25 min",
             status: "completed"
           },
@@ -105,21 +99,12 @@ const CourseModule = () => {
             id: 5,
             type: "document", 
             title: "Study Guide and References", 
-            duration: "20 min read",
             status: "completed"
           },
           { 
             id: 6,
             type: "assignment", 
             title: "Practice Exercise", 
-            duration: "45 min",
-            status: "completed"
-          },
-          { 
-            id: 7,
-            type: "quiz", 
-            title: "Concepts Review", 
-            duration: "15 min",
             status: "completed"
           }
         ]
@@ -127,43 +112,26 @@ const CourseModule = () => {
       {
         id: 3,
         title: "Module 3: Advanced Topics",
-        duration: "4 hours",
-        lessons: 5,
+        lessons: 3,
         completed: false,
         materials: [
           { 
-            id: 8,
+            id: 7,
             type: "video", 
-            title: "Advanced Techniques", 
+            title: "Advanced Techniques",
             duration: "30 min",
             status: "in-progress"
           },
           { 
-            id: 9,
-            type: "video", 
-            title: "Case Studies", 
-            duration: "25 min",
-            status: "not-started"
-          },
-          { 
-            id: 10,
+            id: 8,
             type: "document", 
             title: "Research Materials", 
-            duration: "30 min read",
             status: "not-started"
           },
           { 
-            id: 11,
+            id: 9,
             type: "assignment", 
             title: "Project Work", 
-            duration: "2 hours",
-            status: "not-started"
-          },
-          { 
-            id: 12,
-            type: "quiz", 
-            title: "Advanced Assessment", 
-            duration: "20 min",
             status: "not-started"
           }
         ]
@@ -171,29 +139,26 @@ const CourseModule = () => {
       {
         id: 4,
         title: "Module 4: Final Project",
-        duration: "5 hours",
         lessons: 3,
         completed: false,
         materials: [
           { 
-            id: 13,
+            id: 10,
             type: "video", 
-            title: "Project Guidelines", 
+            title: "Project Guidelines",
             duration: "20 min",
             status: "not-started"
           },
           { 
-            id: 14,
-            type: "assignment", 
-            title: "Final Project Submission", 
-            duration: "3 hours",
+            id: 11,
+            type: "document", 
+            title: "Submission Guidelines", 
             status: "not-started"
           },
           { 
-            id: 15,
-            type: "document", 
-            title: "Submission Guidelines", 
-            duration: "15 min read",
+            id: 12,
+            type: "assignment", 
+            title: "Final Project Submission", 
             status: "not-started"
           }
         ]
@@ -202,7 +167,6 @@ const CourseModule = () => {
   };
 
   const handleMaterialClick = (material: Material): void => {
-    // In real app, this would navigate to the material
     console.log("Opening material:", material);
     alert(`Opening: ${material.title}`);
   };
@@ -211,7 +175,6 @@ const CourseModule = () => {
     switch (type) {
       case 'video': return '🎬';
       case 'document': return '📄';
-      case 'quiz': return '📝';
       case 'assignment': return '📋';
       default: return '📄';
     }
@@ -235,79 +198,136 @@ const CourseModule = () => {
     return texts[status] || 'Not Started';
   };
 
+  // Helper to get display duration - only show for videos
+  const getDisplayDuration = (material: Material): string => {
+    if (material.type === 'video' && material.duration) {
+      return ` • ${material.duration}`;
+    }
+    return '';
+  };
+
+  // Helper to get material type display
+  const getMaterialTypeDisplay = (material: Material): string => {
+    const type = material.type.charAt(0).toUpperCase() + material.type.slice(1);
+    const duration = getDisplayDuration(material);
+    return `${type}${duration}`;
+  };
+
   return (
     <div className="course-module-container">
       {/* Course Header */}
       <div className="course-header">
         <div className="course-banner">
-          <img 
-            src="/api/placeholder/800/200" 
-            alt="Course Banner" 
+          <Image
+            src={love}
+            alt="Course Banner"
             className="banner-image"
+            width={800}
+            height={200}
           />
+
           <div className="course-overlay">
             <h1>{courseData.title}</h1>
             <p>{courseData.description}</p>
           </div>
         </div>
-        
-        <div className="course-meta">
-          <div className="meta-item">
-            <i className="bi bi-person"></i>
-            <span>Instructor: {courseData.instructor}</span>
-          </div>
-          <div className="meta-item">
-            <i className="bi bi-clock"></i>
-            <span>Duration: {courseData.duration}</span>
-          </div>
-          <div className="meta-item">
-            <i className="bi bi-graph-up"></i>
-            <span>Level: {courseData.level}</span>
-          </div>
-          <div className="meta-item">
-            <i className="bi bi-people"></i>
-            <span>Students: {courseData.enrolledStudents.toLocaleString()}</span>
-          </div>
-          <div className="meta-item">
-            <i className="bi bi-star-fill"></i>
-            <span>Rating: {courseData.rating}/5.0</span>
-          </div>
-        </div>
       </div>
 
       {/* Progress Section */}
-      <div className="progress-section">
-        <div className="progress-header">
-          <h3>Your Progress</h3>
-          <span>{progress}% Complete</span>
-        </div>
-        <div className="progress-bar">
-          <div 
-            className="progress-fill" 
-            style={{ width: `${progress}%` }}
-          ></div>
-        </div>
-        <div className="progress-stats">
-          <div className="stat">
-            <strong>{courseData.modules.filter(m => m.completed).length}</strong>
-            <span>Completed Modules</span>
-          </div>
-          <div className="stat">
-            <strong>
-              {courseData.modules.reduce((total, module) => 
-                total + module.materials.filter(m => m.status === 'completed').length, 0
-              )}
-            </strong>
-            <span>Completed Lessons</span>
-          </div>
-          <div className="stat">
-            <strong>
-              {courseData.modules.reduce((total, module) => total + module.materials.length, 0)}
-            </strong>
-            <span>Total Lessons</span>
-          </div>
-        </div>
+<div className="progress-section">
+  <div className="progress-header">
+    <div className="progress-title">
+      <i className="bi bi-graph-up-arrow"></i>
+      <h3>Learning Journey</h3>
+    </div>
+    <div className="progress-percentage">
+      <span className="percentage-number">{progress}%</span>
+      <span className="percentage-label">Complete</span>
+    </div>
+  </div>
+  
+  <div className="progress-bar-container">
+    <div className="progress-bar">
+      <div 
+        className="progress-fill" 
+        style={{ width: `${progress}%` }}
+      >
+        <div className="progress-glow"></div>
       </div>
+    </div>
+    <div className="progress-milestones">
+      <div className="milestone" style={{ left: '25%' }}>
+        <div className="milestone-dot"></div>
+        <span>25%</span>
+      </div>
+      <div className="milestone" style={{ left: '50%' }}>
+        <div className="milestone-dot"></div>
+        <span>50%</span>
+      </div>
+      <div className="milestone" style={{ left: '75%' }}>
+        <div className="milestone-dot"></div>
+        <span>75%</span>
+      </div>
+      <div className="milestone" style={{ left: '100%' }}>
+        <div className="milestone-dot"></div>
+        <span>100%</span>
+      </div>
+    </div>
+  </div>
+  
+  <div className="progress-stats">
+    <div className="stat-card">
+      <div className="stat-icon completed-modules">
+        <i className="bi bi-journal-check"></i>
+      </div>
+      <div className="stat-info">
+        <strong>{courseData.modules.filter(m => m.completed).length}</strong>
+        <span>Completed Modules</span>
+      </div>
+      <div className="stat-trend">
+        <i className="bi bi-arrow-up-short"></i>
+        <span>+{courseData.modules.filter(m => m.completed).length}</span>
+      </div>
+    </div>
+    
+    <div className="stat-card">
+      <div className="stat-icon completed-lessons">
+        <i className="bi bi-check-circle-fill"></i>
+      </div>
+      <div className="stat-info">
+        <strong>
+          {courseData.modules.reduce((total, module) => 
+            total + module.materials.filter(m => m.status === 'completed').length, 0
+          )}
+        </strong>
+        <span>Completed Lessons</span>
+      </div>
+      <div className="stat-trend">
+        <i className="bi bi-arrow-up-short"></i>
+        <span>
+          +{courseData.modules.reduce((total, module) => 
+            total + module.materials.filter(m => m.status === 'completed').length, 0
+          )}
+        </span>
+      </div>
+    </div>
+    
+    <div className="stat-card">
+      <div className="stat-icon total-lessons">
+        <i className="bi bi-book-half"></i>
+      </div>
+      <div className="stat-info">
+        <strong>
+          {courseData.modules.reduce((total, module) => total + module.materials.length, 0)}
+        </strong>
+        <span>Total Lessons</span>
+      </div>
+      <div className="stat-trend">
+        <i className="bi bi-flag"></i>
+      </div>
+    </div>
+  </div>
+</div>
 
       <div className="course-content">
         {/* Modules Sidebar */}
@@ -329,7 +349,7 @@ const CourseModule = () => {
                 </div>
                 <div className="module-info">
                   <h5>{module.title}</h5>
-                  <span>{module.duration} • {module.lessons} lessons</span>
+                  <span>{module.lessons} lessons</span>
                 </div>
                 <div className="module-arrow">
                   <i className="bi bi-chevron-right"></i>
@@ -346,10 +366,6 @@ const CourseModule = () => {
               <div className="module-header">
                 <h2>{courseData.modules[selectedModule].title}</h2>
                 <div className="module-meta">
-                  <span className="duration">
-                    <i className="bi bi-clock"></i>
-                    {courseData.modules[selectedModule].duration}
-                  </span>
                   <span className="lessons">
                     <i className="bi bi-list-ul"></i>
                     {courseData.modules[selectedModule].lessons} lessons
@@ -379,7 +395,7 @@ const CourseModule = () => {
                         <div className="material-title-section">
                           <h5>{material.title}</h5>
                           <span className="material-type">
-                            {material.type.charAt(0).toUpperCase() + material.type.slice(1)} • {material.duration}
+                            {getMaterialTypeDisplay(material)}
                           </span>
                         </div>
                       </div>
@@ -432,10 +448,6 @@ const CourseModule = () => {
 
       {/* Quick Actions */}
       <div className="quick-actions">
-        <button className="action-btn primary">
-          <i className="bi bi-download"></i>
-          Download Course Materials
-        </button>
         <button className="action-btn secondary">
           <i className="bi bi-chat"></i>
           Ask Instructor

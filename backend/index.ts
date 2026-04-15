@@ -12,6 +12,7 @@ import studentProfileRoutes from './routes/studentProfile';
 import forgotpasswordRoutes from './routes/forgotpassword';
 import paymentInfoRoutes from './routes/paymentInfo';
 import adminRoutes from './routes/adminRoute/adminRoutes';
+import courseContentRoutes from './routes/courseContentRoute';
 
 
 const app = express();
@@ -23,6 +24,10 @@ const allowedOrigins = [
   "http://localhost:5000",
   "http://localhost:3000",
 ];
+
+// Body parsers with increased limits
+app.use(express.json({ limit: '2gb' }));
+app.use(express.urlencoded({ extended: true, limit: '2gb' }));
 
 // Test database connection on startup
 async function testDatabaseConnection() {
@@ -64,7 +69,7 @@ app.use(
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"], // Add PATCH here
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
@@ -169,6 +174,7 @@ app.use("/api", studentProfileRoutes);
 app.use("/api", forgotpasswordRoutes);
 app.use("/api/payment-info", paymentInfoRoutes);
 app.use('/api/admin', adminRoutes);  
+app.use('/api/content-files', courseContentRoutes);
 
 
 // Error handling middleware
