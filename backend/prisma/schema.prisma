@@ -143,14 +143,35 @@ model Course {
   @@index([isPublished])
 }
 
-//////////////////////////
-// COURSE CONTENT MODEL
-//////////////////////////
+// Add after Program model
+model Module {
+  id          Int            @id @default(autoincrement())
+  title       String
+  description String?
+  order       Int            @default(0)
+  programName String         // Which program this module belongs to
+  status      ContentStatus  @default(draft)
+  
+  // Content items in this module (1 video, 1 document, 1 assignment)
+  contents    CourseContent[]
+  
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  
+  @@unique([programName, order])
+  @@index([programName])
+  @@index([order])
+}
 
+// Update CourseContent model - add moduleId
 model CourseContent {
   id          Int         @id @default(autoincrement())
   courseId    Int?        
   course      Course?     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  // New: Link to Module
+  moduleId    Int?
+  module      Module?     @relation(fields: [moduleId], references: [id], onDelete: SetNull)
   
   programName String
   title       String
@@ -160,7 +181,7 @@ model CourseContent {
   
   // File information
   fileUrl     String?
-  thumbnailUrl String?    // ADD THIS - Thumbnail URL for videos
+  thumbnailUrl String?
   fileSize    Int?
   mimeType    String?
   duration    String?
@@ -173,32 +194,11 @@ model CourseContent {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   
-  assignment  Assignment?
   contentProgress ContentProgress[] 
   
   @@index([programName])
   @@index([courseId])
-}
-
-//////////////////////////
-// ASSIGNMENT MODEL (for assignments that need submissions)
-//////////////////////////
-
-model Assignment {
-  id                Int              @id @default(autoincrement())
-  contentId         Int              @unique
-  content           CourseContent    @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  
-  dueDate           DateTime?
-  maxPoints         Int?             @default(100)
-  passingScore      Int?             @default(60)
-  instructions      String?
-  allowedAttempts   Int?             @default(1)
-  
-  submissions       AssignmentSubmission[]
-  
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
+  @@index([moduleId])
 }
 
 //////////////////////////
@@ -207,24 +207,23 @@ model Assignment {
 
 model AssignmentSubmission {
   id              Int            @id @default(autoincrement())
-  assignmentId    Int
-  assignment      Assignment     @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
-  
+  assignmentId    Int            
   studentId       Int
   student         Student        @relation(fields: [studentId], references: [id])
   
-  submissionUrl   String         // URL to submitted file
-  submissionText  String?        // Text submission if applicable
+  submissionUrl   String?
+  submissionText  String?
   submittedAt     DateTime       @default(now())
   
   grade           Float?
   feedback        String?
-  gradedBy        Int?           // User ID of grader
+  gradedBy        Int?
   gradedAt        DateTime?
   
   attemptNumber   Int            @default(1)
   status          SubmissionStatus @default(submitted)
   
+  @@unique([assignmentId, studentId]) 
   @@unique([assignmentId, studentId, attemptNumber])
   @@index([assignmentId])
   @@index([studentId])
@@ -328,4 +327,19 @@ model Payment {
   @@index([status])
   @@index([transactionId])
   @@index([courseId])
+}
+
+model AssignmentNotification {
+  id             Int      @id @default(autoincrement())
+  adminId        Int      // Which admin receives it
+  submissionId   Int      // Link to the submission
+  studentName    String
+  assignmentTitle String
+  programName    String
+  read           Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  
+  @@index([adminId])
+  @@index([read])
+  @@index([createdAt])
 }

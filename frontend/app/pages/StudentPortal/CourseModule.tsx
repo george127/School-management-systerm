@@ -1,444 +1,1022 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./style/CourseModule.css";
-import Image from "next/image";
-import love from "./images/hardware-engineer-developers.avif";
-// Types
+import VideoPlayer from "./VideoPlayer";
+
+// Types - ADD NEW TYPES
+interface AssignmentSubmission {
+  id: number;
+  submissionUrl?: string | null;
+  submissionText?: string | null;
+  grade?: number;
+  feedback?: string;
+  status: string;
+  attemptNumber: number;
+  submittedAt: string;
+}
 interface Material {
   id: number;
   type: string;
   title: string;
-  duration?: string; // Only videos will have duration
+  duration?: string;
   status: "completed" | "in-progress" | "not-started";
   fileUrl?: string;
+  thumbnailUrl?: string;
+  description?: string;
+  lastPosition?: number;
+  hasSubmitted?: boolean; // NEW - track if assignment submitted
+  submissionId?: number; // NEW
 }
 
 interface Module {
   id: number;
   title: string;
+  description: string;
+  order: number;
   lessons: number;
   completed: boolean;
   materials: Material[];
 }
 
 interface CourseData {
-  title: string;
-  instructor: string;
-  description: string;
-  level: string;
-  enrolledStudents: number;
-  rating: number;
+  programName: string;
+  studentName: string;
+  studentEmail: string;
+  progress: number;
   modules: Module[];
+  stats: {
+    totalModules: number;
+    totalLessons: number;
+    completedLessons: number;
+  };
 }
 
-// Type for status colors
 type StatusColors = {
-  [key in Material['status']]: string;
+  [key in Material["status"]]: string;
 };
 
-// Type for status texts
 type StatusTexts = {
-  [key in Material['status']]: string;
+  [key in Material["status"]]: string;
+};
+
+const normalizeStatus = (status: string | undefined): Material["status"] => {
+  if (status === "completed") return "completed";
+  if (status === "in-progress") return "in-progress";
+  return "not-started";
 };
 
 const CourseModule = () => {
   const [selectedModule, setSelectedModule] = useState<number>(0);
-  const [progress] = useState<number>(35);
+  const [courseData, setCourseData] = useState<CourseData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<any>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lockedModuleMessage, setLockedModuleMessage] = useState<string | null>(
+    null,
+  );
+  const [toastMessage, setToastMessage] = useState<{
+    type: string;
+    text: string;
+  } | null>(null);
 
-  // Course data structure - NO durations on modules, only videos have duration
-  const courseData: CourseData = {
-    title: "Course Title",
-    instructor: "Instructor Name",
-    description: "Course description and overview of what students will learn.",
-    level: "Beginner",
-    enrolledStudents: 1247,
-    rating: 4.8,
-    modules: [
-      {
-        id: 1,
-        title: "Module 1: Introduction",
-        lessons: 3,
-        completed: true,
-        materials: [
-          { 
-            id: 1,
-            type: "video", 
-            title: "Welcome and Course Overview",
-            duration: "15 min",
-            status: "completed"
-          },
-          { 
-            id: 2,
-            type: "document", 
-            title: "Course Syllabus and Requirements", 
-            status: "completed"
-          },
-          { 
-            id: 3,
-            type: "assignment", 
-            title: "Introduction Assignment", 
-            status: "completed"
-          }
-        ]
-      },
-      {
-        id: 2,
-        title: "Module 2: Core Concepts",
-        lessons: 3,
-        completed: true,
-        materials: [
-          { 
-            id: 4,
-            type: "video", 
-            title: "Key Concepts Lecture",
-            duration: "25 min",
-            status: "completed"
-          },
-          { 
-            id: 5,
-            type: "document", 
-            title: "Study Guide and References", 
-            status: "completed"
-          },
-          { 
-            id: 6,
-            type: "assignment", 
-            title: "Practice Exercise", 
-            status: "completed"
-          }
-        ]
-      },
-      {
-        id: 3,
-        title: "Module 3: Advanced Topics",
-        lessons: 3,
-        completed: false,
-        materials: [
-          { 
-            id: 7,
-            type: "video", 
-            title: "Advanced Techniques",
-            duration: "30 min",
-            status: "in-progress"
-          },
-          { 
-            id: 8,
-            type: "document", 
-            title: "Research Materials", 
-            status: "not-started"
-          },
-          { 
-            id: 9,
-            type: "assignment", 
-            title: "Project Work", 
-            status: "not-started"
-          }
-        ]
-      },
-      {
-        id: 4,
-        title: "Module 4: Final Project",
-        lessons: 3,
-        completed: false,
-        materials: [
-          { 
-            id: 10,
-            type: "video", 
-            title: "Project Guidelines",
-            duration: "20 min",
-            status: "not-started"
-          },
-          { 
-            id: 11,
-            type: "document", 
-            title: "Submission Guidelines", 
-            status: "not-started"
-          },
-          { 
-            id: 12,
-            type: "assignment", 
-            title: "Final Project Submission", 
-            status: "not-started"
-          }
-        ]
+  // NEW: Assignment modal state
+  const [selectedAssignment, setSelectedAssignment] = useState<{
+    contentId: number;
+    title: string;
+    dueDate?: string;
+    instructions?: string;
+    maxPoints?: number;
+    existingSubmission?: AssignmentSubmission;
+  } | null>(null);
+
+  const [submissionFile, setSubmissionFile] = useState<File | null>(null);
+  const [submissionText, setSubmissionText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user.email) {
+          setUserEmail(user.email);
+        } else {
+          setError("User email not found");
+          setIsLoading(false);
+        }
+      } catch (err) {
+        setError("Invalid user data");
+        setIsLoading(false);
       }
-    ]
-  };
+    } else {
+      setError("Please log in");
+      setIsLoading(false);
+    }
+  }, []);
 
-  const handleMaterialClick = (material: Material): void => {
-    console.log("Opening material:", material);
-    alert(`Opening: ${material.title}`);
-  };
+  useEffect(() => {
+    if (userEmail) {
+      fetchCourseContent();
+    }
+  }, [userEmail]);
 
-  const getMaterialIcon = (type: string): string => {
-    switch (type) {
-      case 'video': return '🎬';
-      case 'document': return '📄';
-      case 'assignment': return '📋';
-      default: return '📄';
+  const fetchCourseContent = async (showRefresh = false) => {
+  if (showRefresh) setRefreshing(true);
+  setIsLoading(true);
+  try {
+    const API_URL =
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+    const response = await fetch(
+      `${API_URL}/api/content-files/student/course-content?email=${encodeURIComponent(userEmail!)}`,
+    );
+
+    if (!response.ok) throw new Error("Failed to fetch");
+
+    const data = await response.json();
+
+    if (data && data.modules) {
+      // Fetch submission status for all assignments
+      for (const module of data.modules) {
+        for (const material of module.materials) {
+          material.status = normalizeStatus(material.status as string);
+          
+          // If this is an assignment, check if student has submitted
+          if (material.type === "assignment") {
+            try {
+              const submissionCheck = await fetch(
+                `${API_URL}/api/assignments/content/${material.id}/details?email=${encodeURIComponent(userEmail!)}`,
+              );
+              if (submissionCheck.ok) {
+                const submissionData = await submissionCheck.json();
+                if (submissionData.submission) {
+                  material.status = "completed";
+                  material.hasSubmitted = true;
+                  material.submissionId = submissionData.submission.id;
+                }
+              }
+            } catch (err) {
+              console.error("Error checking submission:", err);
+            }
+          }
+        }
+      }
+    }
+
+    setCourseData(data);
+    setLockedModuleMessage(null);
+  } catch (err: any) {
+    setError(err.message);
+  } finally {
+    setIsLoading(false);
+    if (showRefresh) setRefreshing(false);
+  }
+};
+
+  const markContentCompleted = async (
+    contentId: number,
+    contentTitle: string,
+  ) => {
+    try {
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const response = await fetch(
+        `${API_URL}/api/video-progress/content/mark-completed`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: userEmail,
+            contentId: contentId,
+            isCompleted: true,
+          }),
+        },
+      );
+
+      if (response.ok) {
+        setToastMessage({
+          type: "success",
+          text: `✅ "${contentTitle}" marked as completed!`,
+        });
+        setTimeout(() => setToastMessage(null), 3000);
+        await fetchCourseContent(true);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error:", error);
+      return false;
     }
   };
 
-  const getStatusColor = (status: Material['status']): string => {
+  const handleDocumentClick = async (material: Material) => {
+    if (material.fileUrl) {
+      window.open(material.fileUrl, "_blank");
+      if (material.status !== "completed") {
+        await markContentCompleted(material.id, material.title);
+      }
+    }
+  };
+
+  const handleVideoClick = async (video: Material) => {
+    setSelectedVideo({
+      url: video.fileUrl!,
+      contentId: video.id,
+      title: video.title,
+    });
+  };
+
+  const closeVideoModal = () => {
+    setSelectedVideo(null);
+    fetchCourseContent(true);
+  };
+
+
+   // NEW: Fetch assignment details
+    const fetchAssignmentDetails = async (contentId: number, title: string) => {
+      try {
+        const API_URL =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+        const response = await fetch(
+          `${API_URL}/api/assignments/content/${contentId}/details?email=${encodeURIComponent(userEmail!)}`,
+        );
+
+        if (!response.ok) throw new Error("Failed to fetch assignment details");
+
+        const data = await response.json();
+
+        setSelectedAssignment({
+          contentId: data.contentId,
+          title: data.title,
+          dueDate: data.dueDate,
+          instructions: data.instructions || data.description,
+          maxPoints: data.maxPoints,
+          existingSubmission: data.submission,
+        });
+      } catch (error) {
+        console.error("Error fetching assignment:", error);
+        setToastMessage({
+          type: "error",
+          text: "Failed to load assignment details",
+        });
+        setTimeout(() => setToastMessage(null), 3000);
+      }
+    };
+
+    // NEW: Submit assignment
+    const handleSubmitAssignment = async () => {
+      if (!selectedAssignment) return;
+
+      if (!submissionText && !submissionFile) {
+        setToastMessage({
+          type: "error",
+          text: "Please provide text or upload a file",
+        });
+        setTimeout(() => setToastMessage(null), 3000);
+        return;
+      }
+
+      setIsSubmitting(true);
+
+      try {
+        const API_URL =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+        const formData = new FormData();
+        formData.append("contentId", selectedAssignment.contentId.toString());
+        formData.append("email", userEmail!);
+        if (submissionText) formData.append("submissionText", submissionText);
+        if (submissionFile) formData.append("file", submissionFile);
+
+        const response = await fetch(`${API_URL}/api/assignments/submit`, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || "Submission failed");
+        }
+
+        const result = await response.json();
+
+        setToastMessage({ type: "success", text: result.message });
+        setTimeout(() => setToastMessage(null), 3000);
+
+        // Close modal and refresh
+        setSelectedAssignment(null);
+        setSubmissionFile(null);
+        setSubmissionText("");
+        await fetchCourseContent(true);
+      } catch (error: any) {
+        console.error("Submission error:", error);
+        setToastMessage({ type: "error", text: error.message });
+        setTimeout(() => setToastMessage(null), 3000);
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+
+    // NEW: View submission (opens modal with existing submission)
+    const handleViewSubmission = async (material: Material) => {
+      await fetchAssignmentDetails(material.id, material.title);
+    };
+
+
+
+  const handleVideoProgressUpdate = async () => {
+    await fetchCourseContent(true);
+  };
+
+  const isModuleAccessible = (moduleIndex: number): boolean => {
+    if (!courseData) return false;
+    if (moduleIndex === 0) return true;
+    const previousModule = courseData.modules[moduleIndex - 1];
+    return previousModule?.completed === true;
+  };
+
+  const handleModuleClick = (index: number) => {
+    if (isModuleAccessible(index)) {
+      setSelectedModule(index);
+      setLockedModuleMessage(null);
+    } else {
+      const previousModule = courseData?.modules[index - 1];
+      setLockedModuleMessage(
+        `⚠️ Module "${previousModule?.title}" must be completed before accessing "${courseData?.modules[index]?.title}".\n\nComplete all materials in the current module to unlock the next module.`,
+      );
+      setTimeout(() => setLockedModuleMessage(null), 5000);
+    }
+  };
+
+  const getStatusColor = (status: Material["status"]): string => {
     const colors: StatusColors = {
-      'completed': '#4CAF50',
-      'in-progress': '#2196F3',
-      'not-started': '#9E9E9E'
+      completed: "#4CAF50",
+      "in-progress": "#2196F3",
+      "not-started": "#9E9E9E",
     };
-    return colors[status] || '#666';
+    return colors[status];
   };
 
-  const getMaterialStatusText = (status: Material['status']): string => {
+  const getMaterialStatusText = (status: Material["status"]): string => {
     const texts: StatusTexts = {
-      'completed': 'Completed',
-      'in-progress': 'In Progress',
-      'not-started': 'Not Started'
+      completed: "Completed",
+      "in-progress": "In Progress",
+      "not-started": "Not Started",
     };
-    return texts[status] || 'Not Started';
+    return texts[status];
   };
 
-  // Helper to get display duration - only show for videos
   const getDisplayDuration = (material: Material): string => {
-    if (material.type === 'video' && material.duration) {
+    if (material.type === "video" && material.duration) {
       return ` • ${material.duration}`;
     }
-    return '';
+    return "";
   };
 
-  // Helper to get material type display
   const getMaterialTypeDisplay = (material: Material): string => {
     const type = material.type.charAt(0).toUpperCase() + material.type.slice(1);
     const duration = getDisplayDuration(material);
     return `${type}${duration}`;
   };
 
+  const getModuleProgress = (module: Module): number => {
+    if (!module.materials.length) return 0;
+    const completedCount = module.materials.filter(
+      (m) => m.status === "completed",
+    ).length;
+    return (completedCount / module.materials.length) * 100;
+  };
+
+  // UPDATED: No mark complete button for assignments
+  const renderMarkCompleteButton = (material: Material) => {
+    if (material.type === "assignment") return null; // REMOVED for assignments
+
+    if (material.status === "completed") {
+      return (
+        <button className="start-btn completed" disabled>
+          ✓ Completed
+        </button>
+      );
+    }
+
+   
+
+    return (
+      <button
+        className="start-btn mark-complete"
+        onClick={(e) => {
+          e.stopPropagation();
+          markContentCompleted(material.id, material.title);
+        }}
+      >
+        Mark as Completed
+      </button>
+    );
+  };
+
+  if (isLoading && !refreshing) {
+    return (
+      <div className="course-module-container">
+        <div className="loading-state">
+          <div className="loading-spinner"></div>
+          <p>Loading your course content...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !courseData) {
+    return (
+      <div className="course-module-container">
+        <div className="error-state">
+          <span className="material-symbols-outlined">error</span>
+          <p>{error || "No course content available"}</p>
+          <button onClick={() => fetchCourseContent()}>Try Again</button>
+        </div>
+      </div>
+    );
+  }
+
+  const currentModule = courseData.modules[selectedModule];
+  const overallProgress = courseData.progress;
+
   return (
     <div className="course-module-container">
-      {/* Course Header */}
-      <div className="course-header">
-        <div className="course-banner">
-          <Image
-            src={love}
-            alt="Course Banner"
-            className="banner-image"
-            width={800}
-            height={200}
-          />
+      {/* Toast Message Notification */}
+      {toastMessage && (
+        <div className={`toast-notification ${toastMessage.type}`}>
+          <div className="toast-content">
+            <span className="toast-icon">
+              {toastMessage.type === "success" ? "✅" : "❌"}
+            </span>
+            <span className="toast-text">{toastMessage.text}</span>
+          </div>
+        </div>
+      )}
 
-          <div className="course-overlay">
-            <h1>{courseData.title}</h1>
-            <p>{courseData.description}</p>
+      {/* Locked Module Message Toast */}
+      {lockedModuleMessage && (
+        <div className="locked-module-toast">
+          <div className="toast-content">
+            <span className="toast-icon">🔒</span>
+            <div className="toast-text">
+              <strong>Module Locked</strong>
+              <p>{lockedModuleMessage}</p>
+            </div>
+            <button
+              className="toast-close"
+              onClick={() => setLockedModuleMessage(null)}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Video Player Modal */}
+      {selectedVideo && userEmail && (
+        <div className="video-modal-overlay" onClick={closeVideoModal}>
+          <div
+            className="video-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="video-modal-header">
+              <h3>{selectedVideo.title}</h3>
+              <button className="video-modal-close" onClick={closeVideoModal}>
+                ✕
+              </button>
+            </div>
+            <VideoPlayer
+              videoUrl={selectedVideo.url}
+              contentId={selectedVideo.contentId}
+              studentEmail={userEmail}
+              title={selectedVideo.title}
+              onProgressUpdate={handleVideoProgressUpdate}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* NEW: Assignment Submission Modal */}
+      {selectedAssignment && (
+        <div
+          className="assignment-modal-overlay"
+          onClick={() => setSelectedAssignment(null)}
+        >
+          <div
+            className="assignment-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="assignment-modal-header">
+              <h3>{selectedAssignment.title}</h3>
+              <button
+                className="assignment-modal-close"
+                onClick={() => setSelectedAssignment(null)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="assignment-modal-body">
+              {selectedAssignment.instructions && (
+                <div className="assignment-instructions">
+                  <h4>Instructions</h4>
+                  <p>{selectedAssignment.instructions}</p>
+                </div>
+              )}
+
+              <div className="assignment-meta">
+                {selectedAssignment.dueDate && (
+                  <div className="meta-item">
+                    <span className="meta-label">Due Date:</span>
+                    <span
+                      className={`meta-value ${new Date(selectedAssignment.dueDate) < new Date() ? "overdue" : ""}`}
+                    >
+                      {new Date(selectedAssignment.dueDate).toLocaleString()}
+                    </span>
+                  </div>
+                )}
+                {selectedAssignment.maxPoints && (
+                  <div className="meta-item">
+                    <span className="meta-label">Points:</span>
+                    <span className="meta-value">
+                      {selectedAssignment.maxPoints}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {selectedAssignment.existingSubmission && (
+                <div className="existing-submission">
+                  <h4>Your Submission</h4>
+                  <div className="submission-details">
+                    <p>
+                      <strong>
+                        Attempt #
+                        {selectedAssignment.existingSubmission.attemptNumber}
+                      </strong>
+                    </p>
+                    <p>
+                      Submitted:{" "}
+                      {new Date(
+                        selectedAssignment.existingSubmission.submittedAt,
+                      ).toLocaleString()}
+                    </p>
+                    {selectedAssignment.existingSubmission.grade !==
+                      undefined && (
+                      <p className="grade-display">
+                        Grade: {selectedAssignment.existingSubmission.grade} /{" "}
+                        {selectedAssignment.maxPoints || 100}
+                        {selectedAssignment.existingSubmission.grade >= 60
+                          ? " ✅"
+                          : " 📝"}
+                      </p>
+                    )}
+                    {selectedAssignment.existingSubmission.feedback && (
+                      <div className="feedback">
+                        <strong>Feedback:</strong>
+                        <p>{selectedAssignment.existingSubmission.feedback}</p>
+                      </div>
+                    )}
+                    {selectedAssignment.existingSubmission.submissionUrl && (
+                      <p>
+                        <a
+                          href={
+                            selectedAssignment.existingSubmission.submissionUrl
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="submission-link"
+                        >
+                          📎 View Uploaded File
+                        </a>
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="submission-form">
+                <h4>
+                  {selectedAssignment.existingSubmission
+                    ? "Resubmit Assignment"
+                    : "Submit Assignment"}
+                </h4>
+
+                <div className="form-group">
+                  <label>Text Submission</label>
+                  <textarea
+                    value={submissionText}
+                    onChange={(e) => setSubmissionText(e.target.value)}
+                    placeholder="Enter your answer here..."
+                    rows={5}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>File Upload (PDF, DOC, ZIP - Max 50MB)</label>
+                  <input
+                    type="file"
+                    onChange={(e) =>
+                      setSubmissionFile(e.target.files?.[0] || null)
+                    }
+                    accept=".pdf,.doc,.docx,.zip,.txt"
+                  />
+                  {submissionFile && (
+                    <p className="file-name">Selected: {submissionFile.name}</p>
+                  )}
+                </div>
+
+                <button
+                  className="submit-assignment-btn"
+                  onClick={handleSubmitAssignment}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit Assignment"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="course-header-wrapper">
+        <div className="course-header-container">
+          <div className="header-content-section">
+            <div className="content-top-badge">
+              <span className="welcome-badge">
+                Welcome, {courseData.studentName}
+              </span>
+            </div>
+
+            <h1 className="course-title">
+              {courseData.programName}
+              <span className="title-underline"></span>
+            </h1>
+
+            <p className="course-description">
+              {courseData.programName} course content - Complete learning path
+              from fundamentals to advanced topics.
+            </p>
+
+            <div className="course-stats-row">
+              <div className="stat-item">
+                <span className="stat-icon">📚</span>
+                <div>
+                  <strong>{courseData.modules?.length || 0}</strong>
+                  <span>Total Modules</span>
+                </div>
+              </div>
+              <div className="stat-item">
+                <span className="stat-icon">✅</span>
+                <div>
+                  <strong>
+                    {courseData.modules?.filter((m) => m.completed).length || 0}
+                  </strong>
+                  <span>Completed Modules</span>
+                </div>
+              </div>
+              <div className="stat-item">
+                <span className="stat-icon">🎥</span>
+                <div>
+                  <strong>{courseData.stats?.totalLessons || 0}</strong>
+                  <span>Total Lessons</span>
+                </div>
+              </div>
+              <div className="stat-item">
+                <span className="stat-icon">✔️</span>
+                <div>
+                  <strong>{courseData.stats?.completedLessons || 0}</strong>
+                  <span>Completed Lessons</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="student-greeting">
+              <div className="avatar-placeholder">
+                <span>{courseData.studentName?.charAt(0) || "S"}</span>
+              </div>
+              <div className="greeting-text">
+                <p className="student-name">{courseData.studentName}</p>
+                <p className="student-email">{courseData.studentEmail}</p>
+              </div>
+              <div className="progress-indicator">
+                <div className="mini-progress-bar">
+                  <div
+                    className="mini-progress-fill"
+                    style={{ width: `${overallProgress || 0}%` }}
+                  ></div>
+                </div>
+                <span>{overallProgress || 0}% Complete</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Progress Section */}
-<div className="progress-section">
-  <div className="progress-header">
-    <div className="progress-title">
-      <i className="bi bi-graph-up-arrow"></i>
-      <h3>Learning Journey</h3>
-    </div>
-    <div className="progress-percentage">
-      <span className="percentage-number">{progress}%</span>
-      <span className="percentage-label">Complete</span>
-    </div>
-  </div>
-  
-  <div className="progress-bar-container">
-    <div className="progress-bar">
-      <div 
-        className="progress-fill" 
-        style={{ width: `${progress}%` }}
-      >
-        <div className="progress-glow"></div>
-      </div>
-    </div>
-    <div className="progress-milestones">
-      <div className="milestone" style={{ left: '25%' }}>
-        <div className="milestone-dot"></div>
-        <span>25%</span>
-      </div>
-      <div className="milestone" style={{ left: '50%' }}>
-        <div className="milestone-dot"></div>
-        <span>50%</span>
-      </div>
-      <div className="milestone" style={{ left: '75%' }}>
-        <div className="milestone-dot"></div>
-        <span>75%</span>
-      </div>
-      <div className="milestone" style={{ left: '100%' }}>
-        <div className="milestone-dot"></div>
-        <span>100%</span>
-      </div>
-    </div>
-  </div>
-  
-  <div className="progress-stats">
-    <div className="stat-card">
-      <div className="stat-icon completed-modules">
-        <i className="bi bi-journal-check"></i>
-      </div>
-      <div className="stat-info">
-        <strong>{courseData.modules.filter(m => m.completed).length}</strong>
-        <span>Completed Modules</span>
-      </div>
-      <div className="stat-trend">
-        <i className="bi bi-arrow-up-short"></i>
-        <span>+{courseData.modules.filter(m => m.completed).length}</span>
-      </div>
-    </div>
-    
-    <div className="stat-card">
-      <div className="stat-icon completed-lessons">
-        <i className="bi bi-check-circle-fill"></i>
-      </div>
-      <div className="stat-info">
-        <strong>
-          {courseData.modules.reduce((total, module) => 
-            total + module.materials.filter(m => m.status === 'completed').length, 0
-          )}
-        </strong>
-        <span>Completed Lessons</span>
-      </div>
-      <div className="stat-trend">
-        <i className="bi bi-arrow-up-short"></i>
-        <span>
-          +{courseData.modules.reduce((total, module) => 
-            total + module.materials.filter(m => m.status === 'completed').length, 0
-          )}
-        </span>
-      </div>
-    </div>
-    
-    <div className="stat-card">
-      <div className="stat-icon total-lessons">
-        <i className="bi bi-book-half"></i>
-      </div>
-      <div className="stat-info">
-        <strong>
-          {courseData.modules.reduce((total, module) => total + module.materials.length, 0)}
-        </strong>
-        <span>Total Lessons</span>
-      </div>
-      <div className="stat-trend">
-        <i className="bi bi-flag"></i>
-      </div>
-    </div>
-  </div>
-</div>
 
       <div className="course-content">
         {/* Modules Sidebar */}
         <div className="modules-sidebar">
           <h4>Course Modules</h4>
           <div className="modules-list">
-            {courseData.modules.map((module, index) => (
-              <div
-                key={module.id}
-                className={`module-item ${selectedModule === index ? 'active' : ''} ${module.completed ? 'completed' : ''}`}
-                onClick={() => setSelectedModule(index)}
-              >
-                <div className="module-status">
-                  {module.completed ? (
-                    <i className="bi bi-check-circle-fill"></i>
-                  ) : (
-                    <i className="bi bi-circle"></i>
-                  )}
+            {courseData.modules.map((module, index) => {
+              const moduleProgress = getModuleProgress(module);
+              const isAccessible = isModuleAccessible(index);
+              const isLocked = !isAccessible && index > 0;
+
+              return (
+                <div
+                  key={module.id}
+                  className={`module-item ${selectedModule === index ? "active" : ""} ${module.completed ? "completed" : ""} ${isLocked ? "locked" : ""}`}
+                  onClick={() => handleModuleClick(index)}
+                  style={
+                    isLocked ? { opacity: 0.7, cursor: "not-allowed" } : {}
+                  }
+                >
+                  <div className="module-status">
+                    {module.completed ? (
+                      <i className="bi bi-check-circle-fill"></i>
+                    ) : isLocked ? (
+                      <i className="bi bi-lock-fill"></i>
+                    ) : (
+                      <i className="bi bi-circle"></i>
+                    )}
+                  </div>
+                  <div className="module-info">
+                    <h5>
+                      {module.title}
+                      {isLocked && <span className="lock-badge"> 🔒</span>}
+                    </h5>
+                    <span>{module.lessons} lessons</span>
+                    <div className="module-progress-bar">
+                      <div
+                        className="module-progress-fill"
+                        style={{ width: `${moduleProgress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  <div className="module-arrow">
+                    <i className="bi bi-chevron-right"></i>
+                  </div>
                 </div>
-                <div className="module-info">
-                  <h5>{module.title}</h5>
-                  <span>{module.lessons} lessons</span>
-                </div>
-                <div className="module-arrow">
-                  <i className="bi bi-chevron-right"></i>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
         {/* Module Details */}
         <div className="module-details">
-          {courseData.modules[selectedModule] && (
+          {currentModule && (
             <>
               <div className="module-header">
-                <h2>{courseData.modules[selectedModule].title}</h2>
+                <h2>{currentModule.title}</h2>
                 <div className="module-meta">
                   <span className="lessons">
                     <i className="bi bi-list-ul"></i>
-                    {courseData.modules[selectedModule].lessons} lessons
+                    {currentModule.lessons} lessons
                   </span>
-                  {courseData.modules[selectedModule].completed && (
+                  {currentModule.completed && (
                     <span className="completed-badge">
                       <i className="bi bi-check-circle"></i>
                       Completed
                     </span>
                   )}
                 </div>
+                {currentModule.description && (
+                  <p className="module-description-full">
+                    {currentModule.description}
+                  </p>
+                )}
               </div>
 
               <div className="materials-list">
                 <h4>Learning Materials</h4>
                 <div className="materials-grid">
-                  {courseData.modules[selectedModule].materials.map((material) => (
-                    <div
-                      key={material.id}
-                      className="material-card"
-                      onClick={() => handleMaterialClick(material)}
-                    >
-                      <div className="material-header">
-                        <div className="material-icon">
-                          {getMaterialIcon(material.type)}
+                  {currentModule.materials.map((material) => {
+                    const materialStatus = material.status;
+
+                    return material.type === "video" ? (
+                      // Video Card
+                      <div
+                        key={material.id}
+                        className={`material-card video-card ${materialStatus}`}
+                        onClick={() => handleVideoClick(material)}
+                      >
+                        <div className="material-header">
+                          <div className="material-icon">
+                            {material.thumbnailUrl ? (
+                              <img
+                                src={material.thumbnailUrl}
+                                alt={material.title}
+                                className="video-thumbnail"
+                              />
+                            ) : (
+                              <span className="material-symbols-outlined">
+                                play_circle
+                              </span>
+                            )}
+                          </div>
+                          <div className="material-title-section">
+                            <h5>{material.title}</h5>
+                            <span className="material-type">
+                              {getMaterialTypeDisplay(material)}
+                            </span>
+                            {material.description && (
+                              <p className="material-description">
+                                {material.description}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                        <div className="material-title-section">
-                          <h5>{material.title}</h5>
-                          <span className="material-type">
-                            {getMaterialTypeDisplay(material)}
-                          </span>
+                        <div className="material-footer">
+                          <div className="status-container">
+                            <span
+                              className="material-status"
+                              style={{ color: getStatusColor(materialStatus) }}
+                            >
+                              {getMaterialStatusText(materialStatus)}
+                            </span>
+                            {materialStatus === "in-progress" &&
+                              material.lastPosition && (
+                                <span className="resume-indicator">
+                                  {Math.floor(material.lastPosition / 60)} min
+                                  watched
+                                </span>
+                              )}
+                          </div>
+                          <button className={`start-btn ${materialStatus}`}>
+                            {materialStatus === "completed"
+                              ? "Watch Again"
+                              : materialStatus === "in-progress"
+                                ? "Resume"
+                                : "Start Watching"}
+                          </button>
                         </div>
                       </div>
-                      <div className="material-footer">
-                        <span 
-                          className="material-status"
-                          style={{ color: getStatusColor(material.status) }}
+                    ) : material.type === "document" ? (
+                      // Document Card
+                      <div
+                        key={material.id}
+                        className={`material-card document-card ${materialStatus}`}
+                      >
+                        <div
+                          className="material-header"
+                          onClick={() => handleDocumentClick(material)}
+                          style={{ cursor: "pointer" }}
                         >
-                          {getMaterialStatusText(material.status)}
-                        </span>
-                        <button className="start-btn">
-                          {material.status === 'completed' ? 'Review' : 
-                           material.status === 'in-progress' ? 'Continue' : 'Start'}
-                        </button>
+                          <div className="material-icon">
+                            <span className="material-symbols-outlined">
+                              description
+                            </span>
+                          </div>
+                          <div className="material-title-section">
+                            <h5>{material.title}</h5>
+                            <span className="material-type">
+                              {getMaterialTypeDisplay(material)}
+                            </span>
+                            {material.description && (
+                              <p className="material-description">
+                                {material.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="material-footer">
+                          <div className="status-container">
+                            <span
+                              className="material-status"
+                              style={{ color: getStatusColor(materialStatus) }}
+                            >
+                              {getMaterialStatusText(materialStatus)}
+                            </span>
+                          </div>
+                          <div className="button-group">
+                            <button
+                              className="start-btn view-btn"
+                              onClick={() => handleDocumentClick(material)}
+                            >
+                              View Document
+                            </button>
+                            {renderMarkCompleteButton(material)}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ) : (
+                      // Assignment Card (UPDATED with click handlers)
+                      <div
+                        key={material.id}
+                        className={`material-card assignment-card ${materialStatus}`}
+                      >
+                        <div className="material-header">
+                          <div className="material-icon">
+                            <span className="material-symbols-outlined">
+                              assignment
+                            </span>
+                          </div>
+                          <div className="material-title-section">
+                            <h5>{material.title}</h5>
+                            <span className="material-type">
+                              {getMaterialTypeDisplay(material)}
+                            </span>
+                            {material.description && (
+                              <p className="material-description">
+                                {material.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="material-footer">
+                          <div className="status-container">
+                            <span
+                              className="material-status"
+                              style={{ color: getStatusColor(materialStatus) }}
+                            >
+                              {materialStatus === "completed"
+                                ? "Submitted ✓"
+                                : getMaterialStatusText(materialStatus)}
+                            </span>
+                          </div>
+                          <div className="button-group">
+                            {/* View Assignment Button - opens the assignment file */}
+                            {material.fileUrl && (
+                              <button
+                                className="start-btn view-assignment-btn"
+                                onClick={() =>
+                                  window.open(material.fileUrl, "_blank")
+                                }
+                              >
+                                📄 View Assignment
+                              </button>
+                            )}
+                            {/* Submit / View Submission Button */}
+                            <button
+                              className={`start-btn ${materialStatus === "completed" ? "view-submission-btn" : "submit-btn"}`}
+                              onClick={() => {
+                                if (materialStatus === "completed") {
+                                  handleViewSubmission(material);
+                                } else {
+                                  fetchAssignmentDetails(
+                                    material.id,
+                                    material.title,
+                                  );
+                                }
+                              }}
+                            >
+                              {materialStatus === "completed"
+                                ? "📋 View Submission"
+                                : "✏️ Submit Assignment"}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
               {/* Module Progress */}
               <div className="module-progress">
                 <h4>Module Progress</h4>
+                <div className="module-progress-bar-large">
+                  <div
+                    className="module-progress-fill-large"
+                    style={{ width: `${getModuleProgress(currentModule)}%` }}
+                  >
+                    <span>{Math.round(getModuleProgress(currentModule))}%</span>
+                  </div>
+                </div>
                 <div className="progress-breakdown">
-                  {courseData.modules[selectedModule].materials.map((material) => (
-                    <div key={material.id} className="progress-item">
-                      <div className="progress-info">
-                        <span className="material-name">{material.title}</span>
-                        <span 
-                          className="progress-status"
-                          style={{ color: getStatusColor(material.status) }}
-                        >
-                          {getMaterialStatusText(material.status)}
-                        </span>
+                  {currentModule.materials.map((material) => {
+                    const materialStatus = material.status;
+                    return (
+                      <div key={material.id} className="progress-item">
+                        <div className="progress-info">
+                          <span className="material-name">
+                            {material.title}
+                          </span>
+                          <span
+                            className="progress-status"
+                            style={{ color: getStatusColor(materialStatus) }}
+                          >
+                            {materialStatus === "completed" &&
+                            material.type === "assignment"
+                              ? "Submitted ✓"
+                              : getMaterialStatusText(materialStatus)}
+                          </span>
+                        </div>
+                        <div className="progress-indicator">
+                          <div
+                            className={`status-dot ${materialStatus}`}
+                            style={{
+                              backgroundColor: getStatusColor(materialStatus),
+                            }}
+                          ></div>
+                        </div>
                       </div>
-                      <div className="progress-indicator">
-                        <div 
-                          className={`status-dot ${material.status}`}
-                          style={{ backgroundColor: getStatusColor(material.status) }}
-                        ></div>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </>
@@ -457,6 +1035,84 @@ const CourseModule = () => {
           Share Progress
         </button>
       </div>
+
+      <style jsx>{`
+        .assignment-modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.8);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 2000;
+        }
+        .assignment-modal-content {
+          background: white;
+          border-radius: 12px;
+          width: 90%;
+          max-width: 600px;
+          max-height: 90vh;
+          overflow-y: auto;
+        }
+        .assignment-modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20px;
+          border-bottom: 1px solid #ddd;
+        }
+        .assignment-modal-body {
+          padding: 20px;
+        }
+        .form-group {
+          margin-bottom: 20px;
+        }
+        .form-group label {
+          display: block;
+          margin-bottom: 8px;
+          font-weight: bold;
+        }
+        .form-group textarea {
+          width: 100%;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+        }
+        .form-group input[type="file"] {
+          width: 100%;
+        }
+        .submit-assignment-btn {
+          background: #4caf50;
+          color: white;
+          padding: 12px 24px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          width: 100%;
+        }
+        .submit-assignment-btn:disabled {
+          background: #ccc;
+        }
+        .existing-submission {
+          background: #f5f5f5;
+          padding: 15px;
+          border-radius: 8px;
+          margin-bottom: 20px;
+        }
+        .grade-display {
+          font-size: 18px;
+          font-weight: bold;
+        }
+        .feedback {
+          margin-top: 10px;
+          padding: 10px;
+          background: #e3f2fd;
+          border-radius: 4px;
+        }
+      `}</style>
     </div>
   );
 };

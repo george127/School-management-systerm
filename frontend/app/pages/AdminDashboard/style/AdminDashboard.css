@@ -107,46 +107,65 @@
   color: #343a40;
 }
 
-.admin-header .search-bar-container {
+/* Admin Icons Container */
+.admin-icons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   position: relative;
 }
 
-.admin-header .search-icon-button,
-.close-icon-button {
-  background: none;
+/* Notification Container */
+.notification-container {
+  position: relative;
+}
+
+/* Search Bar Container */
+.search-bar-container {
+  display: flex;
+  align-items: center;
+}
+
+/* Search Icon Button */
+.search-icon-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   border: none;
   cursor: pointer;
-  color: #555;
-  padding: 5px;
-  border-radius: 50%;
-  transition: background-color 0.3s;
   display: flex;
   align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.admin-header .search-icon-button .material-symbols-outlined {
-  margin: 0;
-  font-size: 18px;
-  background-color: #ffeee4;
-  padding: 10px;
-  border-radius: 50px;
+.search-icon-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(233, 105, 30, 0.15);
+  background: linear-gradient(135deg, #ffffff 0%, #fff5ed 100%);
 }
 
-.admin-header .search-wrapper {
+.search-icon-button .material-symbols-outlined {
+  font-size: 22px;
+  color: #4a5568;
+  transition: color 0.3s ease;
+}
+
+.search-icon-button:hover .material-symbols-outlined {
+  color: #e9691e;
+}
+
+/* Search Wrapper */
+.search-wrapper {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background: #ffeee4;
-  width: 360px;
-  padding: 5px 10px;
-  animation: fadeIn 0.3s ease-in-out;
+  gap: 0.5rem;
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.admin-header .search-wrapper .close-icon-button .material-symbols-outlined{
-  font-size: 18px;
-}
-
-@keyframes fadeIn {
+@keyframes slideIn {
   from {
     opacity: 0;
     transform: translateX(-10px);
@@ -157,12 +176,123 @@
   }
 }
 
-.admin-header .search-input {
-  border: none;
-  background: transparent;
-  padding: 8px;
-  width: 200px;
+/* Search Input */
+.search-input {
+  padding: 8px 16px;
+  height: 40px;
+  width: 240px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 14px;
+  background: #ffffff;
+  color: #1a202c;
+  transition: all 0.3s ease;
   outline: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.search-input:focus {
+  border-color: #e9691e;
+  box-shadow: 0 0 0 3px rgba(233, 105, 30, 0.1);
+  width: 280px;
+}
+
+.search-input::placeholder {
+  color: #a0aec0;
+}
+
+/* Close Icon Button */
+.close-icon-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #f8f9fa;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-icon-button:hover {
+  background: #fee2e2;
+  transform: rotate(90deg);
+}
+
+.close-icon-button .material-symbols-outlined {
+  font-size: 18px;
+  color: #e9691e;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .admin-icons {
+    gap: 0.75rem;
+  }
+
+  .search-input {
+    width: 160px;
+  }
+
+  .search-input:focus {
+    width: 180px;
+  }
+
+  .notification-button,
+  .search-icon-button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .notification-button .material-symbols-outlined,
+  .search-icon-button .material-symbols-outlined {
+    font-size: 20px;
+  }
+}
+
+/* Optional: Add a subtle glow effect on active elements */
+.notification-button:active,
+.search-icon-button:active {
+  transform: translateY(0);
+}
+
+/* Optional: Tooltip styling for better UX */
+.notification-container::before {
+  content: "Notifications";
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a202c;
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+}
+
+.notification-container:hover::before {
+  opacity: 1;
+}
+
+.search-icon-button:hover::before {
+  content: "Search";
+  position: absolute;
+  top: -30px;
+  background: #1a202c;
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 1;
+  pointer-events: none;
+  z-index: 100;
 }
 
 

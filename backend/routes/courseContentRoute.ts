@@ -82,6 +82,8 @@ const uploadToS3FromBuffer = async (buffer: Buffer, key: string, contentType: st
     key: key,
   };
 };
+
+
 // =====================
 // GET COURSE CONTENT BY PROGRAM NAME
 // =====================
@@ -92,7 +94,6 @@ router.get("/courses/:programName/content", async (req, res) => {
     const content = await prisma.courseContent.findMany({
       where: { programName: programName },
       include: {
-        assignment: true,
         uploadedBy: true,
       },
       orderBy: { order: "asc" },
@@ -112,12 +113,12 @@ router.get("/courses/:programName/content", async (req, res) => {
 });
 
 // =====================
-// UPLOAD CONTENT WITH THUMBNAIL
+// UPLOAD CONTENT WITH THUMBNAIL AND MODULE ASSIGNMENT
 // =====================
 router.post("/upload-content", upload.single("file"), async (req, res) => {
   try {
     const file = req.file;
-    const { programName, title, type, description, uploadedById, duration } = req.body;
+    const { programName, moduleId, title, type, description, uploadedById, duration } = req.body;
 
     if (!file) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -127,7 +128,7 @@ router.post("/upload-content", upload.single("file"), async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    console.log("Uploading:", { programName, title, type, fileSize: file.size });
+    console.log("Uploading:", { programName, moduleId, title, type, fileSize: file.size });
 
     // Upload original file to S3
     const uploadResult = await uploadToS3(file, type);
@@ -163,10 +164,11 @@ router.post("/upload-content", upload.single("file"), async (req, res) => {
       maxOrderResult = { _max: { order: null } };
     }
 
-    // Save to database
+    // Save to database - INCLUDING moduleId
     const content = await prisma.courseContent.create({
       data: {
         programName: programName,
+        moduleId: moduleId ? parseInt(moduleId) : null,  // ← ADD THIS LINE
         title: title,
         type: type,
         description: description || null,
@@ -303,7 +305,6 @@ router.get("/content/:contentId", async (req, res) => {
     const content = await prisma.courseContent.findUnique({
       where: { id: contentId },
       include: {
-        assignment: true,
         uploadedBy: true,
       },
     });
@@ -337,5 +338,460 @@ router.get("/all-content", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch content" });
   }
 });
+
+
+// =====================
+// MODULE CRUD OPERATIONS
+// =====================
+
+// Get all modules for a program
+router.get("/modules/:programName", async (req, res) => {
+  try {
+    const { programName } = req.params;
+    
+    const modules = await prisma.module.findMany({
+      where: { programName },
+      include: {
+        contents: {
+          orderBy: { order: "asc" }
+        }
+      },
+      orderBy: { order: "asc" }
+    });
+    
+    res.json({ success: true, modules });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch modules" });
+  }
+});
+
+// Create a new module
+router.post("/modules", async (req, res) => {
+  try {
+    const { title, description, programName, order } = req.body;
+    
+    if (!title || !programName) {
+      return res.status(400).json({ error: "Title and programName are required" });
+    }
+    
+    // Get the next order number if not provided
+    let moduleOrder = order;
+    if (!moduleOrder) {
+      const maxOrder = await prisma.module.aggregate({
+        where: { programName },
+        _max: { order: true }
+      });
+      moduleOrder = (maxOrder._max.order ?? -1) + 1;
+    }
+    
+    const module = await prisma.module.create({
+      data: {
+        title,
+        description: description || null,
+        programName,
+        order: moduleOrder,
+        status: "draft"
+      }
+    });
+    
+    res.json({ success: true, module });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to create module" });
+  }
+});
+
+// Update module
+router.put("/modules/:moduleId", async (req, res) => {
+  try {
+    const moduleId = parseInt(req.params.moduleId);
+    const { title, description, order, status } = req.body;
+    
+    const updated = await prisma.module.update({
+      where: { id: moduleId },
+      data: { title, description, order, status }
+    });
+    
+    res.json({ success: true, module: updated });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to update module" });
+  }
+});
+
+// Delete module - ONLY if empty
+router.delete("/modules/:moduleId", async (req, res) => {
+  try {
+    const moduleId = parseInt(req.params.moduleId);
+    
+    // Check if module has any content
+    const moduleWithContents = await prisma.module.findUnique({
+      where: { id: moduleId },
+      include: {
+        contents: true
+      }
+    });
+    
+    if (!moduleWithContents) {
+      return res.status(404).json({ error: "Module not found" });
+    }
+    
+    // If module has content, prevent deletion
+    if (moduleWithContents.contents.length > 0) {
+      return res.status(400).json({ 
+        error: `Cannot delete module "${moduleWithContents.title}". It contains ${moduleWithContents.contents.length} content item(s). Please delete all content from this module first.`,
+        contentsCount: moduleWithContents.contents.length,
+        contents: moduleWithContents.contents.map(c => ({ id: c.id, title: c.title, type: c.type }))
+      });
+    }
+    
+    // Only delete if empty
+    await prisma.module.delete({
+      where: { id: moduleId }
+    });
+    
+    res.json({ success: true, message: "Module deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to delete module" });
+  }
+});
+// Assign content to module
+router.patch("/content/:contentId/assign-module", async (req, res) => {
+  try {
+    const contentId = parseInt(req.params.contentId);
+    const { moduleId, order } = req.body;
+    
+    const updated = await prisma.courseContent.update({
+      where: { id: contentId },
+      data: {
+        moduleId: moduleId || null,
+        order: order || 0
+      }
+    });
+    
+    res.json({ success: true, content: updated });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to assign content to module" });
+  }
+});
+
+// Get module structure for student view
+router.get("/program/:programName/module-structure", async (req, res) => {
+  try {
+    const { programName } = req.params;
+    
+    const modules = await prisma.module.findMany({
+      where: { 
+        programName,
+        status: "published"
+      },
+      include: {
+        contents: {
+          where: { status: "published" },
+          orderBy: { order: "asc" }
+        }
+      },
+      orderBy: { order: "asc" }
+    });
+    
+    res.json({ success: true, modules });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch module structure" });
+  }
+});
+
+
+
+
+
+
+// =====================
+// GET STUDENT COURSE CONTENT (Based on Student's Email from Query)
+// =====================
+router.get("/student/course-content", async (req, res) => {
+  try {
+    const { email } = req.query;
+    
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    const student = await prisma.student.findUnique({
+      where: { email: email as string },
+      select: { 
+        id: true,
+        fullName: true, 
+        email: true,
+        programName: true,
+        enrollments: {
+          include: {
+            contentProgress: true
+          }
+        }
+      }
+    });
+
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    if (!student.programName) {
+      return res.status(404).json({ error: "Student is not enrolled in any program" });
+    }
+
+    // Get all content progress for this student
+    const contentProgressMap = new Map();
+    
+    for (const enrollment of student.enrollments) {
+      for (const progress of enrollment.contentProgress) {
+        contentProgressMap.set(progress.contentId, {
+          isCompleted: progress.isCompleted,
+          lastPosition: progress.lastPosition,
+          score: progress.score,
+          enrollmentId: enrollment.id
+        });
+      }
+    }
+
+    // ALSO check for assignment submissions (even without progress record)
+    const assignmentSubmissions = await prisma.assignmentSubmission.findMany({
+      where: {
+        studentId: student.id,
+      },
+      select: {
+        assignmentId: true,
+        submittedAt: true,
+      }
+    });
+
+    const assignmentSubmissionMap = new Map();
+    for (const submission of assignmentSubmissions) {
+      assignmentSubmissionMap.set(submission.assignmentId, {
+        submitted: true,
+        submittedAt: submission.submittedAt
+      });
+    }
+
+    console.log("Content progress found:", contentProgressMap.size);
+    console.log("Assignment submissions found:", assignmentSubmissionMap.size);
+
+    // Fetch only published modules and content
+    const modules = await prisma.module.findMany({
+      where: {
+        programName: student.programName,
+        status: "published"
+      },
+      include: {
+        contents: {
+          where: {
+            status: "published"
+          },
+          orderBy: { order: "asc" }
+        }
+      },
+      orderBy: { order: "asc" }
+    });
+
+    console.log("PUBLISHED modules found:", modules.length);
+
+    let totalLessons = 0;
+    let completedLessons = 0;
+
+    const formattedModules = modules.map((module) => {
+      // Process materials with progress
+      const materials = module.contents.map((content) => {
+        let status = "not-started";
+        let lastPosition = 0;
+        
+        // Check if this content has progress
+        const progress = contentProgressMap.get(content.id);
+        
+        // Check if this is an assignment with submission
+        const assignmentSubmission = assignmentSubmissionMap.get(content.id);
+        
+        if (progress) {
+          lastPosition = progress.lastPosition || 0;
+          if (progress.isCompleted) {
+            status = "completed";
+            completedLessons++;
+          } else if (progress.lastPosition && progress.lastPosition > 0) {
+            status = "in-progress";
+          }
+        } 
+        // If it's an assignment and has a submission, mark as completed
+        else if (content.type === "assignment" && assignmentSubmission) {
+          status = "completed";
+          completedLessons++;
+          console.log(`Assignment ${content.title} marked completed via submission`);
+        }
+        
+        totalLessons++;
+        
+        return {
+          id: content.id,
+          type: content.type,
+          title: content.title,
+          duration: content.duration,
+          fileUrl: content.fileUrl,
+          thumbnailUrl: content.thumbnailUrl,
+          description: content.description,
+          status: status,
+          lastPosition: lastPosition,
+          hasSubmitted: content.type === "assignment" && !!assignmentSubmission,
+          submissionId: assignmentSubmission ? null : undefined
+        };
+      });
+
+      // Calculate if module is completed (all content completed)
+      const moduleCompleted = materials.length > 0 && 
+        materials.every(material => material.status === "completed");
+
+      return {
+        id: module.id,
+        title: module.title,
+        description: module.description,
+        order: module.order,
+        lessons: module.contents.length,
+        completed: moduleCompleted,
+        materials: materials
+      };
+    });
+
+    // Calculate overall progress percentage
+    const overallProgress = totalLessons > 0 
+      ? Math.round((completedLessons / totalLessons) * 100)
+      : 0;
+
+    console.log(`Progress: ${completedLessons}/${totalLessons} lessons completed (${overallProgress}%)`);
+
+    res.json({
+      success: true,
+      programName: student.programName,
+      studentName: student.fullName,
+      studentEmail: student.email,
+      progress: overallProgress,
+      modules: formattedModules,
+      stats: {
+        totalModules: modules.length,
+        totalLessons: totalLessons,
+        completedLessons: completedLessons
+      }
+    });
+
+  } catch (error) {
+    console.error("Error fetching student course content:", error);
+    res.status(500).json({ error: "Failed to fetch course content" });
+  }
+}); 
+
+// =====================
+// GET STUDENT COURSE CONTENT BY PROGRAM NAME (Alternative)
+// =====================
+router.get("/student/course-content/:programName", async (req, res) => {
+  try {
+    const { programName } = req.params;
+    const { email } = req.query;
+
+    // Find the student to verify enrollment
+    if (email) {
+      const student = await prisma.student.findUnique({
+        where: { email: email as string },
+        select: { programName: true }
+      });
+
+      if (!student || student.programName !== programName) {
+        return res.status(403).json({ error: "Student not enrolled in this program" });
+      }
+    }
+
+    // Fetch all published modules for this program
+    const modules = await prisma.module.findMany({
+      where: {
+        programName: programName,
+        status: "published"
+      },
+      include: {
+        contents: {
+          where: {
+            status: "published"
+          },
+          orderBy: { order: "asc" }
+        }
+      },
+      orderBy: { order: "asc" }
+    });
+
+    const formattedModules = modules.map((module) => ({
+      id: module.id,
+      title: module.title,
+      description: module.description,
+      order: module.order,
+      lessons: module.contents.length,
+      materials: module.contents.map((content) => ({
+        id: content.id,
+        type: content.type,
+        title: content.title,
+        duration: content.duration,
+        fileUrl: content.fileUrl,
+        thumbnailUrl: content.thumbnailUrl,
+        description: content.description
+      }))
+    }));
+
+    res.json({
+      success: true,
+      programName,
+      modules: formattedModules
+    });
+
+  } catch (error) {
+    console.error("Error fetching course content by program:", error);
+    res.status(500).json({ error: "Failed to fetch course content" });
+  }
+});
+
+// =====================
+// GET ALL PROGRAMS FOR STUDENT ENROLLMENT
+// =====================
+router.get("/student/programs", async (req, res) => {
+  try {
+    const programs = await prisma.program.findMany({
+      where: {
+        courses: {
+          some: {
+            isPublished: true
+          }
+        }
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        courses: {
+          where: { isPublished: true },
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            thumbnail: true,
+            level: true,
+            duration: true
+          }
+        }
+      },
+      orderBy: { name: "asc" }
+    });
+
+    res.json({ success: true, programs });
+  } catch (error) {
+    console.error("Error fetching programs:", error);
+    res.status(500).json({ error: "Failed to fetch programs" });
+  }
+});
+
 
 export default router;

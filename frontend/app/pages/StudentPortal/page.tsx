@@ -1088,6 +1088,12 @@ const StudentPortal = () => {
   const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
+    const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
+
+  const toggleSearch = (): void => {
+    setIsSearchVisible(!isSearchVisible);
+  };
+
   // Get user from localStorage instead of Redux
   const getUserFromStorage = () => {
     if (typeof window !== "undefined") {
@@ -1398,19 +1404,36 @@ useEffect(() => {
                 height={40}
               />
             </div>
-            <div className="navbar-center">
-              <div className="search-bar">
-                <i className="bi bi-search search-icon"></i>
-                <input type="text" placeholder="Search..." />
+             <div className="student-icons">
+            {/* Notification Bell */}
+            <div className="notification-container">
+              <div className="notification-button">
+                <span className="material-symbols-outlined">notifications</span>
+                <span className="notification-badge"></span>
               </div>
             </div>
-            <div className="navbar-right">
-              <i className="bi bi-envelope message-icon" title="Messages"></i>
-              <i
-                className="bi bi-bell notification-icon"
-                title="Notifications"
-              ></i>
+
+            {/* Search Bar */}
+            <div className="search-bar-container">
+              {!isSearchVisible && (
+                <button className="search-icon-button" onClick={toggleSearch}>
+                  <span className="material-symbols-outlined">search</span>
+                </button>
+              )}
+              {isSearchVisible && (
+                <div className="search-wrapper">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="search-input"
+                  />
+                  <button className="close-icon-button" onClick={toggleSearch}>
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+              )}
             </div>
+          </div>
           </div>
         </div>
         {activeSection === "dashboard" && (

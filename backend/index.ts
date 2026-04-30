@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
+import { createServer } from "http";
+import { initSocket } from "./socket";
 import cors from "cors";
 import { PrismaClient } from "@prisma/client";
 import authRoute from "./routes/auth";
@@ -13,11 +15,16 @@ import forgotpasswordRoutes from './routes/forgotpassword';
 import paymentInfoRoutes from './routes/paymentInfo';
 import adminRoutes from './routes/adminRoute/adminRoutes';
 import courseContentRoutes from './routes/courseContentRoute';
-
+import videoProgressRoutes from "./routes/videoProgress";
+import assignmentRoutes from "./routes/assignments";
 
 const app = express();
 const prisma = new PrismaClient();
 
+// Create HTTP server FIRST
+const server = createServer(app);
+
+// CORS configuration - MUST come BEFORE Socket.io
 const allowedOrigins = [
   "https://main.d2qiaka43ozgqd.amplifyapp.com",
   "https://e5s4hxpbwy.us-east-1.awsapprunner.com",
@@ -25,42 +32,10 @@ const allowedOrigins = [
   "http://localhost:3000",
 ];
 
-// Body parsers with increased limits
-app.use(express.json({ limit: '2gb' }));
-app.use(express.urlencoded({ extended: true, limit: '2gb' }));
-
-// Test database connection on startup
-async function testDatabaseConnection() {
-  try {
-    await prisma.$connect();
-    console.log("✅ Database connected successfully!");
-    
-    // Test a simple query
-    const result = await prisma.$queryRaw`SELECT NOW() as current_time`;
-    console.log("✅ Database query test passed:", result);
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    console.error("❌ Database connection failed:", errorMessage);
-    // Don't crash the app, just log the error
-  }
-}
-
-// Call database test on startup
-testDatabaseConnection();
-
-app.get("/", (req, res) => {
-  res.json({
-    message: "School Management System API is running",
-    status: "ok",
-  });
-});
-
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
-      
       if (allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
@@ -69,25 +44,42 @@ app.use(
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"], // Add PATCH here
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-app.use(
-  express.json({
-    limit: "50mb",
-  })
-);
+// Body parsers
+app.use(express.json({ limit: '2gb' }));
+app.use(express.urlencoded({ extended: true, limit: '2gb' }));
 
-app.use(
-  express.urlencoded({
-    limit: "50mb",
-    extended: true,
-  })
-);
+// Initialize Socket.io AFTER CORS, using the same server
+const io = initSocket(server);
+console.log("✅ Socket.io initialized");
 
-// Add this endpoint to test database connection
+// Test database connection
+async function testDatabaseConnection() {
+  try {
+    await prisma.$connect();
+    console.log("✅ Database connected successfully!");
+    const result = await prisma.$queryRaw`SELECT NOW() as current_time`;
+    console.log("✅ Database query test passed:", result);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("❌ Database connection failed:", errorMessage);
+  }
+}
+
+testDatabaseConnection();
+
+// Routes
+app.get("/", (req, res) => {
+  res.json({
+    message: "School Management System API is running",
+    status: "ok",
+  });
+});
+
 app.get("/api/test-db", async (req, res) => {
   try {
     const result = await prisma.$queryRaw`SELECT NOW() as current_time, version() as pg_version`;
@@ -99,7 +91,6 @@ app.get("/api/test-db", async (req, res) => {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    console.error("Database connection error:", errorMessage);
     res.status(500).json({
       success: false,
       message: "Database connection failed",
@@ -109,7 +100,6 @@ app.get("/api/test-db", async (req, res) => {
   }
 });
 
-// Add endpoint to check database tables (optional)
 app.get("/api/db-tables", async (req, res) => {
   try {
     const tables = await prisma.$queryRaw`
@@ -135,9 +125,6 @@ app.get("/api/db-tables", async (req, res) => {
 app.get("/api/delete-all-data", async (req, res) => {
   try {
     const deletedData = {};
-    
-    // Delete in order: child tables first, then parent tables
-    // Payment depends on Student? Check relationships
     const tablesInOrder = ["Payment", "Student", "User"];
     
     for (const table of tablesInOrder) {
@@ -155,7 +142,6 @@ app.get("/api/delete-all-data", async (req, res) => {
       deletedData,
       timestamp: new Date().toISOString()
     });
-    
   } catch (error) {
     console.error("Error deleting data:", error);
     res.status(500).json({ 
@@ -165,6 +151,7 @@ app.get("/api/delete-all-data", async (req, res) => {
   }
 });
 
+// Register routes
 app.use("/api", authRoute);
 app.use("/api/upload", s3UploadRoutes);
 app.use("/api/forms", studentFormsRoutes);
@@ -173,9 +160,10 @@ app.use("/api/fees", feesPaymentRoutes);
 app.use("/api", studentProfileRoutes);
 app.use("/api", forgotpasswordRoutes);
 app.use("/api/payment-info", paymentInfoRoutes);
-app.use('/api/admin', adminRoutes);  
-app.use('/api/content-files', courseContentRoutes);
-
+app.use("/api/admin", adminRoutes);  
+app.use("/api/content-files", courseContentRoutes);
+app.use("/api/video-progress", videoProgressRoutes);
+app.use("/api/assignments", assignmentRoutes);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -190,6 +178,9 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-app.listen(5000, () => {
-  console.log("Server running on http://localhost:5000");
+// Start the server using the SAME server that has Socket.io attached
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(`✅ WebSocket server ready on port ${PORT}`);
 });

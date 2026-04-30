@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import ModuleManagement from "./ModuleManagement";
 import "./style/CourseContentManagement.css";
 
 // Types
@@ -11,11 +12,21 @@ interface ModuleItem {
   duration?: string;
   status: "draft" | "published" | "archived";
   fileUrl?: string;
-  thumbnailUrl?: string; // ADDED: Thumbnail URL for videos
+  thumbnailUrl?: string;
   description?: string;
   programName: string;
+  moduleId?: number;
   order: number;
   createdAt: string;
+}
+
+interface Module {
+  id: number;
+  title: string;
+  description: string;
+  order: number;
+  status: string;
+  contents: ModuleItem[];
 }
 
 interface ContentStats {
@@ -30,6 +41,41 @@ interface Notification {
   id: number;
 }
 
+// Confirmation Modal Component
+const ConfirmModal = ({ 
+  isOpen, 
+  onClose, 
+  onConfirm, 
+  title, 
+  message 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  onConfirm: () => void; 
+  title: string; 
+  message: string;
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="confirm-modal-overlay" onClick={onClose}>
+      <div className="confirm-modal-container" onClick={(e) => e.stopPropagation()}>
+        <div className="confirm-modal-header">
+          <h3>{title}</h3>
+          <button className="confirm-modal-close" onClick={onClose}>✕</button>
+        </div>
+        <div className="confirm-modal-body">
+          <p>{message}</p>
+        </div>
+        <div className="confirm-modal-footer">
+          <button className="confirm-btn-cancel" onClick={onClose}>Cancel</button>
+          <button className="confirm-btn-confirm" onClick={onConfirm}>Delete</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 /* =====================
    API FUNCTIONS
 ===================== */
@@ -41,6 +87,33 @@ const getCourseContent = async (programName: string): Promise<ModuleItem[]> => {
   if (!response.ok) throw new Error("Failed to fetch course content");
   const data = await response.json();
   return data.content;
+};
+
+const getModules = async (programName: string): Promise<Module[]> => {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const response = await fetch(
+    `${API_URL}/api/content-files/modules/${encodeURIComponent(programName)}`,
+  );
+  if (!response.ok) throw new Error("Failed to fetch modules");
+  const data = await response.json();
+  return data.modules;
+};
+
+const assignContentToModule = async (
+  contentId: number,
+  moduleId: number | null,
+): Promise<any> => {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const response = await fetch(
+    `${API_URL}/api/content-files/content/${contentId}/assign-module`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ moduleId }),
+    },
+  );
+  if (!response.ok) throw new Error("Failed to assign content");
+  return response.json();
 };
 
 const getContentById = async (contentId: number): Promise<ModuleItem> => {
@@ -69,34 +142,16 @@ const updateContentStatus = async (
   status: string,
 ): Promise<any> => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
-  console.log(`Updating content ${contentId} to status: ${status}`);
-
-  try {
-    const response = await fetch(
-      `${API_URL}/api/content-files/courses/content/${contentId}/status`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status }),
-      },
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("Status update failed:", data);
-      throw new Error(data.error || "Failed to update status");
-    }
-
-    console.log("Status updated successfully:", data);
-    return data;
-  } catch (error) {
-    console.error("Error in updateContentStatus:", error);
-    throw error;
-  }
+  const response = await fetch(
+    `${API_URL}/api/content-files/courses/content/${contentId}/status`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    },
+  );
+  if (!response.ok) throw new Error("Failed to update status");
+  return response.json();
 };
 
 const updateContent = async (
@@ -104,33 +159,24 @@ const updateContent = async (
   data: Partial<ModuleItem>,
 ): Promise<any> => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
   const response = await fetch(
     `${API_URL}/api/content-files/courses/content/${contentId}`,
     {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     },
   );
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || "Failed to update content");
-  }
+  if (!response.ok) throw new Error("Failed to update content");
   return response.json();
 };
 
 const uploadContent = async (formData: FormData): Promise<any> => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
   const response = await fetch(`${API_URL}/api/content-files/upload-content`, {
     method: "POST",
     body: formData,
   });
-
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.error || "Failed to upload content");
@@ -150,16 +196,12 @@ const ContentModal = ({
 }) => {
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
+      if (e.key === "Escape") onClose();
     };
-
     if (isOpen) {
       document.addEventListener("keydown", handleEsc);
       document.body.style.overflow = "hidden";
     }
-
     return () => {
       document.removeEventListener("keydown", handleEsc);
       document.body.style.overflow = "unset";
@@ -210,9 +252,7 @@ const ContentModal = ({
         <button className="modal-close-btn" onClick={onClose}>
           <span className="material-symbols-outlined">close</span>
         </button>
-
         <div className="modal-header-section">
-          {/* Show thumbnail for videos */}
           {content.type === "video" && content.thumbnailUrl ? (
             <div className="modal-thumbnail">
               <img src={content.thumbnailUrl} alt={content.title} />
@@ -240,7 +280,6 @@ const ContentModal = ({
             </span>
           </div>
         </div>
-
         <div className="modal-body-section">
           {content.description && (
             <div className="modal-info-group">
@@ -248,7 +287,6 @@ const ContentModal = ({
               <p>{content.description}</p>
             </div>
           )}
-
           <div className="modal-details-grid">
             <div className="modal-detail-item">
               <span className="material-symbols-outlined">folder</span>
@@ -257,7 +295,6 @@ const ContentModal = ({
                 <p>{content.programName}</p>
               </div>
             </div>
-
             {content.duration && (
               <div className="modal-detail-item">
                 <span className="material-symbols-outlined">schedule</span>
@@ -267,7 +304,6 @@ const ContentModal = ({
                 </div>
               </div>
             )}
-
             <div className="modal-detail-item">
               <span className="material-symbols-outlined">calendar_today</span>
               <div>
@@ -275,7 +311,6 @@ const ContentModal = ({
                 <p>{formatDate(content.createdAt)}</p>
               </div>
             </div>
-
             <div className="modal-detail-item">
               <span className="material-symbols-outlined">badge</span>
               <div>
@@ -284,7 +319,6 @@ const ContentModal = ({
               </div>
             </div>
           </div>
-
           {content.fileUrl && (
             <div className="modal-action-buttons">
               <a
@@ -315,9 +349,7 @@ const Notification = ({
   onClose: () => void;
 }) => {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onClose();
-    }, 5000);
+    const timer = setTimeout(() => onClose(), 5000);
     return () => clearTimeout(timer);
   }, [onClose]);
 
@@ -384,6 +416,138 @@ const Notification = ({
   );
 };
 
+// Accordion Module Item Component
+const AccordionModuleItem = ({ 
+  module, 
+  isOpen, 
+  onToggle,
+  onViewDetails,
+  onEditClick,
+  onDeleteClick,
+  onStatusChange
+}: { 
+  module: Module;
+  isOpen: boolean;
+  onToggle: () => void;
+  onViewDetails: (id: number) => void;
+  onEditClick: (item: ModuleItem) => void;
+  onDeleteClick: (id: number) => void;
+  onStatusChange: (id: number, status: string) => void;
+}) => {
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "draft": return "#f59e0b";
+      case "published": return "#4caf50";
+      case "archived": return "#f44336";
+      default: return "#666";
+    }
+  };
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case "video": return "🎬";
+      case "document": return "📄";
+      case "assignment": return "📋";
+      default: return "📄";
+    }
+  };
+
+  return (
+    <div className="accordion-module-wrapper">
+      <div className="accordion-module-header" onClick={onToggle}>
+        <div className="accordion-title-section">
+          <span className="accordion-icon">📦</span>
+          <div>
+            <h4>{module.title}</h4>
+            <p className="accordion-description">{module.description || "No description"}</p>
+          </div>
+        </div>
+        <div className="accordion-stats-section">
+          <span className="accordion-arrow">{isOpen ? "▲" : "▼"}</span>
+        </div>
+      </div>
+      
+      {isOpen && (
+        <div className="accordion-module-content">
+          {module.contents && module.contents.length > 0 ? (
+            module.contents.map((item) => (
+              <div key={item.id} className="module-item">
+                <div className="module-icon">
+                  {item.type === "video" && item.thumbnailUrl ? (
+                    <img
+                      src={item.thumbnailUrl}
+                      alt={item.title}
+                      className="video-thumbnail"
+                      onClick={() => onViewDetails(item.id)}
+                    />
+                  ) : (
+                    <span className="material-symbols-outlined">
+                      {item.type === "video" ? "play_circle" : item.type === "document" ? "description" : "assignment"}
+                    </span>
+                  )}
+                </div>
+                <div className="module-details">
+                  <h6 className="module-title">{item.title}</h6>
+                  <div className="module-meta">
+                    <span className="module-type">{item.type}</span>
+                    {item.duration && (
+                      <span className="module-duration">{item.duration}</span>
+                    )}
+                    <span className={`module-status ${item.status === "draft" ? "status-draft" : item.status === "published" ? "status-published" : "status-archived"}`}>
+                      {item.status}
+                    </span>
+                  </div>
+                  {item.description && (
+                    <p className="module-description">{item.description}</p>
+                  )}
+                  {item.fileUrl && (
+                    <button
+                      className="file-link-btn"
+                      onClick={() => onViewDetails(item.id)}
+                    >
+                      <span className="material-symbols-outlined">visibility</span> View Details
+                    </button>
+                  )}
+                </div>
+                <div className="module-actions">
+                  <select
+                    className="status-select"
+                    value={item.status}
+                    onChange={(e) => onStatusChange(item.id, e.target.value)}
+                  >
+                    <option value="draft">Draft</option>
+                    <option value="published">Published</option>
+                    <option value="archived">Archived</option>
+                  </select>
+                  <button
+                    className="icon-btn edit"
+                    title="Edit content"
+                    onClick={() => onEditClick(item)}
+                  >
+                    <span className="material-symbols-outlined">edit</span>
+                  </button>
+                  <button
+                    className="icon-btn delete"
+                    title="Delete content"
+                    onClick={() => onDeleteClick(item.id)}
+                  >
+                    <span className="material-symbols-outlined">delete</span>
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="empty-module-contents">
+              <p>No content yet. Upload video, document, and assignment for this module.</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Main Component
 const CourseContentManagement = () => {
   const [selectedProgram, setSelectedProgram] = useState<string>("");
   const [uploadProgress, setUploadProgress] = useState<number>(0);
@@ -395,6 +559,8 @@ const CourseContentManagement = () => {
   const [contentDescription, setContentDescription] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [moduleItems, setModuleItems] = useState<ModuleItem[]>([]);
+  const [modules, setModules] = useState<Module[]>([]);
+  const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [editingItem, setEditingItem] = useState<ModuleItem | null>(null);
@@ -403,11 +569,13 @@ const CourseContentManagement = () => {
     null,
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+  const [contentToDelete, setContentToDelete] = useState<number | null>(null);
+  const [openModules, setOpenModules] = useState<{ [key: number]: boolean }>({});
 
-  // Hardcoded program list
   const programOptions = [
     "Software Engineering",
-    "Cloud Computing",
+    "Cloud Engineering",
     "Cyber Security",
     "Data Analytics",
     "Digital Marketing",
@@ -423,19 +591,27 @@ const CourseContentManagement = () => {
   };
 
   const removeNotification = (id: number) => {
-    setNotifications((prev) =>
-      prev.filter((notification) => notification.id !== id),
-    );
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
-  // Fetch course content when selected program changes
-  useEffect(() => {
-    if (selectedProgram) {
-      fetchCourseContent(selectedProgram);
-    } else {
-      setModuleItems([]);
+  const toggleModule = (moduleId: number) => {
+    setOpenModules(prev => ({ ...prev, [moduleId]: !prev[moduleId] }));
+  };
+
+  const fetchModules = async (programName: string) => {
+    try {
+      const fetchedModules = await getModules(programName);
+      setModules(fetchedModules);
+      // Initialize all modules as closed
+      const initialOpenState: { [key: number]: boolean } = {};
+      fetchedModules.forEach(module => {
+        initialOpenState[module.id] = false;
+      });
+      setOpenModules(initialOpenState);
+    } catch (error) {
+      console.error("Error fetching modules:", error);
     }
-  }, [selectedProgram]);
+  };
 
   const fetchCourseContent = async (programName: string) => {
     setIsLoading(true);
@@ -450,39 +626,39 @@ const CourseContentManagement = () => {
     }
   };
 
+  const handleProgramChange = async (e: ChangeEvent<HTMLSelectElement>) => {
+    const programName = e.target.value;
+    setSelectedProgram(programName);
+    setSelectedModuleId(null);
+    if (programName) {
+      await fetchModules(programName);
+      await fetchCourseContent(programName);
+    }
+    if (isEditing) handleCancelEdit();
+  };
+
   const handleViewDetails = async (contentId: number) => {
     try {
       const content = await getContentById(contentId);
       setSelectedContent(content);
       setIsModalOpen(true);
     } catch (error) {
-      console.error("Error fetching content details:", error);
       addNotification("Failed to load content details", "error");
     }
   };
 
   const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-    }
-  };
-
-  const handleProgramChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    const programName = e.target.value;
-    setSelectedProgram(programName);
-    if (isEditing) {
-      handleCancelEdit();
-    }
+    if (file) setSelectedFile(file);
   };
 
   const handleStatusChange = async (contentId: number, newStatus: string) => {
     try {
       await updateContentStatus(contentId, newStatus);
       await fetchCourseContent(selectedProgram);
+      await fetchModules(selectedProgram);
       addNotification(`Status updated to ${newStatus}`, "success");
     } catch (error) {
-      console.error("Error updating status:", error);
       addNotification("Failed to update status", "error");
     }
   };
@@ -492,6 +668,7 @@ const CourseContentManagement = () => {
     setContentTitle(item.title);
     setContentDescription(item.description || "");
     setContentType(item.type);
+    setSelectedModuleId(item.moduleId || null);
     setIsEditing(true);
     document
       .querySelector(".upload-card")
@@ -504,6 +681,7 @@ const CourseContentManagement = () => {
     setContentDescription("");
     setContentType("video");
     setSelectedFile(null);
+    setSelectedModuleId(null);
     setIsEditing(false);
     const fileInput = document.getElementById(
       "content-file",
@@ -514,8 +692,16 @@ const CourseContentManagement = () => {
   const handleUpdate = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!editingItem) return;
-    setIsUploading(true);
 
+    if (selectedModuleId !== editingItem.moduleId && selectedModuleId) {
+      const canAssign = await checkModuleContentLimit(
+        selectedModuleId,
+        editingItem.type,
+      );
+      if (!canAssign) return;
+    }
+
+    setIsUploading(true);
     try {
       const updateData: any = {
         title: contentTitle,
@@ -523,33 +709,91 @@ const CourseContentManagement = () => {
         type: contentType,
       };
       await updateContent(editingItem.id, updateData);
+      if (selectedModuleId !== editingItem.moduleId) {
+        await assignContentToModule(editingItem.id, selectedModuleId);
+      }
       await fetchCourseContent(selectedProgram);
+      await fetchModules(selectedProgram);
       handleCancelEdit();
       addNotification("Content updated successfully!", "success");
     } catch (error: any) {
-      console.error("Error updating content:", error);
       addNotification(error.message || "Failed to update content", "error");
     } finally {
       setIsUploading(false);
     }
   };
 
-  const handleUpload = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const checkModuleContentLimit = async (
+    moduleId: number,
+    contentType: string,
+  ): Promise<boolean> => {
+    const selectedModule = modules.find((m) => m.id === moduleId);
+    if (!selectedModule) return true;
 
-    if (!selectedProgram) {
-      addNotification("Please select a program first", "warning");
-      return;
+    const existingContents = selectedModule.contents || [];
+
+    const videoCount = existingContents.filter(
+      (c) => c.type === "video",
+    ).length;
+    const documentCount = existingContents.filter(
+      (c) => c.type === "document",
+    ).length;
+    const assignmentCount = existingContents.filter(
+      (c) => c.type === "assignment",
+    ).length;
+
+    if (contentType === "video" && videoCount >= 1) {
+      addNotification(
+        `Module "${selectedModule.title}" already has a video. Each module can only have 1 video.`,
+        "error",
+      );
+      return false;
+    }
+    if (contentType === "document" && documentCount >= 1) {
+      addNotification(
+        `Module "${selectedModule.title}" already has a document. Each module can only have 1 document.`,
+        "error",
+      );
+      return false;
+    }
+    if (contentType === "assignment" && assignmentCount >= 1) {
+      addNotification(
+        `Module "${selectedModule.title}" already has an assignment. Each module can only have 1 assignment.`,
+        "error",
+      );
+      return false;
     }
 
-    if (!contentTitle) {
-      addNotification("Please enter a title for your content", "warning");
-      return;
-    }
+    return true;
+  };
 
-    if (!selectedFile) {
-      addNotification("Please select a file to upload", "warning");
-      return;
+ const handleUpload = async (e: FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  if (!selectedProgram) {
+    addNotification("Please select a program first", "warning");
+    return;
+  }
+  if (!contentTitle) {
+    addNotification("Please enter a title for your content", "warning");
+    return;
+  }
+  if (!selectedFile) {
+    addNotification("Please select a file to upload", "warning");
+    return;
+  }
+  
+  // NEW: Check if module is selected
+  if (!selectedModuleId) {
+    addNotification("Please select a module first. Content must be assigned to a module.", "error");
+    return;
+  }
+
+    if (selectedModuleId) {
+      const canUpload = await checkModuleContentLimit(
+        selectedModuleId,
+        contentType,
+      );
+      if (!canUpload) return;
     }
 
     setIsUploading(true);
@@ -561,7 +805,9 @@ const CourseContentManagement = () => {
     formData.append("type", contentType);
     formData.append("description", contentDescription);
     formData.append("file", selectedFile);
-
+    if (selectedModuleId) {
+      formData.append("moduleId", selectedModuleId.toString());
+    }
     try {
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
@@ -577,10 +823,12 @@ const CourseContentManagement = () => {
       clearInterval(progressInterval);
       setUploadProgress(100);
       await fetchCourseContent(selectedProgram);
+      await fetchModules(selectedProgram);
 
       setContentTitle("");
       setContentDescription("");
       setSelectedFile(null);
+      setSelectedModuleId(null);
       const fileInput = document.getElementById(
         "content-file",
       ) as HTMLInputElement;
@@ -588,11 +836,7 @@ const CourseContentManagement = () => {
 
       addNotification("Content uploaded successfully!", "success");
     } catch (error: any) {
-      console.error("Error uploading content:", error);
-      addNotification(
-        error.message || "Failed to upload content. Please try again.",
-        "error",
-      );
+      addNotification(error.message || "Failed to upload content", "error");
     } finally {
       setIsUploading(false);
       setTimeout(() => setUploadProgress(0), 1000);
@@ -607,15 +851,23 @@ const CourseContentManagement = () => {
     }
   };
 
-  const handleDeleteContent = async (id: number) => {
-    if (confirm("Are you sure you want to delete this content?")) {
+  const handleDeleteClick = (id: number) => {
+    setContentToDelete(id);
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (contentToDelete) {
       try {
-        await deleteContent(id);
+        await deleteContent(contentToDelete);
         await fetchCourseContent(selectedProgram);
+        await fetchModules(selectedProgram);
         addNotification("Content deleted successfully!", "success");
       } catch (error) {
-        console.error("Error deleting content:", error);
-        addNotification("Failed to delete content. Please try again.", "error");
+        addNotification("Failed to delete content", "error");
+      } finally {
+        setShowConfirmModal(false);
+        setContentToDelete(null);
       }
     }
   };
@@ -645,28 +897,15 @@ const CourseContentManagement = () => {
       .length,
   };
 
-  useEffect(() => {
-    const style = document.createElement("style");
-    style.textContent = `
-      @keyframes slideIn {
-        from {
-          transform: translateX(100%);
-          opacity: 0;
-        }
-        to {
-          transform: translateX(0);
-          opacity: 1;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
-
   return (
     <div className="management-container content-management">
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Content"
+        message="Are you sure you want to delete this content? This action cannot be undone."
+      />
       <ContentModal
         content={selectedContent}
         onClose={() => {
@@ -675,12 +914,12 @@ const CourseContentManagement = () => {
         }}
         isOpen={isModalOpen}
       />
-      {notifications.map((notification) => (
+      {notifications.map((n) => (
         <Notification
-          key={notification.id}
-          message={notification.message}
-          type={notification.type}
-          onClose={() => removeNotification(notification.id)}
+          key={n.id}
+          message={n.message}
+          type={n.type}
+          onClose={() => removeNotification(n.id)}
         />
       ))}
 
@@ -716,7 +955,7 @@ const CourseContentManagement = () => {
                   className={`type-btn ${contentType === "video" ? "active" : ""}`}
                   onClick={() => setContentType("video")}
                 >
-                  <span className="material-symbols-outlined">play_circle</span>
+                  <span className="material-symbols-outlined">play_circle</span>{" "}
                   Video
                 </button>
                 <button
@@ -724,7 +963,7 @@ const CourseContentManagement = () => {
                   className={`type-btn ${contentType === "document" ? "active" : ""}`}
                   onClick={() => setContentType("document")}
                 >
-                  <span className="material-symbols-outlined">description</span>
+                  <span className="material-symbols-outlined">description</span>{" "}
                   Document
                 </button>
                 <button
@@ -732,7 +971,7 @@ const CourseContentManagement = () => {
                   className={`type-btn ${contentType === "assignment" ? "active" : ""}`}
                   onClick={() => setContentType("assignment")}
                 >
-                  <span className="material-symbols-outlined">assignment</span>
+                  <span className="material-symbols-outlined">assignment</span>{" "}
                   Assignment
                 </button>
               </div>
@@ -781,10 +1020,10 @@ const CourseContentManagement = () => {
                         contentType === "video"
                           ? "video/*"
                           : contentType === "document"
-                            ? ".pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                            ? ".pdf,.doc,.docx"
                             : "*"
                       }
-                      required={!isEditing}
+                      required
                     />
                     <label htmlFor="content-file" className="file-upload-label">
                       <span className="material-symbols-outlined">
@@ -799,6 +1038,26 @@ const CourseContentManagement = () => {
                   </div>
                 </div>
               )}
+
+              <div className="form-group">
+                <label className="form-label">Assign to Module</label>
+                <select
+                  className="form-select"
+                  value={selectedModuleId || ""}
+                  onChange={(e) =>
+                    setSelectedModuleId(
+                      e.target.value ? parseInt(e.target.value) : null,
+                    )
+                  }
+                >
+                  <option value="">-- No Module (Unassigned) --</option>
+                  {modules.map((module) => (
+                    <option key={module.id} value={module.id}>
+                      {module.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               {isEditing && (
                 <div className="edit-mode-indicator">
@@ -859,6 +1118,14 @@ const CourseContentManagement = () => {
         </div>
 
         <div className="content-main">
+          <ModuleManagement
+            programName={selectedProgram}
+            onModuleChange={() => {
+              fetchModules(selectedProgram);
+              fetchCourseContent(selectedProgram);
+            }}
+            onNotification={addNotification}
+          />
           <div className="content-list-card">
             <div className="content-header">
               <h4 className="content-title">
@@ -882,6 +1149,21 @@ const CourseContentManagement = () => {
               <div className="loading-state">
                 <div className="loading-spinner" />
                 <p>Loading content...</p>
+              </div>
+            ) : modules.length > 0 ? (
+              <div className="accordion-container">
+                {modules.map((module) => (
+                  <AccordionModuleItem
+                    key={module.id}
+                    module={module}
+                    isOpen={openModules[module.id] || false}
+                    onToggle={() => toggleModule(module.id)}
+                    onViewDetails={handleViewDetails}
+                    onEditClick={handleEditClick}
+                    onDeleteClick={handleDeleteClick}
+                    onStatusChange={handleStatusChange}
+                  />
+                ))}
               </div>
             ) : moduleItems.length > 0 ? (
               <div className="module-list">
@@ -926,8 +1208,8 @@ const CourseContentManagement = () => {
                         >
                           <span className="material-symbols-outlined">
                             visibility
-                          </span>
-                          View Details
+                          </span>{" "}
+                          View Detail
                         </button>
                       )}
                     </div>
@@ -953,7 +1235,7 @@ const CourseContentManagement = () => {
                       <button
                         className="icon-btn delete"
                         title="Delete content"
-                        onClick={() => handleDeleteContent(item.id)}
+                        onClick={() => handleDeleteClick(item.id)}
                       >
                         <span className="material-symbols-outlined">
                           delete

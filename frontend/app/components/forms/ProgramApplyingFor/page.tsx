@@ -260,7 +260,7 @@ function ProgramApplyingFor({ onComplete, handleShowNext, studentEmail, formData
             >
               <option value="">Choose a program</option>
               <option value="Software Engineering">Software Engineering</option>
-              <option value="Cloud Computing">Cloud Computing</option>
+              <option value="Cloud Engineering">Cloud Engineering</option>
               <option value="Cyber Security">Cyber Security</option>
               <option value="Data Analytics">Data Analytics</option>
               <option value="Digital Marketing">Digital Marketing</option>
