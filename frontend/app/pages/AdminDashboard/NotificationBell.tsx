@@ -739,7 +739,7 @@ const NotificationBell = () => {
 
         @keyframes pulse {
           0% {
-            transform: scale(1);
+            transform: scale(1.50);
             box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7);
           }
           70% {
@@ -747,7 +747,7 @@ const NotificationBell = () => {
             box-shadow: 0 0 0 4px rgba(244, 67, 54, 0);
           }
           100% {
-            transform: scale(1);
+            transform: scale(1.50);
             box-shadow: 0 0 0 0 rgba(244, 67, 54, 0);
           }
         }
@@ -800,7 +800,7 @@ const NotificationBell = () => {
         .mark-all-read {
           background: none;
           border: none;
-          color: #667eea;
+          color: #e9691e;
           font-size: 12px;
           cursor: pointer;
           padding: 4px 8px;
@@ -809,7 +809,7 @@ const NotificationBell = () => {
         }
 
         .mark-all-read:hover {
-          background: rgba(102, 126, 234, 0.1);
+          background: rgba(233, 105, 30, 0.1);
         }
 
         .view-all {
@@ -903,7 +903,7 @@ const NotificationBell = () => {
         }
 
         .program-tag {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: #e9691e;
           color: white;
           padding: 2px 8px;
           border-radius: 4px;
@@ -919,7 +919,7 @@ const NotificationBell = () => {
         .unread-dot {
           width: 8px;
           height: 8px;
-          background: #2196f3;
+          background: #e9691e;
           border-radius: 50%;
           flex-shrink: 0;
           margin-top: 8px;

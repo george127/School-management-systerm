@@ -124,57 +124,57 @@ const CourseModule = () => {
   }, [userEmail]);
 
   const fetchCourseContent = async (showRefresh = false) => {
-  if (showRefresh) setRefreshing(true);
-  setIsLoading(true);
-  try {
-    const API_URL =
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    if (showRefresh) setRefreshing(true);
+    setIsLoading(true);
+    try {
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-    const response = await fetch(
-      `${API_URL}/api/content-files/student/course-content?email=${encodeURIComponent(userEmail!)}`,
-    );
+      const response = await fetch(
+        `${API_URL}/api/content-files/student/course-content?email=${encodeURIComponent(userEmail!)}`,
+      );
 
-    if (!response.ok) throw new Error("Failed to fetch");
+      if (!response.ok) throw new Error("Failed to fetch");
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (data && data.modules) {
-      // Fetch submission status for all assignments
-      for (const module of data.modules) {
-        for (const material of module.materials) {
-          material.status = normalizeStatus(material.status as string);
-          
-          // If this is an assignment, check if student has submitted
-          if (material.type === "assignment") {
-            try {
-              const submissionCheck = await fetch(
-                `${API_URL}/api/assignments/content/${material.id}/details?email=${encodeURIComponent(userEmail!)}`,
-              );
-              if (submissionCheck.ok) {
-                const submissionData = await submissionCheck.json();
-                if (submissionData.submission) {
-                  material.status = "completed";
-                  material.hasSubmitted = true;
-                  material.submissionId = submissionData.submission.id;
+      if (data && data.modules) {
+        // Fetch submission status for all assignments
+        for (const module of data.modules) {
+          for (const material of module.materials) {
+            material.status = normalizeStatus(material.status as string);
+
+            // If this is an assignment, check if student has submitted
+            if (material.type === "assignment") {
+              try {
+                const submissionCheck = await fetch(
+                  `${API_URL}/api/assignments/content/${material.id}/details?email=${encodeURIComponent(userEmail!)}`,
+                );
+                if (submissionCheck.ok) {
+                  const submissionData = await submissionCheck.json();
+                  if (submissionData.submission) {
+                    material.status = "completed";
+                    material.hasSubmitted = true;
+                    material.submissionId = submissionData.submission.id;
+                  }
                 }
+              } catch (err) {
+                console.error("Error checking submission:", err);
               }
-            } catch (err) {
-              console.error("Error checking submission:", err);
             }
           }
         }
       }
-    }
 
-    setCourseData(data);
-    setLockedModuleMessage(null);
-  } catch (err: any) {
-    setError(err.message);
-  } finally {
-    setIsLoading(false);
-    if (showRefresh) setRefreshing(false);
-  }
-};
+      setCourseData(data);
+      setLockedModuleMessage(null);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+      if (showRefresh) setRefreshing(false);
+    }
+  };
 
   const markContentCompleted = async (
     contentId: number,
@@ -234,97 +234,94 @@ const CourseModule = () => {
     fetchCourseContent(true);
   };
 
+  // NEW: Fetch assignment details
+  const fetchAssignmentDetails = async (contentId: number, title: string) => {
+    try {
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const response = await fetch(
+        `${API_URL}/api/assignments/content/${contentId}/details?email=${encodeURIComponent(userEmail!)}`,
+      );
 
-   // NEW: Fetch assignment details
-    const fetchAssignmentDetails = async (contentId: number, title: string) => {
-      try {
-        const API_URL =
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-        const response = await fetch(
-          `${API_URL}/api/assignments/content/${contentId}/details?email=${encodeURIComponent(userEmail!)}`,
-        );
+      if (!response.ok) throw new Error("Failed to fetch assignment details");
 
-        if (!response.ok) throw new Error("Failed to fetch assignment details");
+      const data = await response.json();
 
-        const data = await response.json();
+      setSelectedAssignment({
+        contentId: data.contentId,
+        title: data.title,
+        dueDate: data.dueDate,
+        instructions: data.instructions || data.description,
+        maxPoints: data.maxPoints,
+        existingSubmission: data.submission,
+      });
+    } catch (error) {
+      console.error("Error fetching assignment:", error);
+      setToastMessage({
+        type: "error",
+        text: "Failed to load assignment details",
+      });
+      setTimeout(() => setToastMessage(null), 3000);
+    }
+  };
 
-        setSelectedAssignment({
-          contentId: data.contentId,
-          title: data.title,
-          dueDate: data.dueDate,
-          instructions: data.instructions || data.description,
-          maxPoints: data.maxPoints,
-          existingSubmission: data.submission,
-        });
-      } catch (error) {
-        console.error("Error fetching assignment:", error);
-        setToastMessage({
-          type: "error",
-          text: "Failed to load assignment details",
-        });
-        setTimeout(() => setToastMessage(null), 3000);
+  // NEW: Submit assignment
+  const handleSubmitAssignment = async () => {
+    if (!selectedAssignment) return;
+
+    if (!submissionText && !submissionFile) {
+      setToastMessage({
+        type: "error",
+        text: "Please provide text or upload a file",
+      });
+      setTimeout(() => setToastMessage(null), 3000);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const formData = new FormData();
+      formData.append("contentId", selectedAssignment.contentId.toString());
+      formData.append("email", userEmail!);
+      if (submissionText) formData.append("submissionText", submissionText);
+      if (submissionFile) formData.append("file", submissionFile);
+
+      const response = await fetch(`${API_URL}/api/assignments/submit`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Submission failed");
       }
-    };
 
-    // NEW: Submit assignment
-    const handleSubmitAssignment = async () => {
-      if (!selectedAssignment) return;
+      const result = await response.json();
 
-      if (!submissionText && !submissionFile) {
-        setToastMessage({
-          type: "error",
-          text: "Please provide text or upload a file",
-        });
-        setTimeout(() => setToastMessage(null), 3000);
-        return;
-      }
+      setToastMessage({ type: "success", text: result.message });
+      setTimeout(() => setToastMessage(null), 3000);
 
-      setIsSubmitting(true);
+      // Close modal and refresh
+      setSelectedAssignment(null);
+      setSubmissionFile(null);
+      setSubmissionText("");
+      await fetchCourseContent(true);
+    } catch (error: any) {
+      console.error("Submission error:", error);
+      setToastMessage({ type: "error", text: error.message });
+      setTimeout(() => setToastMessage(null), 3000);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-      try {
-        const API_URL =
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-        const formData = new FormData();
-        formData.append("contentId", selectedAssignment.contentId.toString());
-        formData.append("email", userEmail!);
-        if (submissionText) formData.append("submissionText", submissionText);
-        if (submissionFile) formData.append("file", submissionFile);
-
-        const response = await fetch(`${API_URL}/api/assignments/submit`, {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || "Submission failed");
-        }
-
-        const result = await response.json();
-
-        setToastMessage({ type: "success", text: result.message });
-        setTimeout(() => setToastMessage(null), 3000);
-
-        // Close modal and refresh
-        setSelectedAssignment(null);
-        setSubmissionFile(null);
-        setSubmissionText("");
-        await fetchCourseContent(true);
-      } catch (error: any) {
-        console.error("Submission error:", error);
-        setToastMessage({ type: "error", text: error.message });
-        setTimeout(() => setToastMessage(null), 3000);
-      } finally {
-        setIsSubmitting(false);
-      }
-    };
-
-    // NEW: View submission (opens modal with existing submission)
-    const handleViewSubmission = async (material: Material) => {
-      await fetchAssignmentDetails(material.id, material.title);
-    };
-
-
+  // NEW: View submission (opens modal with existing submission)
+  const handleViewSubmission = async (material: Material) => {
+    await fetchAssignmentDetails(material.id, material.title);
+  };
 
   const handleVideoProgressUpdate = async () => {
     await fetchCourseContent(true);
@@ -400,8 +397,6 @@ const CourseModule = () => {
         </button>
       );
     }
-
-   
 
     return (
       <button
@@ -1035,84 +1030,6 @@ const CourseModule = () => {
           Share Progress
         </button>
       </div>
-
-      <style jsx>{`
-        .assignment-modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.8);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 2000;
-        }
-        .assignment-modal-content {
-          background: white;
-          border-radius: 12px;
-          width: 90%;
-          max-width: 600px;
-          max-height: 90vh;
-          overflow-y: auto;
-        }
-        .assignment-modal-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 20px;
-          border-bottom: 1px solid #ddd;
-        }
-        .assignment-modal-body {
-          padding: 20px;
-        }
-        .form-group {
-          margin-bottom: 20px;
-        }
-        .form-group label {
-          display: block;
-          margin-bottom: 8px;
-          font-weight: bold;
-        }
-        .form-group textarea {
-          width: 100%;
-          padding: 10px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-        }
-        .form-group input[type="file"] {
-          width: 100%;
-        }
-        .submit-assignment-btn {
-          background: #4caf50;
-          color: white;
-          padding: 12px 24px;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          width: 100%;
-        }
-        .submit-assignment-btn:disabled {
-          background: #ccc;
-        }
-        .existing-submission {
-          background: #f5f5f5;
-          padding: 15px;
-          border-radius: 8px;
-          margin-bottom: 20px;
-        }
-        .grade-display {
-          font-size: 18px;
-          font-weight: bold;
-        }
-        .feedback {
-          margin-top: 10px;
-          padding: 10px;
-          background: #e3f2fd;
-          border-radius: 4px;
-        }
-      `}</style>
     </div>
   );
 };

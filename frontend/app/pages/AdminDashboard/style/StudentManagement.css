@@ -1,4 +1,9 @@
 /* StudentManagement.css */
+
+/* ============================================
+   MAIN CONTAINER
+   ============================================ */
+
 .management-container {
   padding: 22px;
   box-sizing: border-box;
@@ -8,73 +13,166 @@
   color: #7f8c8d;
 }
 
-/* Header */
+/* ============================================
+   HEADER SECTION
+   ============================================ */
+
 .management-container .management-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 18px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
-/* Titles */
 .management-container .title {
   margin: 0;
   font-size: 1.4rem;
   font-weight: 700;
   color: #1e293b;
 }
+
 .management-container .subtitle {
   margin: 4px 0 0 0;
-   font-size: 1rem;
+  font-size: 1rem;
   color: #64748b;
 }
 
-/* Add button */
+/* Add Button */
+.management-container .btn-container {
+  display: flex;
+  align-items: center;
+}
+
 .management-container .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  gap: 8px;
   border-radius: 12px;
   width: 200px;
   height: 42px;
   font-size: 0.9rem;
+  background: linear-gradient(135deg, #e9691e 0%, #f08b4a 100%);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
 }
 
-/* Stats grid */
+.management-container .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 105, 30, 0.3);
+  background: linear-gradient(135deg, #d45a12 0%, #e9691e 100%);
+}
+
+.management-container .btn .icon {
+  font-size: 20px;
+}
+
+/* ============================================
+   SEARCH AND FILTER BAR
+   ============================================ */
+
+.management-container .search-filter-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.management-container .search-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 250px;
+}
+
+.management-container .search-icon {
+  position: absolute;
+  left: 12px;
+  color: #94a3b8;
+  font-size: 20px;
+}
+
+.management-container .search-input-field {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  background: #ffffff;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.management-container .search-input-field:focus {
+  border-color: #e9691e;
+  box-shadow: 0 0 0 3px rgba(233, 105, 30, 0.1);
+}
+
+.management-container .filter-wrapper {
+  min-width: 150px;
+}
+
+.management-container .filter-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  background: #ffffff;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.management-container .filter-select:focus {
+  border-color: #e9691e;
+  box-shadow: 0 0 0 3px rgba(233, 105, 30, 0.1);
+}
+
+/* ============================================
+   STATS GRID
+   ============================================ */
+
 .management-container .management-stats {
   margin-bottom: 20px;
 }
 
 .management-container .stats-grid {
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 14px;
 }
 
-@media (min-width: 780px) {
+@media (max-width: 780px) {
   .management-container .stats-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* Stat cards */
+@media (max-width: 480px) {
+  .management-container .stats-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+/* Stat Cards */
 .management-container .stat-card {
   padding: 1.5rem;
   border-radius: 16px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(248, 250, 252, 0.9) 100%
-  );
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(233, 105, 30, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   text-align: center;
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
 }
 
 .management-container .stat-card::before {
@@ -84,170 +182,79 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: #e9691e;
-  opacity: 0.8;
+  background: linear-gradient(90deg, #e9691e, #f08b4a);
 }
 
 .management-container .stat-card:hover {
   transform: translateY(-5px);
-  box-shadow: 
-    0 8px 30px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  box-shadow: 0 8px 30px rgba(233, 105, 30, 0.15);
 }
 
 .management-container .stat-value {
-  font-size: 1.6rem;
+  font-size: 2rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #1e293b, #475569);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #1e293b;
   margin-bottom: 0.5rem;
   display: block;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.1));
 }
 
 .management-container .stat-label {
   color: #64748b;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0;
 }
 
-/* Optional: Add icons to stat cards */
-.management-container .stat-card {
-  position: relative;
-}
-
-.management-container .stat-card::after {
-  content: '';
+/* Stat Card Icons */
+.student-management .stat-card:nth-child(1)::after {
+  content: '👥';
   position: absolute;
   top: 1rem;
   right: 1rem;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: currentColor;
-}
-/* Student Management Icons */
-.student-management .stat-card:nth-child(1)::after {
-  content: '👥';
-  background: transparent;
   font-size: 1.5rem;
+  opacity: 0.3;
 }
 
 .student-management .stat-card:nth-child(2)::after {
   content: '✅';
-  background: transparent;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
   font-size: 1.5rem;
+  opacity: 0.3;
 }
 
 .student-management .stat-card:nth-child(3)::after {
   content: '⏸️';
-  background: transparent;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
   font-size: 1.5rem;
+  opacity: 0.3;
 }
 
 .student-management .stat-card:nth-child(4)::after {
   content: '📚';
-  background: transparent;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
   font-size: 1.5rem;
+  opacity: 0.3;
 }
 
-/* Course Management Icons */
-.course-management .stat-card:nth-child(1)::after {
-  content: '📊';
-  background: transparent;
-  font-size: 1.5rem;
-}
+/* ============================================
+   TABLE STYLES
+   ============================================ */
 
-.course-management .stat-card:nth-child(2)::after {
-  content: '🎯';
-  background: transparent;
-  font-size: 1.5rem;
-}
-
-.course-management .stat-card:nth-child(3)::after {
-  content: '⏰';
-  background: transparent;
-  font-size: 1.5rem;
-}
-
-.course-management .stat-card:nth-child(4)::after {
-  content: '👨‍🎓';
-  background: transparent;
-  font-size: 1.5rem;
-}
-
-.payment-management .stat-card:nth-child(1)::after {
-  content: '💰';
-  background: transparent;
-  font-size: 1.5rem;
-}
-
-.payment-management .stat-card:nth-child(2)::after {
-  content: '✅';
-  background: transparent;
-  font-size: 1.5rem;
-}
-
-.payment-management .stat-card:nth-child(3)::after {
-  content: '⏳';
-  background: transparent;
-  font-size: 1.5rem;
-}
-
-.payment-management .stat-card:nth-child(4)::after {
-  content: '📊';
-  background: transparent;
-  font-size: 1.5rem;
-}
-
-/* Animation for value updates */
-@keyframes pulseUpdate {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-.management-container .stat-value.updated {
-  animation: pulseUpdate 0.6s ease-in-out;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .management-container .stat-card {
-    padding: 1.2rem;
-    border-radius: 12px;
-  }
-  
-  .management-container .stat-value {
-    font-size: 1.8rem;
-  }
-  
-  .management-container .stat-label {
-    font-size: 0.8rem;
-  }
-  
-  .management-container .stat-card::after {
-    width: 32px;
-    height: 32px;
-    top: 0.8rem;
-    right: 0.8rem;
-    font-size: 1.2rem;
-  }
-}
-/* Table wrapper (responsive) */
 .management-container .table-wrap {
-  overflow: auto;
+  overflow-x: auto;
   margin-top: 8px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid #e2e8f0;
 }
 
-/* Table */
 .management-container .students-table {
   width: 100%;
   border-collapse: collapse;
@@ -257,379 +264,1332 @@
 .management-container .students-table thead th {
   text-align: left;
   padding: 14px 18px;
-  font-size: 0.9rem;
-  color: #023a50;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.01)
-  );
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
   position: sticky;
   top: 0;
   z-index: 1;
 }
 
-.management-container .students-table tbody tr.table-row {
-  transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.01),
-    rgba(255, 255, 255, 0)
-  );
+.management-container .students-table tbody tr {
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.management-container .students-table tbody tr.table-row:hover {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.01)
-  );
-  transform: translateY(-4px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.09);
+.management-container .students-table tbody tr:hover {
+  background: #f8fafc;
 }
 
 .management-container .students-table td {
-  padding: 12px 18px;
+  padding: 14px 18px;
   vertical-align: middle;
-  color: #7f8c8d;
-  font-size: 0.95rem;
+  color: #475569;
+  font-size: 0.9rem;
 }
 
-/* Name cell with avatar */
+/* Name Cell */
 .management-container .name-cell {
   display: flex;
   align-items: center;
   gap: 12px;
 }
+
 .management-container .avatar {
   width: 44px;
   height: 44px;
-  border-radius: 10px;
-  display: inline-grid;
-  place-items: center;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 700;
+  font-size: 1rem;
   color: #fff;
-  background: #e9691e;
-  box-shadow: 0 4px 14px rgba(4, 40, 46, 0.05);
+  background: linear-gradient(135deg, #e9691e, #f08b4a);
+  box-shadow: 0 2px 8px rgba(233, 105, 30, 0.2);
 }
 
-/* small meta below name */
+.management-container .avatar-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .management-container .student-name {
   font-weight: 600;
-  color: #023a50;
-}
-.management-container .student-sub {
-  font-size: 0.82rem;
-  color: #7f8c8d;
+  color: #1e293b;
+  margin-bottom: 2px;
 }
 
-/* Badges */
+.management-container .student-sub {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* ============================================
+   STATUS BADGES
+   ============================================ */
+
 .management-container .badge {
-  padding: 0.5rem 1rem;
+  padding: 0.35rem 0.85rem;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
-  border: 1px solid transparent;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .management-container .badge.active {
-  background: linear-gradient(135deg, #bbf7d0, #dcfce7);
-  color: #064e3b;
-  border-color: rgba(34, 197, 94, 0.3);
-  box-shadow: 0 2px 6px rgba(34, 197, 94, 0.15);
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
 }
 
-.management-container .badge.inactive {
-  background: linear-gradient(135deg, #fed7aa, #fdba74);
-  color: #7c2d12;
-  border-color: rgba(251, 146, 60, 0.3);
-  box-shadow: 0 2px 6px rgba(251, 146, 60, 0.15);
-}
-
-.management-container .badge.pending {
-  background: linear-gradient(135deg, #bfdbfe, #93c5fd);
-  color: #1e40af;
-  border-color: rgba(59, 130, 246, 0.3);
-  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.15);
-}
-
-.management-container .badge.unknown {
-  background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
-  color: #475569;
-  border-color: rgba(100, 116, 139, 0.3);
-  box-shadow: 0 2px 6px rgba(100, 116, 139, 0.15);
-}
-
-/* Optional: Add status icons */
 .management-container .badge.active::before {
   content: "✓";
   font-weight: bold;
 }
 
+.management-container .badge.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
 .management-container .badge.inactive::before {
-  content: "⏸";
-}
-
-.management-container .badge.pending::before {
-  content: "⏳";
-}
-
-.management-container .badge.unknown::before {
-  content: "?";
+  content: "✗";
   font-weight: bold;
 }
 
-/* Hover effects */
 .management-container .badge:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.management-container .badge.active:hover {
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+/* ============================================
+   ACTION BUTTONS
+   ============================================ */
+
+.management-container .actions-cell {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
-.management-container .badge.inactive:hover {
-  box-shadow: 0 4px 12px rgba(251, 146, 60, 0.25);
-}
-
-.management-container .badge.pending:hover {
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
-}
-
-.management-container .badge.unknown:hover {
-  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.25);
-}
-/* Action buttons */
 .management-container .icon-btn {
-  display: inline-grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
   border: none;
-  margin-left: 6px;
   cursor: pointer;
-  transition: transform 0.12s, box-shadow 0.12s, opacity 0.12s;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.01)
-  );
-  color: #eaf6ff;
+  transition: all 0.2s ease;
+  background: #f1f5f9;
+  color: #475569;
 }
 
-.management-container .icon-btn:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
-  opacity: 0.98;
-}
 .management-container .icon-btn .material-symbols-outlined {
   font-size: 18px;
 }
 
-/* accent colors for action icons */
-.management-container .icon-btn.edit {
-  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-  color: #0369a1;
-  border: 1px solid rgba(3, 105, 161, 0.2);
-}
-
-.management-container .icon-btn.view {
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-  color: #15803d;
-  border: 1px solid rgba(21, 128, 61, 0.2);
-}
-
-.management-container .icon-btn.delete {
-  background: linear-gradient(135deg, #fef2f2, #fee2e2);
-  color: #dc2626;
-  border: 1px solid rgba(220, 38, 38, 0.2);
-}
-
-.management-container .icon-btn.manage {
-  background: linear-gradient(135deg, #faf5ff, #f3e8ff);
-  color: #7c3aed;
-  border: 1px solid rgba(124, 58, 237, 0.2);
-}
-
-/* Hover states */
 .management-container .icon-btn.edit:hover {
-  background: linear-gradient(135deg, #e0f2fe, #bae6fd);
-  color: #075985;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(3, 105, 161, 0.2);
+  background: #e0f2fe;
+  color: #0369a1;
+  transform: translateY(-2px);
 }
 
 .management-container .icon-btn.view:hover {
-  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
-  color: #166534;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(21, 128, 61, 0.2);
+  background: #dcfce7;
+  color: #15803d;
+  transform: translateY(-2px);
 }
 
 .management-container .icon-btn.delete:hover {
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
-  color: #b91c1c;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+  background: #fee2e2;
+  color: #dc2626;
+  transform: translateY(-2px);
 }
 
-.management-container .icon-btn.manage:hover {
-  background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
-  color: #6d28d9;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
-}
+/* ============================================
+   PAGINATION
+   ============================================ */
 
-/* Active states */
-.management-container .icon-btn.edit:active {
-  background: linear-gradient(135deg, #bae6fd, #7dd3fc);
-  transform: translateY(0);
-}
-
-.management-container .icon-btn.view:active {
-  background: linear-gradient(135deg, #bbf7d0, #86efac);
-  transform: translateY(0);
-}
-
-.management-container .icon-btn.delete:active {
-  background: linear-gradient(135deg, #fecaca, #fca5a5);
-  transform: translateY(0);
-}
-
-.management-container .icon-btn.manage:active {
-  background: linear-gradient(135deg, #e9d5ff, #d8b4fe);
-  transform: translateY(0);
-}
-/* Footer / Pager */
 .management-container .management-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 2rem;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  margin-top: 1.5rem;
+  padding: 1rem 0;
   color: #64748b;
   font-weight: 500;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.management-container .footer-left {
+  font-size: 0.85rem;
 }
 
 .management-container .pager {
   display: inline-flex;
   gap: 0.5rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .management-container .pager-btn {
-  background: #f8fafc;
+  background: #f1f5f9;
   color: #475569;
-  border: 1.5px solid #e2e8f0;
-  padding: 0.6rem 1rem;
-  border-radius: 10px;
-  font-weight: 600;
+  border: 1px solid #e2e8f0;
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 44px;
+  transition: all 0.2s ease;
+  min-width: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .management-container .pager-btn:not([disabled]):hover {
-  background: #fff;
+  background: #e9691e;
   border-color: #e9691e;
+  color: white;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  color: #e9691e;
 }
 
 .management-container .pager-btn.active {
   background: #e9691e;
   color: white;
-  border-color: transparent;
-  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
-  transform: translateY(-1px);
-}
-
-.management-container .pager-btn.active:hover {
-  background: #fff;
-  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
-  transform: translateY(-2px);
-  color: #e9691e;
+  border-color: #e9691e;
 }
 
 .management-container .pager-btn[disabled] {
-  opacity: 0.4;
+  opacity: 0.5;
   cursor: not-allowed;
-  background: #f1f5f9;
-  color: #94a3b8;
-  border-color: #e2e8f0;
-  transform: none;
-  box-shadow: none;
 }
 
-.management-container .pager-btn[disabled]:hover {
-  background: #f1f5f9;
-  border-color: #e2e8f0;
-  transform: none;
-  box-shadow: none;
-  color: #94a3b8;
+/* ============================================
+   LOADING & ERROR STATES
+   ============================================ */
+
+.management-container .loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  gap: 1rem;
 }
 
-/* Pager info text */
-.management-container .pager-info {
-  font-size: 0.9rem;
-  color: #64748b;
+.management-container .spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #e9691e;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.management-container .error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  gap: 1rem;
+  color: #dc2626;
+  text-align: center;
+}
+
+.management-container .error-state button {
+  padding: 8px 20px;
+  background: #e9691e;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
   font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-/* Responsive design */
+.management-container .error-state button:hover {
+  background: #d45a12;
+  transform: translateY(-1px);
+}
+
+.management-container .no-data-cell {
+  text-align: center;
+  padding: 3rem !important;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
 @media (max-width: 768px) {
+  .management-container {
+    padding: 16px;
+  }
+  
+  .management-container .management-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .management-container .btn {
+    width: 100%;
+  }
+  
+  .management-container .search-filter-bar {
+    flex-direction: column;
+  }
+  
+  .management-container .search-wrapper {
+    min-width: 100%;
+  }
+  
+  .management-container .filter-wrapper {
+    min-width: 100%;
+  }
+  
+  .management-container .students-table td,
+  .management-container .students-table th {
+    padding: 10px 12px;
+  }
+  
+  .management-container .avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 0.85rem;
+  }
+  
   .management-container .management-footer {
     flex-direction: column;
-    gap: 1rem;
     text-align: center;
-    padding: 1rem;
   }
   
   .management-container .pager {
-    flex-wrap: wrap;
     justify-content: center;
   }
   
   .management-container .pager-btn {
-    padding: 0.5rem 0.8rem;
-    min-width: 40px;
-    font-size: 0.85rem;
+    padding: 0.35rem 0.7rem;
+    min-width: 36px;
+    font-size: 0.8rem;
   }
 }
 
-/* Optional: Add pager navigation arrows */
-.management-container .pager-btn.prev::before {
-  content: "←";
-  margin-right: 0.3rem;
+@media (max-width: 480px) {
+  .management-container {
+    padding: 12px;
+  }
+  
+  .management-container .title {
+    font-size: 1.2rem;
+  }
+  
+  .management-container .subtitle {
+    font-size: 0.85rem;
+  }
+  
+  .management-container .stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .management-container .actions-cell {
+    gap: 4px;
+  }
+  
+  .management-container .icon-btn {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .management-container .icon-btn .material-symbols-outlined {
+    font-size: 16px;
+  }
 }
 
-.management-container .pager-btn.next::after {
-  content: "→";
-  margin-left: 0.3rem;
+
+/* StudentManagement.css - View Modal Styles */
+
+/* ============================================
+   VIEW MODAL STYLES (with student-management parent)
+   ============================================ */
+
+.student-management .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: studentModalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Optional: Ellipsis for large page ranges */
-.management-container .pager-ellipsis {
-  padding: 0.6rem 0.5rem;
-  color: #94a3b8;
+@keyframes studentModalFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+  }
+}
+
+.student-management .modal-container {
+  background: linear-gradient(135deg, #ffffff 0%, #fef9f5 100%);
+  border-radius: 28px;
+  width: 90%;
+  max-width: 750px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: studentModalSlideUp 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+  position: relative;
+}
+
+.student-management .modal-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #e9691e, #f08b4a, #e9691e);
+  border-radius: 28px 28px 0 0;
+}
+
+@keyframes studentModalSlideUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.student-management .modal-container.view-modal {
+  max-width: 750px;
+}
+
+/* Modal Header */
+.student-management .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem 1rem;
+  border-bottom: 2px solid rgba(233, 105, 30, 0.1);
+}
+
+.student-management .modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1e293b, #334155);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+.student-management .modal-close {
+  background: rgba(233, 105, 30, 0.1);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #e9691e;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.student-management .modal-close:hover {
+  background: #e9691e;
+  color: white;
+  transform: rotate(90deg);
+}
+
+/* Modal Body */
+.student-management .modal-body {
+  padding: 1.5rem 2rem;
+}
+
+/* Student Profile Header */
+.student-management .student-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(233, 105, 30, 0.05), rgba(240, 139, 74, 0.08));
+  border-radius: 24px;
+  border: 1px solid rgba(233, 105, 30, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.student-management .student-profile-header:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(233, 105, 30, 0.15);
+}
+
+.student-management .profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e9691e, #f08b4a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 8px 20px rgba(233, 105, 30, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.student-management .profile-avatar:hover {
+  transform: scale(1.05);
+}
+
+.student-management .profile-avatar.large {
+  width: 100px;
+  height: 100px;
+  font-size: 2.5rem;
+}
+
+.student-management .profile-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.student-management .profile-info h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.student-management .status-badge {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
   font-weight: 600;
+  text-transform: capitalize;
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  color: #166534;
+  border: 1px solid #86efac;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Details Grid */
+.student-management .details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.student-management .detail-item {
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.student-management .detail-item:hover {
+  background: #ffffff;
+  border-color: rgba(233, 105, 30, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateX(4px);
+}
+
+.student-management .detail-item label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #e9691e;
+  margin-bottom: 0.25rem;
+}
+
+.student-management .detail-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #1e293b;
+  word-break: break-word;
+  font-weight: 500;
+}
+
+/* Enrollments Section */
+.student-management .enrollments-section,
+.student-management .guardian-section {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid rgba(233, 105, 30, 0.1);
+}
+
+.student-management .enrollments-section h4,
+.student-management .guardian-section h4 {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e9691e;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.student-management .enrollments-section h4::before {
+  content: '📚';
+  font-size: 1.1rem;
+}
+
+.student-management .guardian-section h4::before {
+  content: '👨‍👩‍👧';
+  font-size: 1.1rem;
+}
+
+.student-management .enrollments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.student-management .enrollment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 14px;
+  transition: all 0.3s ease;
+  border-left: 3px solid #e9691e;
+}
+
+.student-management .enrollment-item:hover {
+  background: linear-gradient(135deg, #ffffff, #fef9f5);
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(233, 105, 30, 0.1);
+}
+
+.student-management .course-name {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.student-management .course-progress {
+  font-size: 0.85rem;
+  color: #e9691e;
+  font-weight: 700;
+  background: rgba(233, 105, 30, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+}
+
+/* Modal Footer */
+.student-management .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem 2rem 1.5rem;
+  border-top: 1px solid rgba(233, 105, 30, 0.1);
+}
+
+/* Button Styles */
+.student-management .btn-secondary {
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  color: #475569;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
+}
+
+.student-management .btn-secondary:hover {
+  background: linear-gradient(135deg, #e9691e, #f08b4a);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 105, 30, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .student-management .modal-container {
+    width: 95%;
+    max-height: 90vh;
+  }
+  
+  .student-management .details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .student-management .student-profile-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .student-management .modal-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .student-management .modal-header {
+    padding: 1rem 1.25rem;
+  }
+  
+  .student-management .modal-body {
+    padding: 1rem 1.25rem;
+  }
+  
+  .student-management .modal-footer {
+    padding: 1rem 1.25rem;
+  }
+  
+  .student-management .profile-avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
+  }
+  
+  .student-management .detail-item:hover {
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .student-management .enrollment-item {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  
+  .student-management .modal-close {
+    width: 32px;
+    height: 32px;
+    font-size: 1.3rem;
+  }
+}
+
+
+/* StudentManagement.css - Edit Modal Styles (Different from View Modal) */
+
+/* ============================================
+   EDIT MODAL STYLES - Different from View Modal
+   ============================================ */
+
+/* Edit Modal Overlay - Same but kept separate for control */
+.student-management .edit-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: editFadeIn 0.3s ease;
+}
+
+@keyframes editFadeIn {
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to { opacity: 1; backdrop-filter: blur(8px); }
+}
+
+/* Edit Modal Container - Wider than view modal */
+.student-management .edit-modal-container {
+  background: #ffffff;
+  border-radius: 24px;
+  width: 90%;
+  max-width: 900px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+  animation: editSlideUp 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+  position: relative;
+  border: 1px solid rgba(233, 105, 30, 0.2);
+}
+
+/* Different accent - orange bar on top (same as view but kept) */
+.student-management .edit-modal-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #e9691e, #f08b4a);
+  border-radius: 24px 24px 0 0;
+}
+
+@keyframes editSlideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Edit Modal Header - Different styling */
+.student-management .edit-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.75rem;
+  background: linear-gradient(135deg, #fef9f5, #ffffff);
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.student-management .edit-modal-header h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.student-management .edit-modal-header h2::before {
+  content: '✏️';
+  font-size: 1.3rem;
+}
+
+.student-management .edit-modal-close {
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.student-management .edit-modal-close:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Edit Modal Body - Different padding */
+.student-management .edit-modal-body {
+  padding: 1.75rem;
+}
+
+/* Form Grid - 2 columns for better layout */
+.student-management .edit-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+/* Form Groups - Different from view modal details */
+.student-management .edit-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.student-management .edit-form-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.student-management .edit-form-group label .required {
+  color: #e9691e;
+  margin-left: 2px;
+}
+
+/* Form Inputs - Interactive, different from view modal text */
+.student-management .edit-form-group input {
+  padding: 0.7rem 1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  outline: none;
+  background: #ffffff;
+  color: #1e293b;
+}
+
+.student-management .edit-form-group input:focus {
+  border-color: #e9691e;
+  box-shadow: 0 0 0 3px rgba(233, 105, 30, 0.1);
+}
+
+.student-management .edit-form-group input:hover:not(:focus) {
+  border-color: #cbd5e1;
+}
+
+/* Edit Modal Footer - Different button styling */
+.student-management .edit-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.25rem 1.75rem;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  border-radius: 0 0 24px 24px;
+  position: sticky;
+  bottom: 0;
+}
+
+/* Cancel Button */
+.student-management .edit-btn-cancel {
+  background: #ffffff;
+  color: #64748b;
+  border: 1.5px solid #e2e8f0;
+  padding: 0.6rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.student-management .edit-btn-cancel:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+/* Save Button - Different primary color treatment */
+.student-management .edit-btn-save {
+  background: linear-gradient(135deg, #e9691e, #f08b4a);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.8rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 4px rgba(233, 105, 30, 0.2);
+}
+
+.student-management .edit-btn-save:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(233, 105, 30, 0.3);
+}
+
+.student-management .edit-btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .student-management .edit-form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .student-management .edit-modal-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .student-management .edit-modal-container {
+    max-width: 95%;
+  }
+  
+  .student-management .edit-modal-header,
+  .student-management .edit-modal-body,
+  .student-management .edit-modal-footer {
+    padding: 1rem;
+  }
+  
+  .student-management .edit-form-group input {
+    padding: 0.6rem 0.8rem;
+  }
+}
+
+/* Loading state for save button */
+.student-management .edit-btn-save.loading {
+  position: relative;
+  padding-left: 2.2rem;
+}
+
+.student-management .edit-btn-save.loading::before {
+  content: '';
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border: 2px solid white;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* StudentManagement.css - Delete Modal Styles */
+
+/* ============================================
+   DELETE CONFIRMATION MODAL STYLES
+   ============================================ */
+
+/* Delete Modal Overlay */
+.student-management .delete-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: deleteFadeIn 0.25s ease-out;
+}
+
+@keyframes deleteFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+  }
+}
+
+/* Delete Modal Container - Smaller, centered, alert-style */
+.student-management .delete-modal-container {
+  background: linear-gradient(135deg, #ffffff 0%, #fef9f5 100%);
+  border-radius: 32px;
+  width: 90%;
+  max-width: 480px;
+  animation: deleteSlideIn 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+  position: relative;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  overflow: hidden;
+}
+
+/* Red accent bar at the top - different from other modals */
+.student-management .delete-modal-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #dc2626, #ef4444, #dc2626);
+}
+
+@keyframes deleteSlideIn {
+  from {
+    transform: scale(0.9) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Delete Modal Header */
+.student-management .delete-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem 0.75rem;
+  border-bottom: 1px solid rgba(220, 38, 38, 0.1);
+}
+
+.student-management .delete-modal-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.student-management .delete-modal-header h2 i {
+  font-size: 1.3rem;
+}
+
+.student-management .delete-modal-close {
+  background: rgba(220, 38, 38, 0.1);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #dc2626;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.student-management .delete-modal-close i {
+  font-size: 0.9rem;
+}
+
+.student-management .delete-modal-close:hover {
+  background: #dc2626;
+  color: white;
+  transform: rotate(90deg);
+}
+
+/* Delete Modal Body */
+.student-management .delete-modal-body {
+  padding: 1.5rem;
+}
+
+/* Warning Section */
+.student-management .delete-warning {
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.student-management .warning-icon-wrapper {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+  border: 2px solid #fca5a5;
+  animation: warningPulse 2s ease-in-out infinite;
+}
+
+@keyframes warningPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
+  }
+}
+
+.student-management .warning-icon-wrapper i {
+  font-size: 2.5rem;
+  color: #dc2626;
+}
+
+.student-management .warning-message {
+  font-size: 1.1rem;
+  color: #1e293b;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.student-management .warning-message strong {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.student-management .warning-text {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.student-management .warning-text i {
+  color: #e9691e;
+  font-size: 0.9rem;
+}
+
+/* Delete Modal Footer */
+.student-management .delete-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem 1.5rem 1.5rem;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Cancel Button */
+.student-management .delete-btn-cancel {
+  background: #ffffff;
+  color: #64748b;
+  border: 1.5px solid #e2e8f0;
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.student-management .delete-btn-cancel i {
+  font-size: 1rem;
+}
+
+.student-management .delete-btn-cancel:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+/* Confirm Delete Button - Red Danger Style */
+.student-management .delete-btn-confirm {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.4rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+.student-management .delete-btn-confirm i {
+  font-size: 1rem;
+}
+
+.student-management .delete-btn-confirm:hover {
+  background: linear-gradient(135deg, #b91c1c, #dc2626);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+}
+
+.student-management .delete-btn-confirm:active {
+  transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .student-management .delete-modal-container {
+    max-width: 90%;
+    margin: 1rem;
+  }
+  
+  .student-management .delete-modal-header {
+    padding: 1rem 1.25rem 0.5rem;
+  }
+  
+  .student-management .delete-modal-header h2 {
+    font-size: 1.1rem;
+  }
+  
+  .student-management .delete-modal-body {
+    padding: 1.25rem;
+  }
+  
+  .student-management .warning-icon-wrapper {
+    width: 55px;
+    height: 55px;
+  }
+  
+  .student-management .warning-icon-wrapper i {
+    font-size: 2rem;
+  }
+  
+  .student-management .warning-message {
+    font-size: 1rem;
+  }
+  
+  .student-management .delete-modal-footer {
+    padding: 0.875rem 1.25rem 1.25rem;
+  }
+  
+  .student-management .delete-btn-cancel,
+  .student-management .delete-btn-confirm {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .student-management .delete-modal-footer {
+    flex-direction: column;
+  }
+  
+  .student-management .delete-btn-cancel,
+  .student-management .delete-btn-confirm {
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .student-management .warning-text {
+    font-size: 0.75rem;
+  }
 }

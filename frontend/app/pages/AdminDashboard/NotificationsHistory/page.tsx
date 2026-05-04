@@ -626,7 +626,7 @@ const NotificationsHistory = () => {
 
         .mark-all-btn {
           padding: 8px 20px;
-          background: linear-gradient(135deg, #10b981, #059669);
+          background: #e9691e;
           border: none;
           border-radius: 40px;
           color: white;
@@ -641,7 +641,7 @@ const NotificationsHistory = () => {
 
         .mark-all-btn:hover {
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+          box-shadow: 0 4px 6px rgba(233, 105, 30, 0.3);
         }
 
         /* Notifications List */

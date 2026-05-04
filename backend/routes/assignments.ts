@@ -1,16 +1,11 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import { upload, uploadToS3, deleteFromS3 } from "../config/s3";
-
+import nodemailer from "nodemailer";
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// ============================================
-// TEST ENDPOINT
-// ============================================
-router.get("/test", (req, res) => {
-  res.json({ message: "Assignment routes are working!" });
-});
+
 
 // ============================================
 // GET STUDENT BY EMAIL
@@ -116,8 +111,223 @@ router.get("/content/:contentId/details", async (req, res) => {
   }
 });
 
+
+// Configure email transporter with Gmail-specific settings
+const emailTransporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: parseInt(process.env.EMAIL_PORT || "587"),
+  secure: process.env.EMAIL_SECURE === "true",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+  // Gmail-specific settings
+  service: 'gmail',
+  tls: {
+    rejectUnauthorized: false
+  },
+  connectionTimeout: 30000,
+  greetingTimeout: 30000,
+  socketTimeout: 30000,
+});
+
+// Verify transporter configuration (add this before using it)
+async function verifyEmailTransporter() {
+  try {
+    await emailTransporter.verify();
+    console.log('✅ Email transporter is ready to send emails');
+    return true;
+  } catch (error) {
+    console.error('❌ Email transporter verification failed:', error);
+    return false;
+  }
+}
+
+// Helper function to send email notifications to admins
+async function sendEmailToAdmins(admins: any[], studentName: string, assignmentTitle: string, programName: string, submissionId: number) {
+  // Verify transporter first (optional, for debugging)
+  const isVerified = await verifyEmailTransporter();
+  if (!isVerified) {
+    console.log('⚠️ Email transporter not ready, skipping emails');
+    return [];
+  }
+
+  const emailPromises = admins.map(async (admin) => {
+    // Make sure admin has email
+    if (!admin.email) {
+      console.log(`⚠️ Admin ${admin.id} has no email address`);
+      return null;
+    }
+
+    console.log(`📧 Attempting to send email to: ${admin.email}`);
+    
+    const mailOptions = {
+      from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+      to: admin.email,
+      subject: `📝 New Assignment Submission: ${assignmentTitle}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>New Assignment Submission</title>
+        </head>
+        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #e2e8f0; line-height: 1.6;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #e2e8f0;">
+            <tr>
+              <td align="center">
+                <!-- Main Container -->
+                <table width="100%"  cellpadding="0" cellspacing="0" width: 100%; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                  
+                  <!-- Header with Brand Color -->
+                  <tr>
+                    <td style="background-color: #e9691e; padding: 10px; text-align: center;">
+                      <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">New Assignment Submission</h1>
+                      <p style="color: #ffffff; margin: 10px 0 0 0; opacity: 0.9;">Action Required: Review Student Work</p>
+                    </td>
+                  </tr>
+                  
+                  <!-- Content Area -->
+                  <tr>
+                    <td style="padding: 10px; text-align: center;">
+                      <!-- Greeting -->
+                      <h2 style="color: #1a2a3a; font-size: 22px; margin: 0 0 10px 0;">Hello ${admin.name || 'Admin'},</h2>
+                      <p style="color: #4a5568; margin: 0 0 25px 0; font-size: 16px;">
+                        A student has submitted an assignment. Please review the details below and provide feedback.
+                      </p>
+                      
+                      <!-- Submission Details Table -->
+                      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f7fafc; border-radius: 8px; margin-bottom: 30px;">
+                        <tr>
+                          <td style="padding: 20px;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                              <!-- Student Name -->
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                                  <table width="100%" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                      <td style="width: 40%;">
+                                        <strong style="color: #4a5568;">Student Name:</strong>
+                                      </td>
+                                      <td style="width: 60%;">
+                                        <span style="color: #2d3748;">${studentName}</span>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                              <!-- Assignment Title -->
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                                  <table width="100%" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                      <td style="width: 40%;">
+                                        <strong style="color: #4a5568;">Assignment:</strong>
+                                      </td>
+                                      <td style="width: 60%;">
+                                        <span style="color: #2d3748; font-weight: 600;">${assignmentTitle}</span>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                              <!-- Program Name -->
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                                  <table width="100%" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                      <td style="width: 40%;">
+                                        <strong style="color: #4a5568;">Program:</strong>
+                                      </td>
+                                      <td style="width: 60%;">
+                                        <span style="color: #2d3748;">${programName}</span>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                              <!-- Submission ID -->
+                              <tr>
+                                <td style="padding: 12px 0;">
+                                  <table width="100%" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                      <td style="width: 40%;">
+                                        <strong style="color: #4a5568;">Submission ID:</strong>
+                                      </td>
+                                      <td style="width: 60%;">
+                                        <span style="color: #2d3748; font-family: monospace;">#${submissionId}</span>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                      
+                      <!-- Action Button -->
+                      <div style="text-align: center; margin: 35px 0;">
+                        <a href="${process.env.APP_URL || 'http://localhost:3000'}/admin/submissions/${submissionId}" 
+                           style="background-color: #e9691e; color: #ffffff; padding: 14px 32px; text-decoration: none; 
+                                  border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px;
+                                  box-shadow: 0 2px 4px rgba(233, 105, 30, 0.2); transition: all 0.3s ease;">
+                          📋 View Submission
+                        </a>
+                      </div>
+                      
+                      <!-- Additional Info -->
+                      <div style="background-color: #fff3e8; border-left: 4px solid #e9691e; padding: 15px 20px; margin: 30px 0 20px 0; border-radius: 4px;">
+                        <p style="margin: 0; color: #5a4a3a; font-size: 14px;">
+                          <strong>💡 Quick Tip:</strong> You can grade this submission, provide feedback, and update the student's progress directly from the admin panel.
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                  
+                  <!-- Footer -->
+                  <tr>
+                    <td style="background-color: #f7fafc; padding: 30px 40px; text-align: center; border-top: 1px solid #e2e8f0;">
+                      <p style="color: #718096; font-size: 12px; margin: 0 0 10px 0;">
+                        This is an automated notification from your <span style="color: #e9691e; font-weight: 600;">LMS System</span>.
+                      </p>
+                      <p style="color: #a0aec0; font-size: 11px; margin: 0;">
+                        © ${new Date().getFullYear()} Learning Management System. All rights reserved.
+                      </p>
+                      <p style="color: #a0aec0; font-size: 11px; margin: 10px 0 0 0;">
+                        <span style="color: #e9691e;">✦</span> You received this email because you are an administrator in the LMS system.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+      `,
+    };
+
+    try {
+      const info = await emailTransporter.sendMail(mailOptions);
+      console.log(`✅ Email sent to ${admin.email} - Message ID: ${info.messageId}`);
+      return { success: true, email: admin.email };
+    } catch (emailError: any) {
+      console.error(`❌ Failed to send email to ${admin.email}:`, emailError.message);
+      if (emailError.code) {
+        console.error(`Error code: ${emailError.code}`);
+      }
+      return { success: false, email: admin.email, error: emailError.message };
+    }
+  });
+
+  const results = await Promise.all(emailPromises);
+  return results.filter(r => r !== null);
+}
+
 // ============================================
-// SUBMIT ASSIGNMENT
+// SUBMIT ASSIGNMENT (UPDATED WITH EMAIL NOTIFICATIONS)
 // ============================================
 router.post("/submit", upload.single("file"), async (req, res) => {
   try {
@@ -209,14 +419,15 @@ router.post("/submit", upload.single("file"), async (req, res) => {
       });
     }
 
-    // Create notifications for admins (NO top-level await)
-    try {
-      const admins = await prisma.user.findMany({
-        where: { role: "admin" },
-        select: { id: true },
-      });
+    // Get admins with their email addresses
+    const admins = await prisma.user.findMany({
+      where: { role: "admin" },
+      select: { id: true, email: true, name: true }, // Make sure email and name fields exist
+    });
 
-      if (admins.length > 0) {
+    // Create database notifications
+    if (admins.length > 0) {
+      try {
         await prisma.assignmentNotification.createMany({
           data: admins.map((admin) => ({
             adminId: admin.id,
@@ -227,10 +438,23 @@ router.post("/submit", upload.single("file"), async (req, res) => {
             read: false,
           })),
         });
-        console.log(`✅ Notifications created for ${admins.length} admins`);
+        console.log(`✅ Database notifications created for ${admins.length} admins`);
+        
+        // Send email notifications
+        const emailResults = await sendEmailToAdmins(
+          admins,
+          student.fullName,
+          content.title,
+          content.programName,
+          submission.id
+        );
+        
+        const successfulEmails = emailResults.filter(r => r?.success).length;
+        console.log(`✅ Email notifications sent to ${successfulEmails} admins`);
+        
+      } catch (notifError) {
+        console.error("Error creating notifications:", notifError);
       }
-    } catch (notifError) {
-      console.error("Error creating notifications:", notifError);
     }
 
     // Mark content as completed
@@ -285,6 +509,8 @@ router.post("/submit", upload.single("file"), async (req, res) => {
     res.status(500).json({ error: error.message || "Failed to submit assignment" });
   }
 });
+
+
 
 // ============================================
 // GET STUDENT SUBMISSIONS

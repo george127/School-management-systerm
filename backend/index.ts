@@ -17,6 +17,7 @@ import adminRoutes from './routes/adminRoute/adminRoutes';
 import courseContentRoutes from './routes/courseContentRoute';
 import videoProgressRoutes from "./routes/videoProgress";
 import assignmentRoutes from "./routes/assignments";
+import studentManagementRoutes from "./routes/studentManagement";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -164,6 +165,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/content-files", courseContentRoutes);
 app.use("/api/video-progress", videoProgressRoutes);
 app.use("/api/assignments", assignmentRoutes);
+app.use("/api/student-management", studentManagementRoutes); 
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

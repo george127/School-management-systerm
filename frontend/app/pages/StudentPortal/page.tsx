@@ -10,7 +10,6 @@ import PaymentInfo from "./PaymentInfo";
 import Dashboard from "./Dashboard";
 import FeesPayment from "./FeesPayment";
 import CourseModule from "./CourseModule";
-import CourseMaterial from "./CourseMaterial";
 import CoursePerformance from "./CoursePerformance";
 import CourseAssignment from "./CourseAssignment";
 import CourseGrade from "./CourseGrade";
@@ -1078,24 +1077,50 @@ const handlePasswordUpdate = async () => {
 };
 
 // Main StudentPortal Component
+// Add these interfaces at the top of your file, before the StudentPortal component
+
+interface User {
+  id?: string;
+  name?: string;
+  email?: string;
+}
+
+interface ProfileImageResponse {
+  success: boolean;
+  profileImage?: string;
+}
+
+interface ErrorResponse {
+  message?: string;
+}
+
 const StudentPortal = () => {
   const router = useRouter();
-  const [activeSection, setActiveSection] = useState("dashboard");
+  const [activeSection, setActiveSection] = useState<string>("dashboard");
   const [studentData, setStudentData] = useState<StudentData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [isPaymentDropdownOpen, setIsPaymentDropdownOpen] = useState(false);
-  const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] = useState(false);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-
-    const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+  const [isPaymentDropdownOpen, setIsPaymentDropdownOpen] = useState<boolean>(false);
+  const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] = useState<boolean>(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
+  const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState<boolean>(true);
 
   const toggleSearch = (): void => {
     setIsSearchVisible(!isSearchVisible);
   };
 
+  const toggleSidebar = (): void => {
+    setIsSidebarExpanded(!isSidebarExpanded);
+    // Close dropdowns when collapsing to avoid issues
+    if (isSidebarExpanded) {
+      setIsPaymentDropdownOpen(false);
+      setIsCoursesDropdownOpen(false);
+    }
+  };
+
   // Get user from localStorage instead of Redux
-  const getUserFromStorage = () => {
+  const getUserFromStorage = (): User | null => {
     if (typeof window !== "undefined") {
       const userStr = localStorage.getItem("user");
       try {
@@ -1107,11 +1132,11 @@ const StudentPortal = () => {
     return null;
   };
 
-  const user = getUserFromStorage();
-  const userEmail = user?.email;
+  const user: User | null = getUserFromStorage();
+  const userEmail: string | undefined = user?.email;
 
   // Check if user is authenticated
-  const isAuthenticated = () => {
+  const isAuthenticated = (): boolean => {
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("token");
       const user = localStorage.getItem("user");
@@ -1120,62 +1145,95 @@ const StudentPortal = () => {
     return false;
   };
 
-  const togglePaymentDropdown = () => {
-    setIsPaymentDropdownOpen(!isPaymentDropdownOpen);
-  };
-
-  const toggleCoursesDropdown = () => {
-    setIsCoursesDropdownOpen(!isCoursesDropdownOpen);
-  };
-
-
-// Update the fetchStudentData function
-// Update the fetchStudentData function - SIMPLIFIED
-const fetchStudentData = useCallback(async () => {
-  if (!user?.email) return;
-
-  try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-    const token = localStorage.getItem("token");
-    
-    console.log("Fetching profile image for:", user.email);
-    
-    // Fetch profile image directly
-    let profileImage = null;
-    const imageResponse = await fetch(`${API_URL}/api/profile/profile-image/${user.email}`, {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-    });
-    const imageData = await imageResponse.json();
-    console.log("Profile image response:", imageData);
-    
-    if (imageData.success && imageData.profileImage) {
-      profileImage = imageData.profileImage;
+  const togglePaymentDropdown = (e?: React.MouseEvent): void => {
+    if (e) e.stopPropagation();
+    if (!isSidebarExpanded) {
+      // In collapsed mode, close courses dropdown and open payment dropdown
+      setIsCoursesDropdownOpen(false);
+      setIsPaymentDropdownOpen(!isPaymentDropdownOpen);
+    } else {
+      setIsPaymentDropdownOpen(!isPaymentDropdownOpen);
     }
-    
-    // Set student data with profile image
-    setStudentData({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      profileImage: profileImage,
-    });
-    
-  } catch (err: any) {
-    console.error("Error fetching student data:", err);
-    setError(err?.message || "Failed to fetch student data");
-  } finally {
-    setLoading(false);
-  }
-}, [user?.email]);
+  };
 
-// Refresh data when modal closes
-useEffect(() => {
-  if (!isProfileModalOpen && user?.email) {
-    fetchStudentData();
-  }
-}, [isProfileModalOpen, fetchStudentData]);
+  const toggleCoursesDropdown = (e?: React.MouseEvent): void => {
+    if (e) e.stopPropagation();
+    if (!isSidebarExpanded) {
+      // In collapsed mode, close payment dropdown and open courses dropdown
+      setIsPaymentDropdownOpen(false);
+      setIsCoursesDropdownOpen(!isCoursesDropdownOpen);
+    } else {
+      setIsCoursesDropdownOpen(!isCoursesDropdownOpen);
+    }
+  };
+
+  // Close dropdowns when clicking outside (for collapsed mode)
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent): void => {
+      if (!isSidebarExpanded && (isPaymentDropdownOpen || isCoursesDropdownOpen)) {
+        const sidebar = document.querySelector('.sidebar');
+        const target = event.target as Node;
+        
+        // Check if click is outside sidebar
+        if (sidebar && !sidebar.contains(target)) {
+          setIsPaymentDropdownOpen(false);
+          setIsCoursesDropdownOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isSidebarExpanded, isPaymentDropdownOpen, isCoursesDropdownOpen]);
+
+  // Update the fetchStudentData function - FIXED: Now properly sets studentData
+  const fetchStudentData = useCallback(async (): Promise<void> => {
+    if (!user?.email) return;
+
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const token = localStorage.getItem("token");
+      
+      console.log("Fetching profile image for:", user.email);
+      
+      // Fetch profile image directly
+      let profileImage: string | null = null;
+      const imageResponse = await fetch(`${API_URL}/api/profile/profile-image/${user.email}`, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
+      const imageData: ProfileImageResponse = await imageResponse.json();
+      console.log("Profile image response:", imageData);
+      
+      if (imageData.success && imageData.profileImage) {
+        profileImage = imageData.profileImage;
+      }
+      
+      setStudentData({
+        id: user.id || "",
+        name: user.name || "",
+        email: user.email,
+        profileImage: profileImage,
+      });
+      
+    } catch (err: unknown) {
+      console.error("Error fetching student data:", err);
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch student data";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.email, user?.id, user?.name]);
+
+  // Refresh data when modal closes
+  useEffect(() => {
+    if (!isProfileModalOpen && user?.email) {
+      fetchStudentData();
+    }
+  }, [isProfileModalOpen, fetchStudentData, user?.email]);
 
   useEffect(() => {
     fetchStudentData();
@@ -1188,7 +1246,7 @@ useEffect(() => {
     }
   }, [router]);
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     // Clear all auth data from localStorage
     localStorage.removeItem("user");
     localStorage.removeItem("token");
@@ -1218,7 +1276,12 @@ useEffect(() => {
   return (
     <div className="d-flex">
       {/* Sidebar */}
-      <div className="sidebar">
+      <div className={`sidebar ${isSidebarExpanded ? "expanded" : "collapsed"}`}>
+        {/* Toggle Button */}
+        <button className="sidebar-toggle" onClick={toggleSidebar}>
+          <i className={`bi ${isSidebarExpanded ? "bi-chevron-left" : "bi-chevron-right"}`}></i>
+        </button>
+        
         <div className="p-container">
           <div
             className="sidebar-profile"
@@ -1232,59 +1295,84 @@ useEffect(() => {
               }
               alt="Profile Icon"
               className="p-image"
-              onError={(e) => {
+              onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
                 e.currentTarget.src = `https://ui-avatars.com/api/?background=4F46E5&color=fff&bold=true&size=128&name=${encodeURIComponent(user?.name || "User")}`;
               }}
             />
           </div>
-          <p className="name">{user?.name}</p>
+          {isSidebarExpanded && <p className="name">{user?.name}</p>}
         </div>
+        
         <ul className="p-3 nav flex-column">
           <li className="mb-3 nav-item">
             <button
-              className={`nav-link ${
-                activeSection === "dashboard" ? "active" : ""
-              }`}
+              className={`nav-link ${activeSection === "dashboard" ? "active" : ""}`}
               onClick={() => setActiveSection("dashboard")}
             >
               <i className="bi bi-speedometer2 me-2"></i>
-              Dashboard
+              {isSidebarExpanded && "Dashboard"}
             </button>
           </li>
+          
           <li className="mb-3 nav-item">
             <div className="sidebar-item">
-              <div className="dropdown-header" onClick={togglePaymentDropdown}>
+              <div 
+                className={`dropdown-header ${isPaymentDropdownOpen ? "active" : ""}`} 
+                onClick={togglePaymentDropdown}
+              >
                 <button
-                  className={`nav-link ${
-                    isPaymentDropdownOpen ? "active" : ""
-                  }`}
+                  className={`nav-link ${isPaymentDropdownOpen ? "active" : ""}`}
                 >
                   <i className="bi bi-card-list me-2"></i>
-                  Payment Info
-                  <span
-                    className={`arrow-icon ${
-                      isPaymentDropdownOpen ? "open" : ""
-                    }`}
-                  >
-                    &#9662;
-                  </span>
+                  {isSidebarExpanded && "Payment Info"}
+                  {isSidebarExpanded && (
+                    <span className={`arrow-icon ${isPaymentDropdownOpen ? "open" : ""}`}>
+                      &#9662;
+                    </span>
+                  )}
                 </button>
               </div>
-              {isPaymentDropdownOpen && (
+              {/* For expanded mode - dropdown shows inline */}
+              {isSidebarExpanded && isPaymentDropdownOpen && (
                 <div className="dropdown-list">
                   <div
-                    className={`dropdown-item ${
-                      activeSection === "feespayment" ? "active" : ""
-                    }`}
-                    onClick={() => setActiveSection("feespayment")}
+                    className={`dropdown-item ${activeSection === "feespayment" ? "active" : ""}`}
+                    onClick={() => {
+                      setActiveSection("feespayment");
+                      setIsPaymentDropdownOpen(false);
+                    }}
                   >
                     Fees Payment
                   </div>
                   <div
-                    className={`dropdown-item ${
-                      activeSection === "paymentdetails" ? "active" : ""
-                    }`}
-                    onClick={() => setActiveSection("paymentdetails")}
+                    className={`dropdown-item ${activeSection === "paymentdetails" ? "active" : ""}`}
+                    onClick={() => {
+                      setActiveSection("paymentdetails");
+                      setIsPaymentDropdownOpen(false);
+                    }}
+                  >
+                    Payment Details
+                  </div>
+                </div>
+              )}
+              {/* For collapsed mode - dropdown shows as floating menu */}
+              {!isSidebarExpanded && isPaymentDropdownOpen && (
+                <div className="dropdown-list collapsed-dropdown">
+                  <div
+                    className={`dropdown-item ${activeSection === "feespayment" ? "active" : ""}`}
+                    onClick={() => {
+                      setActiveSection("feespayment");
+                      setIsPaymentDropdownOpen(false);
+                    }}
+                  >
+                    Fees Payment
+                  </div>
+                  <div
+                    className={`dropdown-item ${activeSection === "paymentdetails" ? "active" : ""}`}
+                    onClick={() => {
+                      setActiveSection("paymentdetails");
+                      setIsPaymentDropdownOpen(false);
+                    }}
                   >
                     Payment Details
                   </div>
@@ -1292,74 +1380,122 @@ useEffect(() => {
               )}
             </div>
           </li>
+          
           <li className="mb-3 nav-item">
             <div className="sidebar-item">
-              <div className="dropdown-header" onClick={toggleCoursesDropdown}>
+              <div 
+                className={`dropdown-header ${isCoursesDropdownOpen ? "active" : ""}`} 
+                onClick={toggleCoursesDropdown}
+              >
                 <button
-                  className={`nav-link ${
-                    isCoursesDropdownOpen ? "active" : ""
-                  }`}
+                  className={`nav-link ${isCoursesDropdownOpen ? "active" : ""}`}
                 >
                   <i className="bi bi-book me-2"></i>
-                  Courses
-                  <span
-                    className={`arrow-icon ${
-                      isCoursesDropdownOpen ? "open" : ""
-                    }`}
-                  >
-                    &#9662;
-                  </span>
+                  {isSidebarExpanded && "Courses"}
+                  {isSidebarExpanded && (
+                    <span className={`arrow-icon ${isCoursesDropdownOpen ? "open" : ""}`}>
+                      &#9662;
+                    </span>
+                  )}
                 </button>
               </div>
-              {isCoursesDropdownOpen && (
+              {/* For expanded mode - dropdown shows inline */}
+              {isSidebarExpanded && isCoursesDropdownOpen && (
                 <div className="dropdown-list">
                   <div
-                    className={`dropdown-item ${
-                      activeSection === "course Module" ? "active" : ""
-                    }`}
-                    onClick={() => setActiveSection("course Module")}
+                    className={`dropdown-item ${activeSection === "course Module" ? "active" : ""}`}
+                    onClick={() => {
+                      setActiveSection("course Module");
+                      setIsCoursesDropdownOpen(false);
+                    }}
                   >
-                    course Module
+                    Course Module
                   </div>
                   <div
-                    className={`dropdown-item ${
-                      activeSection === "course material" ? "active" : ""
-                    }`}
-                    onClick={() => setActiveSection("course material")}
-                  >
-                    course material
-                  </div>
-                  <div
-                    className={`dropdown-item ${
-                      activeSection === "Performance" ? "active" : ""
-                    }`}
-                    onClick={() => setActiveSection("Performance")}
+                    className={`dropdown-item ${activeSection === "Performance" ? "active" : ""}`}
+                    onClick={() => {
+                      setActiveSection("Performance");
+                      setIsCoursesDropdownOpen(false);
+                    }}
                   >
                     Performance
                   </div>
                   <div
-                    className={`dropdown-item ${
-                      activeSection === "Grade" ? "active" : ""
-                    }`}
-                    onClick={() => setActiveSection("Grade")}
+                    className={`dropdown-item ${activeSection === "Grade" ? "active" : ""}`}
+                    onClick={() => {
+                      setActiveSection("Grade");
+                      setIsCoursesDropdownOpen(false);
+                    }}
                   >
                     Grade
                   </div>
                   <div
-                    className={`dropdown-item ${
-                      activeSection === "Assignment" ? "active" : ""
-                    }`}
-                    onClick={() => setActiveSection("Assignment")}
+                    className={`dropdown-item ${activeSection === "Assignment" ? "active" : ""}`}
+                    onClick={() => {
+                      setActiveSection("Assignment");
+                      setIsCoursesDropdownOpen(false);
+                    }}
                   >
                     Assignment
                   </div>
                   <div
-                    className={`dropdown-item ${
-                      activeSection === "quiz" ? "active" : ""
-                    }`}
-                    onClick={() => setActiveSection("quiz")}
+                    className={`dropdown-item ${activeSection === "quiz" ? "active" : ""}`}
+                    onClick={() => {
+                      setActiveSection("quiz");
+                      setIsCoursesDropdownOpen(false);
+                    }}
                   >
-                    quiz
+                    Quiz
+                  </div>
+                </div>
+              )}
+              {/* For collapsed mode - dropdown shows as floating menu */}
+              {!isSidebarExpanded && isCoursesDropdownOpen && (
+                <div className="dropdown-list collapsed-dropdown">
+                  <div
+                    className={`dropdown-item ${activeSection === "course Module" ? "active" : ""}`}
+                    onClick={() => {
+                      setActiveSection("course Module");
+                      setIsCoursesDropdownOpen(false);
+                    }}
+                  >
+                    Course Module
+                  </div>
+                  <div
+                    className={`dropdown-item ${activeSection === "Performance" ? "active" : ""}`}
+                    onClick={() => {
+                      setActiveSection("Performance");
+                      setIsCoursesDropdownOpen(false);
+                    }}
+                  >
+                    Performance
+                  </div>
+                  <div
+                    className={`dropdown-item ${activeSection === "Grade" ? "active" : ""}`}
+                    onClick={() => {
+                      setActiveSection("Grade");
+                      setIsCoursesDropdownOpen(false);
+                    }}
+                  >
+                    Grade
+                  </div>
+                  <div
+                    className={`dropdown-item ${activeSection === "Assignment" ? "active" : ""}`}
+                    onClick={() => {
+                      setActiveSection("Assignment");
+                      setIsCoursesDropdownOpen(false);
+                    }}
+                  >
+                    Assignment
+                  </div>
+                  <div
+                    className={`dropdown-item ${activeSection === "quiz" ? "active" : ""}`}
+                    onClick={() => {
+                      setActiveSection("quiz");
+                      setIsCoursesDropdownOpen(false);
+                    }}
+                  >
+                    Quiz
                   </div>
                 </div>
               )}
@@ -1368,24 +1504,21 @@ useEffect(() => {
 
           <li className="mb-3 nav-item">
             <button
-              className={`nav-link ${
-                activeSection === "settings" ? "active" : ""
-              }`}
+              className={`nav-link ${activeSection === "settings" ? "active" : ""}`}
               onClick={() => setActiveSection("settings")}
             >
               <i className="bi bi-gear me-2"></i>
-              Settings
+              {isSidebarExpanded && "Settings"}
             </button>
           </li>
+          
           <li className="mb-3 nav-item">
             <button
-              className={`nav-link ${
-                activeSection === "logout" ? "active" : ""
-              }`}
+              className={`nav-link ${activeSection === "logout" ? "active" : ""}`}
               onClick={handleLogout}
             >
               <i className="bi bi-box-arrow-right me-2"></i>
-              Log Out
+              {isSidebarExpanded && "Log Out"}
             </button>
           </li>
         </ul>
@@ -1404,38 +1537,39 @@ useEffect(() => {
                 height={40}
               />
             </div>
-             <div className="student-icons">
-            {/* Notification Bell */}
-            <div className="notification-container">
-              <div className="notification-button">
-                <span className="material-symbols-outlined">notifications</span>
-                <span className="notification-badge"></span>
+            <div className="student-icons">
+              {/* Notification Bell */}
+              <div className="notification-container">
+                <div className="notification-button">
+                  <span className="material-symbols-outlined">notifications</span>
+                  <span className="notification-badge"></span>
+                </div>
+              </div>
+
+              {/* Search Bar */}
+              <div className="search-bar-container">
+                {!isSearchVisible && (
+                  <button className="search-icon-button" onClick={toggleSearch}>
+                    <span className="material-symbols-outlined">search</span>
+                  </button>
+                )}
+                {isSearchVisible && (
+                  <div className="search-wrapper">
+                    <input
+                      type="text"
+                      placeholder="Search..."
+                      className="search-input"
+                    />
+                    <button className="close-icon-button" onClick={toggleSearch}>
+                      <span className="material-symbols-outlined">close</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
-
-            {/* Search Bar */}
-            <div className="search-bar-container">
-              {!isSearchVisible && (
-                <button className="search-icon-button" onClick={toggleSearch}>
-                  <span className="material-symbols-outlined">search</span>
-                </button>
-              )}
-              {isSearchVisible && (
-                <div className="search-wrapper">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    className="search-input"
-                  />
-                  <button className="close-icon-button" onClick={toggleSearch}>
-                    <span className="material-symbols-outlined">close</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
           </div>
         </div>
+        
         {activeSection === "dashboard" && (
           <div className="md-4">
             <Dashboard />
@@ -1452,11 +1586,6 @@ useEffect(() => {
         {activeSection === "course Module" && (
           <div className="section">
             <CourseModule />
-          </div>
-        )}
-        {activeSection === "course material" && (
-          <div className="section">
-            <CourseMaterial />
           </div>
         )}
         {activeSection === "Performance" && (
@@ -1484,6 +1613,7 @@ useEffect(() => {
             <Settings />
           </div>
         )}
+        
         {/* Footer */}
         <div className="footer">
           <p>
