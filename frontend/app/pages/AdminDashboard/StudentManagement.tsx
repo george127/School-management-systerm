@@ -47,6 +47,13 @@ interface StudentStats {
   totalEnrollments: number;
 }
 
+interface Notification {
+  id: number;
+  type: "success" | "error" | "info" | "warning";
+  title: string;
+  message: string;
+}
+
 const StudentManagement = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [stats, setStats] = useState<StudentStats>({
@@ -76,7 +83,262 @@ const StudentManagement = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [editFormData, setEditFormData] = useState<Partial<Student>>({});
 
+  // Notification and Status Modal states
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState<boolean>(false);
+  const [statusAction, setStatusAction] = useState<{
+    studentId: number;
+    studentName: string;
+    currentStatus: string;
+    newStatus: string;
+  } | null>(null);
+
+  // Add these state variables with your other state declarations
+  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+  // Add this with your other state declarations
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [profileImagePreview, setProfileImagePreview] = useState<string>("");
+  const [isAdding, setIsAdding] = useState<boolean>(false);
+  const [addFormData, setAddFormData] = useState<Partial<Student>>({
+    fullName: "",
+    email: "",
+    phone: "",
+    address: "",
+    nationality: "",
+    gender: "male",
+    programName: "",
+    qualification: "",
+    institution: "",
+    studyArea: "",
+    guardianFullName: "",
+    guardianPhone: "",
+    guardianEmail: "",
+  });
+
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+  // Add new student function with profile image
+  const handleAddStudentSubmit = async () => {
+    // Validation
+    if (!addFormData.fullName || !addFormData.email || !addFormData.phone) {
+      addNotification(
+        "error",
+        "Validation Error",
+        "Full name, email, and phone are required",
+      );
+      return;
+    }
+
+    setIsAdding(true);
+    try {
+      let profileImageUrl = addFormData.profileImage || "";
+
+      // Upload profile image if selected
+      if (profileImageFile) {
+        // Option 1: Convert to base64 and store directly (simpler)
+        profileImageUrl = profileImagePreview;
+
+        // Option 2: Upload to server (uncomment if you have an upload endpoint)
+        // profileImageUrl = await uploadProfileImage(profileImageFile);
+      }
+
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${API_URL}/api/student-management/students`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fullName: addFormData.fullName,
+            email: addFormData.email.toLowerCase(),
+            phone: addFormData.phone,
+            address: addFormData.address || "",
+            nationality: addFormData.nationality || "",
+            dob: addFormData.dob
+              ? new Date(addFormData.dob).toISOString()
+              : new Date().toISOString(),
+            gender: addFormData.gender || "male",
+            profileImage: profileImageUrl, // Add profile image URL
+            programName: addFormData.programName || "",
+            courseDetails: addFormData.courseDetails || "",
+            qualification: addFormData.qualification || "",
+            institution: addFormData.institution || "",
+            graduationYear: addFormData.graduationYear
+              ? parseInt(addFormData.graduationYear.toString())
+              : null,
+            studyArea: addFormData.studyArea || "",
+            certifications: addFormData.certifications || "",
+            guardianFullName: addFormData.guardianFullName || "",
+            relationship: addFormData.relationship || "",
+            guardianPhone: addFormData.guardianPhone || "",
+            guardianEmail: addFormData.guardianEmail || "",
+            guardianOccupation: addFormData.guardianOccupation || "",
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to add student");
+      }
+
+      const data = await response.json();
+      addNotification(
+        "success",
+        "Student Added!",
+        `${addFormData.fullName} has been added successfully.`,
+      );
+
+      // Reset form and close modal
+      setAddFormData({
+        fullName: "",
+        email: "",
+        phone: "",
+        address: "",
+        nationality: "",
+        gender: "male",
+        programName: "",
+        qualification: "",
+        institution: "",
+        studyArea: "",
+        guardianFullName: "",
+        guardianPhone: "",
+        guardianEmail: "",
+      });
+      setProfileImageFile(null);
+      setProfileImagePreview("");
+      setIsAddModalOpen(false);
+
+      // Refresh the list
+      await fetchStudents();
+      await fetchStats();
+    } catch (err: any) {
+      console.error("Error adding student:", err);
+      addNotification(
+        "error",
+        "Add Failed",
+        err.message || "Failed to add student",
+      );
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  // Update handleAddStudent to reset form when opening
+  const handleAddStudent = () => {
+    setAddFormData({
+      fullName: "",
+      email: "",
+      phone: "",
+      address: "",
+      nationality: "",
+      gender: "male",
+      programName: "",
+      qualification: "",
+      institution: "",
+      studyArea: "",
+      guardianFullName: "",
+      guardianPhone: "",
+      guardianEmail: "",
+    });
+    setProfileImageFile(null);
+    setProfileImagePreview("");
+    setIsAddModalOpen(true);
+  };
+
+  // Handle profile image selection
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        addNotification(
+          "error",
+          "File Too Large",
+          "Profile image must be less than 5MB",
+        );
+        return;
+      }
+
+      // Validate file type
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+      ];
+      if (!allowedTypes.includes(file.type)) {
+        addNotification(
+          "error",
+          "Invalid File Type",
+          "Please upload a valid image file (JPEG, PNG, GIF, WEBP)",
+        );
+        return;
+      }
+
+      setProfileImageFile(file);
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Upload image to server (optional - if you have an upload endpoint)
+  const uploadProfileImage = async (file: File): Promise<string> => {
+    // If you have an image upload endpoint, use this
+    // Otherwise, you can store as base64 or skip
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_URL}/api/upload`, {
+        method: "POST",
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to upload image");
+      }
+
+      const data = await response.json();
+      return data.imageUrl; // Return the URL of the uploaded image
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      // If upload fails, return empty string or base64
+      return "";
+    }
+  };
+
+  // Notification helper functions
+  const addNotification = (
+    type: Notification["type"],
+    title: string,
+    message: string,
+  ) => {
+    const id = Date.now();
+    setNotifications((prev) => [...prev, { id, type, title, message }]);
+
+    setTimeout(() => {
+      setNotifications((prev) => prev.filter((notif) => notif.id !== id));
+    }, 5000);
+  };
+
+  const removeNotification = (id: number) => {
+    setNotifications((prev) => prev.filter((notif) => notif.id !== id));
+  };
 
   // Fetch students with pagination and filters
   const fetchStudents = useCallback(async () => {
@@ -141,6 +403,84 @@ const StudentManagement = () => {
     }
   }, [API_URL]);
 
+  // Handle status toggle click - opens modal
+  const handleToggleStatusClick = (
+    studentId: number,
+    studentName: string,
+    currentStatus: string,
+  ) => {
+    const newStatus = currentStatus === "active" ? "inactive" : "active";
+    setStatusAction({
+      studentId,
+      studentName,
+      currentStatus,
+      newStatus,
+    });
+    setIsStatusModalOpen(true);
+  };
+
+  // Handle status toggle confirmation
+  const handleToggleStatus = async () => {
+    if (!statusAction) return;
+
+    const { studentId, studentName, newStatus } = statusAction;
+    const action = newStatus === "active" ? "activate" : "deactivate";
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${API_URL}/api/student-management/students/${studentId}/status`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: newStatus }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to update student status");
+      }
+
+      // Update the student in the local state - FIXED: explicitly type the status
+      setStudents((prevStudents) =>
+        prevStudents.map((student) =>
+          student.id === studentId
+            ? { ...student, status: newStatus as "active" | "inactive" } // ← Added type assertion
+            : student,
+        ),
+      );
+
+      // Refresh stats from server to ensure accuracy
+      await fetchStats();
+
+      // Show success notification
+      addNotification(
+        "success",
+        "Status Updated!",
+        `${studentName} has been ${action}d successfully.`,
+      );
+
+      setIsStatusModalOpen(false);
+      setStatusAction(null);
+    } catch (err: any) {
+      console.error("Error updating student status:", err);
+      addNotification(
+        "error",
+        "Update Failed",
+        err.message || "Failed to update student status",
+      );
+      // Refresh the entire list to ensure consistency
+      await fetchStudents();
+      await fetchStats();
+      setIsStatusModalOpen(false);
+      setStatusAction(null);
+    }
+  };
+
   // Fetch single student details
   const fetchStudentDetails = async (studentId: number) => {
     try {
@@ -162,7 +502,11 @@ const StudentManagement = () => {
       return data.student;
     } catch (err: any) {
       console.error("Error fetching student details:", err);
-      alert(err.message || "Failed to fetch student details");
+      addNotification(
+        "error",
+        "Error",
+        err.message || "Failed to fetch student details",
+      );
       return null;
     }
   };
@@ -190,7 +534,11 @@ const StudentManagement = () => {
         throw new Error("Failed to update student");
       }
 
-      alert("Student updated successfully!");
+      addNotification(
+        "success",
+        "Student Updated!",
+        `${selectedStudent.fullName}'s information has been updated successfully.`,
+      );
       setIsEditModalOpen(false);
       setSelectedStudent(null);
       setEditFormData({});
@@ -198,7 +546,11 @@ const StudentManagement = () => {
       await fetchStats();
     } catch (err: any) {
       console.error("Error updating student:", err);
-      alert(err.message || "Failed to update student");
+      addNotification(
+        "error",
+        "Update Failed",
+        err.message || "Failed to update student",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -224,50 +576,22 @@ const StudentManagement = () => {
         throw new Error("Failed to delete student");
       }
 
-      alert(`${studentToDelete.name} has been deleted successfully!`);
+      addNotification(
+        "success",
+        "Student Deleted!",
+        `${studentToDelete.name} has been removed from the system.`,
+      );
       setIsDeleteConfirmOpen(false);
       setStudentToDelete(null);
       await fetchStudents();
       await fetchStats();
     } catch (err: any) {
       console.error("Error deleting student:", err);
-      alert(err.message || "Failed to delete student");
-    }
-  };
-
-  // Toggle student status
-  const handleToggleStatus = async (
-    studentId: number,
-    currentStatus: string,
-  ) => {
-    const newStatus = currentStatus === "active" ? "inactive" : "active";
-    const action = newStatus === "active" ? "activate" : "deactivate";
-
-    if (confirm(`Are you sure you want to ${action} this student?`)) {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `${API_URL}/api/student-management/students/${studentId}/status`,
-          {
-            method: "PATCH",
-            headers: {
-              Authorization: token ? `Bearer ${token}` : "",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ status: newStatus }),
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to update student status");
-        }
-
-        await fetchStudents();
-        await fetchStats();
-      } catch (err: any) {
-        console.error("Error updating student status:", err);
-        alert(err.message || "Failed to update student status");
-      }
+      addNotification(
+        "error",
+        "Deletion Failed",
+        err.message || "Failed to delete student",
+      );
     }
   };
 
@@ -303,20 +627,15 @@ const StudentManagement = () => {
     }
   };
 
-  // Add new student
-  const handleAddStudent = () => {
-    alert(
-      "Add new student functionality - Implement modal or navigate to add student page",
-    );
-  };
-
   // Close modals
   const closeModals = () => {
     setIsViewModalOpen(false);
     setIsEditModalOpen(false);
     setIsDeleteConfirmOpen(false);
+    setIsStatusModalOpen(false);
     setSelectedStudent(null);
     setStudentToDelete(null);
+    setStatusAction(null);
     setEditFormData({});
   };
 
@@ -384,6 +703,89 @@ const StudentManagement = () => {
 
   return (
     <div className="management-container student-management">
+      {/* Notification Container */}
+      <div className="notification-container">
+        {notifications.map((notification) => (
+          <div
+            key={notification.id}
+            className={`notification notification-${notification.type}`}
+            onClick={() => removeNotification(notification.id)}
+          >
+            <div className="notification-content">
+              <div className="notification-icon">
+                {notification.type === "success" && "✓"}
+                {notification.type === "error" && "✗"}
+                {notification.type === "info" && "ℹ"}
+                {notification.type === "warning" && "⚠"}
+              </div>
+              <div className="notification-text">
+                <div className="notification-title">{notification.title}</div>
+                <div className="notification-message">
+                  {notification.message}
+                </div>
+              </div>
+              <button className="notification-close">×</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Status Confirmation Modal */}
+      {isStatusModalOpen && statusAction && (
+        <div className="status-modal-overlay" onClick={closeModals}>
+          <div
+            className="status-modal-container"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="status-modal-header">
+              <h2>Confirm Status Change</h2>
+              <button className="status-modal-close" onClick={closeModals}>
+                ×
+              </button>
+            </div>
+            <div className="status-modal-body">
+              <div className="status-warning">
+                <div className="status-icon-wrapper">
+                  <i
+                    className={`bi bi-${statusAction.newStatus === "active" ? "check-circle" : "x-circle"}`}
+                  ></i>
+                </div>
+                <p className="status-message">
+                  Are you sure you want to{" "}
+                  <strong>
+                    {statusAction.newStatus === "active"
+                      ? "activate"
+                      : "deactivate"}
+                  </strong>{" "}
+                  <strong className="student-name">
+                    {statusAction.studentName}
+                  </strong>
+                  ?
+                </p>
+                <p className="status-text">
+                  {statusAction.newStatus === "active"
+                    ? "This student will regain access to all courses and features."
+                    : "This student will lose access to all courses and features until reactivated."}
+                </p>
+              </div>
+            </div>
+            <div className="status-modal-footer">
+              <button className="status-btn-cancel" onClick={closeModals}>
+                Cancel
+              </button>
+              <button
+                className={`status-btn-confirm ${statusAction.newStatus}`}
+                onClick={handleToggleStatus}
+              >
+                {statusAction.newStatus === "active"
+                  ? "Activate Student"
+                  : "Deactivate Student"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <header className="management-header">
         <div>
           <h3 className="title">Student Management</h3>
@@ -498,7 +900,11 @@ const StudentManagement = () => {
                       className={getStatusBadgeClass(student.status)}
                       style={{ cursor: "pointer" }}
                       onClick={() =>
-                        handleToggleStatus(student.id, student.status)
+                        handleToggleStatusClick(
+                          student.id,
+                          student.fullName,
+                          student.status,
+                        )
                       }
                       title="Click to toggle status"
                     >
@@ -949,12 +1355,9 @@ const StudentManagement = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="delete-modal-header">
-              <h2>
-                <i className="bi bi-trash3-fill"></i>
-                Confirm Delete
-              </h2>
+              <h2>Confirm Delete</h2>
               <button className="delete-modal-close" onClick={closeModals}>
-                <i className="bi bi-x-lg"></i>
+                ×
               </button>
             </div>
             <div className="delete-modal-body">
@@ -967,7 +1370,6 @@ const StudentManagement = () => {
                   <strong>{studentToDelete.name}</strong>?
                 </p>
                 <p className="warning-text">
-                  <i className="bi bi-info-circle"></i>
                   This action cannot be undone. All associated data including
                   enrollments, payments, and submissions will be permanently
                   removed.
@@ -976,16 +1378,387 @@ const StudentManagement = () => {
             </div>
             <div className="delete-modal-footer">
               <button className="delete-btn-cancel" onClick={closeModals}>
-                <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
               <button
                 className="delete-btn-confirm"
                 onClick={handleDeleteStudent}
               >
-                <i className="bi bi-trash3"></i>
                 Delete Student
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Student Modal */}
+      {isAddModalOpen && (
+        <div
+          className="add-modal-overlay"
+          onClick={() => setIsAddModalOpen(false)}
+        >
+          <div
+            className="add-modal-container"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="add-modal-header">
+              <h2>Add New Student</h2>
+              <button
+                className="add-modal-close"
+                onClick={() => setIsAddModalOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="add-modal-body">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleAddStudentSubmit();
+                }}
+              >
+                {/* Profile Image Upload Section */}
+                <div className="form-section">
+                  <h3>Profile Image</h3>
+                  <div className="profile-image-upload">
+                    <div className="profile-image-preview">
+                      {profileImagePreview ? (
+                        <img
+                          src={profileImagePreview}
+                          alt="Profile preview"
+                          className="preview-image"
+                        />
+                      ) : (
+                        <div className="preview-placeholder">
+                          <span className="material-symbols-outlined">
+                            person
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="profile-image-actions">
+                      <label className="upload-btn">
+                        <span className="material-symbols-outlined">
+                          upload
+                        </span>
+                        Choose Image
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                          onChange={handleProfileImageChange}
+                          style={{ display: "none" }}
+                        />
+                      </label>
+                      {profileImagePreview && (
+                        <button
+                          type="button"
+                          className="remove-btn"
+                          onClick={() => {
+                            setProfileImageFile(null);
+                            setProfileImagePreview("");
+                          }}
+                        >
+                          <span className="material-symbols-outlined">
+                            delete
+                          </span>
+                          Remove
+                        </button>
+                      )}
+                      <p className="upload-hint">
+                        JPEG, PNG, GIF, WEBP (Max 5MB)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Basic Information Section */}
+                <div className="form-section">
+                  <h3>Basic Information</h3>
+                  <div className="add-form-grid">
+                    <div className="add-form-group">
+                      <label>
+                        Full Name <span className="required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={addFormData.fullName || ""}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            fullName: e.target.value,
+                          })
+                        }
+                        required
+                        placeholder="Enter full name"
+                      />
+                    </div>
+                    <div className="add-form-group">
+                      <label>
+                        Email <span className="required">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        value={addFormData.email || ""}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            email: e.target.value,
+                          })
+                        }
+                        required
+                        placeholder="Enter email address"
+                      />
+                    </div>
+                    <div className="add-form-group">
+                      <label>
+                        Phone <span className="required">*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        value={addFormData.phone || ""}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            phone: e.target.value,
+                          })
+                        }
+                        required
+                        placeholder="Enter phone number"
+                      />
+                    </div>
+                    <div className="add-form-group">
+                      <label>Gender</label>
+                      <select
+                        value={addFormData.gender || "male"}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            gender: e.target.value,
+                          })
+                        }
+                      >
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                    <div className="add-form-group">
+                      <label>Date of Birth</label>
+                      <input
+                        type="date"
+                        value={addFormData.dob?.toString().split("T")[0] || ""}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            dob: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="add-form-group">
+                      <label>Nationality</label>
+                      <input
+                        type="text"
+                        value={addFormData.nationality || ""}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            nationality: e.target.value,
+                          })
+                        }
+                        placeholder="Enter nationality"
+                      />
+                    </div>
+                    <div className="add-form-group full-width">
+                      <label>Address</label>
+                      <input
+                        type="text"
+                        value={addFormData.address || ""}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            address: e.target.value,
+                          })
+                        }
+                        placeholder="Enter address"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Academic Information Section */}
+                <div className="form-section">
+                  <h3>Academic Information</h3>
+                  <div className="add-form-grid">
+                    <div className="add-form-group">
+                      <label>Program Name</label>
+                      <input
+                        type="text"
+                        value={addFormData.programName || ""}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            programName: e.target.value,
+                          })
+                        }
+                        placeholder="Enter program name"
+                      />
+                    </div>
+                    <div className="add-form-group">
+                      <label>Qualification</label>
+                      <input
+                        type="text"
+                        value={addFormData.qualification || ""}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            qualification: e.target.value,
+                          })
+                        }
+                        placeholder="Enter qualification"
+                      />
+                    </div>
+                    <div className="add-form-group">
+                      <label>Institution</label>
+                      <input
+                        type="text"
+                        value={addFormData.institution || ""}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            institution: e.target.value,
+                          })
+                        }
+                        placeholder="Enter institution"
+                      />
+                    </div>
+                    <div className="add-form-group">
+                      <label>Study Area</label>
+                      <input
+                        type="text"
+                        value={addFormData.studyArea || ""}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            studyArea: e.target.value,
+                          })
+                        }
+                        placeholder="Enter study area"
+                      />
+                    </div>
+                    <div className="add-form-group">
+                      <label>Graduation Year</label>
+                      <input
+                        type="number"
+                        value={addFormData.graduationYear || ""}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            graduationYear: parseInt(e.target.value),
+                          })
+                        }
+                        placeholder="Enter graduation year"
+                        min="1950"
+                        max={new Date().getFullYear() + 10}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Guardian Information Section */}
+                <div className="form-section">
+                  <h3>Guardian Information</h3>
+                  <div className="add-form-grid">
+                    <div className="add-form-group">
+                      <label>Guardian Full Name</label>
+                      <input
+                        type="text"
+                        value={addFormData.guardianFullName || ""}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            guardianFullName: e.target.value,
+                          })
+                        }
+                        placeholder="Enter guardian name"
+                      />
+                    </div>
+                    <div className="add-form-group">
+                      <label>Relationship</label>
+                      <input
+                        type="text"
+                        value={addFormData.relationship || ""}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            relationship: e.target.value,
+                          })
+                        }
+                        placeholder="e.g., Father, Mother"
+                      />
+                    </div>
+                    <div className="add-form-group">
+                      <label>Guardian Phone</label>
+                      <input
+                        type="tel"
+                        value={addFormData.guardianPhone || ""}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            guardianPhone: e.target.value,
+                          })
+                        }
+                        placeholder="Enter guardian phone"
+                      />
+                    </div>
+                    <div className="add-form-group">
+                      <label>Guardian Email</label>
+                      <input
+                        type="email"
+                        value={addFormData.guardianEmail || ""}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            guardianEmail: e.target.value,
+                          })
+                        }
+                        placeholder="Enter guardian email"
+                      />
+                    </div>
+                    <div className="add-form-group full-width">
+                      <label>Guardian Occupation</label>
+                      <input
+                        type="text"
+                        value={addFormData.guardianOccupation || ""}
+                        onChange={(e) =>
+                          setAddFormData({
+                            ...addFormData,
+                            guardianOccupation: e.target.value,
+                          })
+                        }
+                        placeholder="Enter guardian occupation"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="add-modal-footer">
+                  <button
+                    type="button"
+                    className="add-btn-cancel"
+                    onClick={() => setIsAddModalOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="add-btn-submit"
+                    disabled={isAdding}
+                  >
+                    {isAdding ? "Adding..." : "Add Student"}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

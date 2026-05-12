@@ -96,7 +96,6 @@ model Student {
   
   enrollments     Enrollment[]
   assignmentSubmissions AssignmentSubmission[] 
-
 }
 
 model Program {

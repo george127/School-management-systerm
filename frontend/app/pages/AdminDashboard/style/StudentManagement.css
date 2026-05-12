@@ -1593,3 +1593,757 @@
     font-size: 0.75rem;
   }
 }
+
+
+
+
+
+/* ============================================
+   NOTIFICATION TOAST STYLES
+   ============================================ */
+
+.student-management .notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+}
+
+.student-management .notification {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+  cursor: pointer;
+  animation: notificationSlideIn 0.3s ease-out;
+  transition: all 0.3s ease;
+  border-left: 4px solid;
+  overflow: hidden;
+}
+
+.student-management .notification:hover {
+  transform: translateX(-4px);
+  box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes notificationSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.student-management .notification-success {
+  border-left-color: #10b981;
+}
+
+.student-management .notification-error {
+  border-left-color: #ef4444;
+}
+
+.student-management .notification-info {
+  border-left-color: #3b82f6;
+}
+
+.student-management .notification-warning {
+  border-left-color: #f59e0b;
+}
+
+.student-management .notification-content {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  gap: 12px;
+}
+
+.student-management .notification-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.student-management .notification-success .notification-icon {
+  background: #d1fae5;
+  color: #10b981;
+}
+
+.student-management .notification-error .notification-icon {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.student-management .notification-info .notification-icon {
+  background: #dbeafe;
+  color: #3b82f6;
+}
+
+.student-management .notification-warning .notification-icon {
+  background: #fed7aa;
+  color: #f59e0b;
+}
+
+.student-management .notification-text {
+  flex: 1;
+}
+
+.student-management .notification-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #1e293b;
+  margin-bottom: 2px;
+}
+
+.student-management .notification-message {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.student-management .notification-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #94a3b8;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.student-management .notification-close:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* ============================================
+   STATUS CONFIRMATION MODAL STYLES
+   ============================================ */
+
+.student-management .status-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: statusFadeIn 0.25s ease-out;
+}
+
+@keyframes statusFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+  }
+}
+
+.student-management .status-modal-container {
+  background: linear-gradient(135deg, #ffffff 0%, #fef9f5 100%);
+  border-radius: 32px;
+  width: 90%;
+  max-width: 480px;
+  animation: statusSlideIn 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.student-management .status-modal-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #e9691e, #f08b4a);
+}
+
+@keyframes statusSlideIn {
+  from {
+    transform: scale(0.9) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.student-management .status-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem 0.75rem;
+  border-bottom: 1px solid rgba(233, 105, 30, 0.1);
+}
+
+.student-management .status-modal-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #e9691e;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.student-management .status-modal-header h2 i {
+  font-size: 1.3rem;
+}
+
+.student-management .status-modal-close {
+  background: rgba(233, 105, 30, 0.1);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #e9691e;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.student-management .status-modal-close:hover {
+  background: #e9691e;
+  color: white;
+  transform: rotate(90deg);
+}
+
+.student-management .status-modal-body {
+  padding: 1.5rem;
+}
+
+.student-management .status-warning {
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.student-management .status-icon-wrapper {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+  border: 2px solid #fca5a5;
+  animation: statusPulse 2s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(233, 105, 30, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(233, 105, 30, 0);
+  }
+}
+
+.student-management .status-icon-wrapper i {
+  font-size: 2.5rem;
+  color: #e9691e;
+}
+
+.student-management .status-message {
+  font-size: 1.1rem;
+  color: #1e293b;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.student-management .status-message strong {
+  color: #e9691e;
+  font-weight: 700;
+}
+
+.student-management .status-message .student-name {
+  color: #e9691e;
+  font-weight: 700;
+}
+
+.student-management .status-text {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 12px;
+}
+
+.student-management .status-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem 1.5rem 1.5rem;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.student-management .status-btn-cancel {
+  background: #ffffff;
+  color: #64748b;
+  border: 1.5px solid #e2e8f0;
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.student-management .status-btn-cancel i {
+  font-size: 1rem;
+}
+
+.student-management .status-btn-cancel:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.student-management .status-btn-confirm {
+  padding: 0.6rem 1.4rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+}
+
+.student-management .status-btn-confirm.active {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.student-management .status-btn-confirm.active:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.student-management .status-btn-confirm.inactive {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.student-management .status-btn-confirm.inactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* Update the status badge cursor */
+.student-management .badge {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.student-management .badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+
+
+
+
+/* ============================================
+   ADD STUDENT MODAL STYLES
+   ============================================ */
+
+.student-management .add-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: addFadeIn 0.3s ease;
+}
+
+@keyframes addFadeIn {
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to { opacity: 1; backdrop-filter: blur(8px); }
+}
+
+.student-management .add-modal-container {
+  background: #ffffff;
+  border-radius: 24px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+  animation: addSlideUp 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+  position: relative;
+  border: 1px solid rgba(233, 105, 30, 0.2);
+}
+
+.student-management .add-modal-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #e9691e, #f08b4a);
+  border-radius: 24px 24px 0 0;
+}
+
+@keyframes addSlideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.student-management .add-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.75rem;
+  background: linear-gradient(135deg, #fef9f5, #ffffff);
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.student-management .add-modal-header h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.student-management .add-modal-header h2::before {
+  content: '➕';
+  font-size: 1.3rem;
+}
+
+.student-management .add-modal-close {
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.student-management .add-modal-close:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.student-management .add-modal-body {
+  padding: 1.75rem;
+}
+
+.student-management .form-section {
+  margin-bottom: 2rem;
+}
+
+.student-management .form-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e9691e;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(233, 105, 30, 0.2);
+}
+
+.student-management .add-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.student-management .add-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.student-management .add-form-group.full-width {
+  grid-column: span 2;
+}
+
+.student-management .add-form-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.student-management .add-form-group label .required {
+  color: #e9691e;
+  margin-left: 2px;
+}
+
+.student-management .add-form-group input,
+.student-management .add-form-group select {
+  padding: 0.7rem 1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  outline: none;
+  background: #ffffff;
+  color: #1e293b;
+}
+
+.student-management .add-form-group input:focus,
+.student-management .add-form-group select:focus {
+  border-color: #e9691e;
+  box-shadow: 0 0 0 3px rgba(233, 105, 30, 0.1);
+}
+
+.student-management .add-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.25rem 1.75rem;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  border-radius: 0 0 24px 24px;
+  position: sticky;
+  bottom: 0;
+}
+
+.student-management .add-btn-cancel {
+  background: #ffffff;
+  color: #64748b;
+  border: 1.5px solid #e2e8f0;
+  padding: 0.6rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.student-management .add-btn-cancel:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.student-management .add-btn-submit {
+  background: linear-gradient(135deg, #e9691e, #f08b4a);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.8rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 4px rgba(233, 105, 30, 0.2);
+}
+
+.student-management .add-btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(233, 105, 30, 0.3);
+}
+
+.student-management .add-btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .student-management .add-form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .student-management .add-form-group.full-width {
+    grid-column: span 1;
+  }
+  
+  .student-management .add-modal-container {
+    max-width: 95%;
+  }
+  
+  .student-management .add-modal-header,
+  .student-management .add-modal-body,
+  .student-management .add-modal-footer {
+    padding: 1rem;
+  }
+}
+
+
+
+/* Profile Image Upload Styles */
+.student-management .profile-image-upload {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 16px;
+}
+
+.student-management .profile-image-preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #e9691e;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.student-management .profile-image-preview .preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.student-management .profile-image-preview .preview-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+}
+
+.student-management .profile-image-preview .preview-placeholder .material-symbols-outlined {
+  font-size: 3rem;
+  color: #94a3b8;
+}
+
+.student-management .profile-image-actions {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.student-management .upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: white;
+  border: 2px solid #e9691e;
+  border-radius: 10px;
+  color: #e9691e;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.student-management .upload-btn:hover {
+  background: #e9691e;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.student-management .upload-btn .material-symbols-outlined {
+  font-size: 1.2rem;
+}
+
+.student-management .remove-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: #fee2e2;
+  border: none;
+  border-radius: 10px;
+  color: #dc2626;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.student-management .remove-btn:hover {
+  background: #fecaca;
+  transform: translateY(-1px);
+}
+
+.student-management .upload-hint {
+  font-size: 0.7rem;
+  color: #64748b;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .student-management .profile-image-upload {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .student-management .profile-image-actions {
+    align-items: center;
+  }
+  
+  .student-management .upload-btn,
+  .student-management .remove-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express"; 
 import { PrismaClient, ContentStatus } from "@prisma/client";
 import { upload, uploadToS3, deleteFromS3 } from "../config/s3";
 import ffmpeg from "fluent-ffmpeg";
@@ -8,6 +8,20 @@ import AWS from "aws-sdk";
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import { checkStudentActive } from "../middleware/checkStudentActive"; 
+
+
+// ✅ ADD THIS INTERFACE HERE - before using it
+interface AuthRequest extends Request {
+  user?: {
+    id: number;
+    email: string;
+    role: string;
+    cognitoId: string;
+  };
+}
+
+
 
 // Set the ffmpeg path to the static binary
 if (ffmpegStatic) {
@@ -511,22 +525,29 @@ router.get("/program/:programName/module-structure", async (req, res) => {
 
 // =====================
 // GET STUDENT COURSE CONTENT (Based on Student's Email from Query)
-// =====================
-router.get("/student/course-content", async (req, res) => {
+// ✅ PROTECT THIS ROUTE
+router.get("/student/course-content", checkStudentActive, async (req: AuthRequest, res: Response) => {
   try {
     const { email } = req.query;
     
-    if (!email) {
+    // ✅ FIXED: Properly extract email as string with type assertion
+    const studentEmail = typeof email === 'string' ? email : (Array.isArray(email) ? email[0] : null);
+    
+    if (!studentEmail && !req.user?.email) {
       return res.status(400).json({ error: "Email is required" });
     }
 
+    // Use the authenticated user's email if not provided in query
+    const finalEmail: string = (studentEmail || req.user?.email || '') as string;
+    
+    if (!finalEmail) {
+      return res.status(400).json({ error: "Student email is required" });
+    }
+
+    // ✅ FIXED: Use include with proper typing
     const student = await prisma.student.findUnique({
-      where: { email: email as string },
-      select: { 
-        id: true,
-        fullName: true, 
-        email: true,
-        programName: true,
+      where: { email: finalEmail },
+      include: {
         enrollments: {
           include: {
             contentProgress: true
@@ -546,14 +567,18 @@ router.get("/student/course-content", async (req, res) => {
     // Get all content progress for this student
     const contentProgressMap = new Map();
     
-    for (const enrollment of student.enrollments) {
-      for (const progress of enrollment.contentProgress) {
-        contentProgressMap.set(progress.contentId, {
-          isCompleted: progress.isCompleted,
-          lastPosition: progress.lastPosition,
-          score: progress.score,
-          enrollmentId: enrollment.id
-        });
+    if (student.enrollments && student.enrollments.length > 0) {
+      for (const enrollment of student.enrollments) {
+        if (enrollment.contentProgress && enrollment.contentProgress.length > 0) {
+          for (const progress of enrollment.contentProgress) {
+            contentProgressMap.set(progress.contentId, {
+              isCompleted: progress.isCompleted,
+              lastPosition: progress.lastPosition,
+              score: progress.score,
+              enrollmentId: enrollment.id
+            });
+          }
+        }
       }
     }
 
@@ -579,7 +604,7 @@ router.get("/student/course-content", async (req, res) => {
     console.log("Content progress found:", contentProgressMap.size);
     console.log("Assignment submissions found:", assignmentSubmissionMap.size);
 
-    // Fetch only published modules and content
+    // ✅ FIXED: programName is now properly typed as string
     const modules = await prisma.module.findMany({
       where: {
         programName: student.programName,
@@ -602,7 +627,7 @@ router.get("/student/course-content", async (req, res) => {
     let completedLessons = 0;
 
     const formattedModules = modules.map((module) => {
-      // Process materials with progress
+      // ✅ FIXED: 'contents' now exists because of include
       const materials = module.contents.map((content) => {
         let status = "not-started";
         let lastPosition = 0;
@@ -690,16 +715,19 @@ router.get("/student/course-content", async (req, res) => {
 
 // =====================
 // GET STUDENT COURSE CONTENT BY PROGRAM NAME (Alternative)
-// =====================
-router.get("/student/course-content/:programName", async (req, res) => {
+// ✅ PROTECT THIS ROUTE
+router.get("/student/course-content/:programName", checkStudentActive, async (req: AuthRequest, res: Response) => {
   try {
     const { programName } = req.params;
     const { email } = req.query;
 
+    // ✅ FIXED: Properly extract email as string
+    const studentEmail = typeof email === 'string' ? email : (Array.isArray(email) ? email[0] : null);
+
     // Find the student to verify enrollment
-    if (email) {
+    if (studentEmail) {
       const student = await prisma.student.findUnique({
-        where: { email: email as string },
+        where: { email: studentEmail as string },
         select: { programName: true }
       });
 
@@ -708,10 +736,10 @@ router.get("/student/course-content/:programName", async (req, res) => {
       }
     }
 
-    // Fetch all published modules for this program
+    // ✅ FIXED: Properly typed programName as string
     const modules = await prisma.module.findMany({
       where: {
-        programName: programName,
+        programName: programName as string,
         status: "published"
       },
       include: {
@@ -756,8 +784,8 @@ router.get("/student/course-content/:programName", async (req, res) => {
 
 // =====================
 // GET ALL PROGRAMS FOR STUDENT ENROLLMENT
-// =====================
-router.get("/student/programs", async (req, res) => {
+// ✅ PROTECT THIS ROUTE
+router.get("/student/programs", checkStudentActive, async (req: AuthRequest, res: Response) => {
   try {
     const programs = await prisma.program.findMany({
       where: {
@@ -792,6 +820,7 @@ router.get("/student/programs", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch programs" });
   }
 });
+
 
 
 export default router;

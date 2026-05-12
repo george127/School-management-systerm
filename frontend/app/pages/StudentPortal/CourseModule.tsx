@@ -123,94 +123,130 @@ const CourseModule = () => {
     }
   }, [userEmail]);
 
-  const fetchCourseContent = async (showRefresh = false) => {
-    if (showRefresh) setRefreshing(true);
-    setIsLoading(true);
-    try {
-      const API_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const fetchCourseContent = async (showRefresh = false) => {
+  if (showRefresh) setRefreshing(true);
+  setIsLoading(true);
+  try {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    
+    // ✅ Get the token from localStorage
+    const token = localStorage.getItem("token");
+    
+    const response = await fetch(
+      `${API_URL}/api/content-files/student/course-content?email=${encodeURIComponent(userEmail!)}`,
+      {
+        headers: {
+          "Authorization": token ? `Bearer ${token}` : "",
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-      const response = await fetch(
-        `${API_URL}/api/content-files/student/course-content?email=${encodeURIComponent(userEmail!)}`,
-      );
+    // ✅ Handle 403 - Account Inactive
+    if (response.status === 403) {
+      const errorData = await response.json();
+      setError(errorData.message || "Your account is inactive. Please contact support to access course content.");
+      setIsLoading(false);
+      if (showRefresh) setRefreshing(false);
+      return;
+    }
 
-      if (!response.ok) throw new Error("Failed to fetch");
+    if (!response.ok) {
+      if (response.status === 401) {
+        // Token expired or invalid - redirect to login
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+        throw new Error("Session expired. Please login again.");
+      }
+      throw new Error("Failed to fetch");
+    }
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (data && data.modules) {
-        // Fetch submission status for all assignments
-        for (const module of data.modules) {
-          for (const material of module.materials) {
-            material.status = normalizeStatus(material.status as string);
+    if (data && data.modules) {
+      // Fetch submission status for all assignments
+      for (const module of data.modules) {
+        for (const material of module.materials) {
+          material.status = normalizeStatus(material.status as string);
 
-            // If this is an assignment, check if student has submitted
-            if (material.type === "assignment") {
-              try {
-                const submissionCheck = await fetch(
-                  `${API_URL}/api/assignments/content/${material.id}/details?email=${encodeURIComponent(userEmail!)}`,
-                );
-                if (submissionCheck.ok) {
-                  const submissionData = await submissionCheck.json();
-                  if (submissionData.submission) {
-                    material.status = "completed";
-                    material.hasSubmitted = true;
-                    material.submissionId = submissionData.submission.id;
-                  }
+          // If this is an assignment, check if student has submitted
+          if (material.type === "assignment") {
+            try {
+              const submissionCheck = await fetch(
+                `${API_URL}/api/assignments/content/${material.id}/details?email=${encodeURIComponent(userEmail!)}`,
+                {
+                  headers: {
+                    "Authorization": token ? `Bearer ${token}` : "",
+                  },
                 }
-              } catch (err) {
-                console.error("Error checking submission:", err);
+              );
+              if (submissionCheck.ok) {
+                const submissionData = await submissionCheck.json();
+                if (submissionData.submission) {
+                  material.status = "completed";
+                  material.hasSubmitted = true;
+                  material.submissionId = submissionData.submission.id;
+                }
               }
+            } catch (err) {
+              console.error("Error checking submission:", err);
             }
           }
         }
       }
-
-      setCourseData(data);
-      setLockedModuleMessage(null);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-      if (showRefresh) setRefreshing(false);
     }
-  };
 
-  const markContentCompleted = async (
-    contentId: number,
-    contentTitle: string,
-  ) => {
-    try {
-      const API_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const response = await fetch(
-        `${API_URL}/api/video-progress/content/mark-completed`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: userEmail,
-            contentId: contentId,
-            isCompleted: true,
-          }),
+    setCourseData(data);
+    setLockedModuleMessage(null);
+    setError(null); // Clear any existing error
+  } catch (err: any) {
+    setError(err.message);
+  } finally {
+    setIsLoading(false);
+    if (showRefresh) setRefreshing(false);
+  }
+};
+
+const markContentCompleted = async (
+  contentId: number,
+  contentTitle: string,
+) => {
+  try {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const token = localStorage.getItem("token");
+    
+    const response = await fetch(
+      `${API_URL}/api/video-progress/content/mark-completed`,
+      {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : "",  // ✅ Add auth header
         },
-      );
+        body: JSON.stringify({
+          email: userEmail,
+          contentId: contentId,
+          isCompleted: true,
+        }),
+      },
+    );
 
-      if (response.ok) {
-        setToastMessage({
-          type: "success",
-          text: `✅ "${contentTitle}" marked as completed!`,
-        });
-        setTimeout(() => setToastMessage(null), 3000);
-        await fetchCourseContent(true);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error("Error:", error);
-      return false;
+    if (response.ok) {
+      setToastMessage({
+        type: "success",
+        text: `✅ "${contentTitle}" marked as completed!`,
+      });
+      setTimeout(() => setToastMessage(null), 3000);
+      await fetchCourseContent(true);
+      return true;
     }
-  };
+    return false;
+  } catch (error) {
+    console.error("Error:", error);
+    return false;
+  }
+};
 
   const handleDocumentClick = async (material: Material) => {
     if (material.fileUrl) {
@@ -235,88 +271,98 @@ const CourseModule = () => {
   };
 
   // NEW: Fetch assignment details
-  const fetchAssignmentDetails = async (contentId: number, title: string) => {
-    try {
-      const API_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const response = await fetch(
-        `${API_URL}/api/assignments/content/${contentId}/details?email=${encodeURIComponent(userEmail!)}`,
-      );
+const fetchAssignmentDetails = async (contentId: number, title: string) => {
+  try {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const token = localStorage.getItem("token");
+    
+    const response = await fetch(
+      `${API_URL}/api/assignments/content/${contentId}/details?email=${encodeURIComponent(userEmail!)}`,
+      {
+        headers: {
+          "Authorization": token ? `Bearer ${token}` : "",  // ✅ Add auth header
+        },
+      }
+    );
 
-      if (!response.ok) throw new Error("Failed to fetch assignment details");
+    if (!response.ok) throw new Error("Failed to fetch assignment details");
 
-      const data = await response.json();
+    const data = await response.json();
 
-      setSelectedAssignment({
-        contentId: data.contentId,
-        title: data.title,
-        dueDate: data.dueDate,
-        instructions: data.instructions || data.description,
-        maxPoints: data.maxPoints,
-        existingSubmission: data.submission,
-      });
-    } catch (error) {
-      console.error("Error fetching assignment:", error);
-      setToastMessage({
-        type: "error",
-        text: "Failed to load assignment details",
-      });
-      setTimeout(() => setToastMessage(null), 3000);
-    }
-  };
+    setSelectedAssignment({
+      contentId: data.contentId,
+      title: data.title,
+      dueDate: data.dueDate,
+      instructions: data.instructions || data.description,
+      maxPoints: data.maxPoints,
+      existingSubmission: data.submission,
+    });
+  } catch (error) {
+    console.error("Error fetching assignment:", error);
+    setToastMessage({
+      type: "error",
+      text: "Failed to load assignment details",
+    });
+    setTimeout(() => setToastMessage(null), 3000);
+  }
+};
 
   // NEW: Submit assignment
-  const handleSubmitAssignment = async () => {
-    if (!selectedAssignment) return;
+const handleSubmitAssignment = async () => {
+  if (!selectedAssignment) return;
 
-    if (!submissionText && !submissionFile) {
-      setToastMessage({
-        type: "error",
-        text: "Please provide text or upload a file",
-      });
-      setTimeout(() => setToastMessage(null), 3000);
-      return;
+  if (!submissionText && !submissionFile) {
+    setToastMessage({
+      type: "error",
+      text: "Please provide text or upload a file",
+    });
+    setTimeout(() => setToastMessage(null), 3000);
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const token = localStorage.getItem("token");
+    
+    const formData = new FormData();
+    formData.append("contentId", selectedAssignment.contentId.toString());
+    formData.append("email", userEmail!);
+    if (submissionText) formData.append("submissionText", submissionText);
+    if (submissionFile) formData.append("file", submissionFile);
+
+    const response = await fetch(`${API_URL}/api/assignments/submit`, {
+      method: "POST",
+      headers: {
+        "Authorization": token ? `Bearer ${token}` : "",  // ✅ Add auth header (don't set Content-Type with FormData)
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Submission failed");
     }
 
-    setIsSubmitting(true);
+    const result = await response.json();
 
-    try {
-      const API_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const formData = new FormData();
-      formData.append("contentId", selectedAssignment.contentId.toString());
-      formData.append("email", userEmail!);
-      if (submissionText) formData.append("submissionText", submissionText);
-      if (submissionFile) formData.append("file", submissionFile);
+    setToastMessage({ type: "success", text: result.message });
+    setTimeout(() => setToastMessage(null), 3000);
 
-      const response = await fetch(`${API_URL}/api/assignments/submit`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Submission failed");
-      }
-
-      const result = await response.json();
-
-      setToastMessage({ type: "success", text: result.message });
-      setTimeout(() => setToastMessage(null), 3000);
-
-      // Close modal and refresh
-      setSelectedAssignment(null);
-      setSubmissionFile(null);
-      setSubmissionText("");
-      await fetchCourseContent(true);
-    } catch (error: any) {
-      console.error("Submission error:", error);
-      setToastMessage({ type: "error", text: error.message });
-      setTimeout(() => setToastMessage(null), 3000);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    // Close modal and refresh
+    setSelectedAssignment(null);
+    setSubmissionFile(null);
+    setSubmissionText("");
+    await fetchCourseContent(true);
+  } catch (error: any) {
+    console.error("Submission error:", error);
+    setToastMessage({ type: "error", text: error.message });
+    setTimeout(() => setToastMessage(null), 3000);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   // NEW: View submission (opens modal with existing submission)
   const handleViewSubmission = async (material: Material) => {
@@ -422,17 +468,47 @@ const CourseModule = () => {
     );
   }
 
-  if (error || !courseData) {
-    return (
-      <div className="course-module-container">
-        <div className="error-state">
-          <span className="material-symbols-outlined">error</span>
-          <p>{error || "No course content available"}</p>
-          <button onClick={() => fetchCourseContent()}>Try Again</button>
-        </div>
+if (error || !courseData) {
+  // ✅ Check if it's an inactive account error
+  const isInactiveError = error?.toLowerCase().includes("inactive") || 
+                          error?.toLowerCase().includes("contact support");
+  
+  return (
+    <div className="course-module-container">
+      <div className={`error-state ${isInactiveError ? "inactive-error" : ""}`}>
+        {isInactiveError ? (
+          <>
+            <div className="inactive-icon">🔒</div>
+            <h2>Account Inactive</h2>
+            <p>{error || "Your account is currently inactive."}</p>
+            <div className="inactive-message-box">
+              <p>
+                Your access to course content has been temporarily suspended.
+                Please contact the administrator to reactivate your account.
+              </p>
+            </div>
+            <button 
+              className="logout-btn"
+              onClick={() => {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                window.location.href = "/login";
+              }}
+            >
+              Go to Login
+            </button>
+          </>
+        ) : (
+          <>
+            <span className="material-symbols-outlined">error</span>
+            <p>{error || "No course content available"}</p>
+            <button onClick={() => fetchCourseContent()}>Try Again</button>
+          </>
+        )}
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   const currentModule = courseData.modules[selectedModule];
   const overallProgress = courseData.progress;

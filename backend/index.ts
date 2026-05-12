@@ -18,6 +18,11 @@ import courseContentRoutes from './routes/courseContentRoute';
 import videoProgressRoutes from "./routes/videoProgress";
 import assignmentRoutes from "./routes/assignments";
 import studentManagementRoutes from "./routes/studentManagement";
+import adminPaymentsRoutes from "./routes/adminPayments";
+import adminCoursesRoutes from "./routes/adminCourses";
+import dashboardRoutes from "./routes/dashboardOverview";
+import reportsRoutes from "./routes/reports";
+
 
 const app = express();
 const prisma = new PrismaClient();
@@ -158,6 +163,7 @@ app.use("/api/upload", s3UploadRoutes);
 app.use("/api/forms", studentFormsRoutes);
 app.use("/api", studentPortalRoutes);
 app.use("/api/fees", feesPaymentRoutes);
+app.use("/api/admin/payments", adminPaymentsRoutes);
 app.use("/api", studentProfileRoutes);
 app.use("/api", forgotpasswordRoutes);
 app.use("/api/payment-info", paymentInfoRoutes);
@@ -166,6 +172,10 @@ app.use("/api/content-files", courseContentRoutes);
 app.use("/api/video-progress", videoProgressRoutes);
 app.use("/api/assignments", assignmentRoutes);
 app.use("/api/student-management", studentManagementRoutes); 
+app.use("/api/admin/courses", adminCoursesRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/reports", reportsRoutes);
+
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

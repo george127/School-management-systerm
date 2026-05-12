@@ -1,4 +1,18 @@
-/* image */
+/* ============================================
+   DASHBOARD OVERVIEW CSS
+   ============================================ */
+
+/* Main Container */
+.overview-container {
+  padding: 20px;
+  background: #f5f7fb;
+  min-height: 100vh;
+}
+
+/* ============================================
+   WELCOME SECTION WITH BACKGROUND IMAGE
+   ============================================ */
+
 .overview-container .overview-welcome {
   background-image: url("../image/Overview.jpg");
   background-size: cover;
@@ -11,6 +25,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  margin-bottom: 30px;
 }
 
 .overview-welcome .row {
@@ -21,10 +36,29 @@
   position: absolute;
   top: 0;
   bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
+.overview-welcome .row h2 {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.overview-welcome .row p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* ============================================
+   STAT CARDS
+   ============================================ */
 
 .overview-container .stat-card {
   background: white;
@@ -33,8 +67,8 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   display: flex;
   align-items: center;
-
   transition: transform 0.2s;
+  height: 100%;
 }
 
 .overview-container .stat-card:hover {
@@ -50,6 +84,7 @@
   justify-content: center;
   margin-right: 15px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
 }
 
 .overview-container .stat-icon .bi {
@@ -77,6 +112,30 @@
   color: #f1c40f;
 }
 
+.overview-container .stat-icon.enrollments {
+  background-color: rgba(52, 152, 219, 0.2);
+  color: #3498db;
+}
+
+.overview-container .stat-icon.programs {
+  background-color: rgba(46, 204, 113, 0.2);
+  color: #2ecc71;
+}
+
+.overview-container .stat-icon.content {
+  background-color: rgba(155, 89, 182, 0.2);
+  color: #9b59b6;
+}
+
+.overview-container .stat-icon.assignments {
+  background-color: rgba(241, 196, 15, 0.2);
+  color: #f1c40f;
+}
+
+.overview-container .stat-content {
+  flex: 1;
+}
+
 .overview-container .stat-content h3 {
   margin: 0;
   font-size: 1.8rem;
@@ -90,19 +149,29 @@
   font-size: 0.9rem;
 }
 
-/* Layout */
+.overview-container .stat-sub {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* ============================================
+   DASHBOARD GRID LAYOUT
+   ============================================ */
+
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 100px 100px;
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   margin-top: 16px;
   padding: 0;
   box-sizing: border-box;
 }
 
-@media (min-width: 780px) {
+@media (max-width: 780px) {
   .dashboard-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
   }
 }
 
@@ -112,7 +181,11 @@
   padding: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  color: #e8eef8;
+  transition: all 0.3s ease;
+}
+
+.dashboard-grid .state-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .dashboard-grid .stat-title {
@@ -138,7 +211,10 @@
   border-radius: 3px;
 }
 
-/* Content */
+/* ============================================
+   STAT ITEMS
+   ============================================ */
+
 .dashboard-grid .stat-content {
   display: flex;
   flex-direction: column;
@@ -159,13 +235,12 @@
 
 .dashboard-grid .stat-item:hover {
   transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1),
-    inset 0 -2px 10px rgba(255, 255, 255, 0.6);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), inset 0 -2px 10px rgba(255, 255, 255, 0.6);
 }
 
 .dashboard-grid .stat-left {
   display: flex;
-  width: 100%;
+  align-items: center;
   gap: 1rem;
 }
 
@@ -177,7 +252,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 15px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   color: #e9691e;
   background: #fff;
@@ -190,68 +264,188 @@
   font-size: 0.95rem;
 }
 
-.dashboard-grid .stat-right {
-  position: relative;
-}
-
 .dashboard-grid .stat-value {
   font-size: 1.5rem;
   font-weight: 800;
   color: #1e293b;
   position: relative;
-  background: linear-gradient(90deg, hsl(217, 33%, 17%), #475569);
+  background: linear-gradient(90deg, #1e293b, #475569);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.1));
 }
 
-.dashboard-grid .stat-value::after {
-  content: "";
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(90deg, #e9691e, transparent);
-  border-radius: 3px;
+.dashboard-grid .stat-value.pending-value {
+  color: #f59e0b;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* Animation for value update */
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
+.dashboard-grid .stat-value.notification-badge {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.dashboard-grid .stat-value.changed {
-  animation: pulse 0.5s ease-in-out;
+/* ============================================
+   TOP COURSES SECTION
+   ============================================ */
+
+.dashboard-grid .top-courses {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e2e8f0;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .stat-item {
-    padding: 1rem;
-    flex-direction: column;
-    text-align: center;
-    gap: 0.5rem;
-  }
-
-  .stat-left {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .stat-value {
-    font-size: 1.5rem;
-  }
+.dashboard-grid .top-courses h5 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e9691e;
+  margin-bottom: 12px;
 }
+
+.dashboard-grid .top-course-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.85rem;
+}
+
+.dashboard-grid .top-course-item .rank {
+  width: 25px;
+  height: 25px;
+  background: #f1f5f9;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: #e9691e;
+  font-size: 0.75rem;
+}
+
+.dashboard-grid .top-course-item .course-name {
+  flex: 1;
+  margin-left: 10px;
+  color: #475569;
+}
+
+.dashboard-grid .top-course-item .enrollment-count {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+/* ============================================
+   GENDER DISTRIBUTION
+   ============================================ */
+
+.dashboard-grid .gender-distribution {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.dashboard-grid .gender-distribution h5 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e9691e;
+  margin-bottom: 12px;
+}
+
+.dashboard-grid .gender-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+}
+
+.dashboard-grid .gender-item span:first-child {
+  width: 50px;
+  color: #475569;
+}
+
+.dashboard-grid .progress-bar {
+  flex: 1;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.dashboard-grid .progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.dashboard-grid .progress-fill.male {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.dashboard-grid .progress-fill.female {
+  background: linear-gradient(90deg, #ec4899, #f472b6);
+}
+
+.dashboard-grid .gender-item span:last-child {
+  width: 40px;
+  text-align: right;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* ============================================
+   CONTENT STATS
+   ============================================ */
+
+.dashboard-grid .content-stats {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.dashboard-grid .content-stats h5 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e9691e;
+  margin-bottom: 12px;
+}
+
+.dashboard-grid .content-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  text-align: center;
+}
+
+.dashboard-grid .metric {
+  padding: 10px;
+  background: #f8fafc;
+  border-radius: 12px;
+}
+
+.dashboard-grid .metric-value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.dashboard-grid .metric-label {
+  font-size: 0.7rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+/* ============================================
+   DESIGN ELEMENTS (CIRCLES)
+   ============================================ */
 
 .state-card .design {
   position: relative;
@@ -259,6 +453,7 @@
   justify-content: space-evenly;
   align-items: center;
   height: 16px;
+  gap: 5px;
 }
 
 .state-card .circle {
@@ -283,29 +478,15 @@
   }
 }
 
-/* Small screens adjustments */
-@media (max-width: 420px) {
-  .dashboard-grid .material-symbols-outlined.stat-icon {
-    width: 34px;
-    height: 34px;
-    font-size: 18px;
-    border-radius: 8px;
-  }
-  .dashboard-grid .stat-card {
-    padding: 14px;
-    border-radius: 12px;
-  }
-  .dashboard-grid .stat-value {
-    font-size: 0.92rem;
-  }
-}
+/* ============================================
+   CHART CARD & ACTIVITY LIST
+   ============================================ */
 
 .overview-container .chart-card {
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   border-radius: 20px;
   padding: 1.5rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.9);
   overflow: hidden;
@@ -330,7 +511,7 @@
   left: 0;
   width: 50%;
   height: 3px;
-  background: linear-gradient(90deg, #4f46e5, transparent);
+  background: linear-gradient(90deg, #e9691e, transparent);
   border-radius: 3px;
 }
 
@@ -351,7 +532,6 @@
   position: relative;
   overflow: hidden;
   border: 2px solid rgba(247, 246, 246, 0.8);
-  transition: all 600ms ease-in-out;
 }
 
 .overview-container .activity-item::before {
@@ -402,6 +582,11 @@
   color: #0891b2 !important;
 }
 
+.overview-container .activity-item .text-warning {
+  background: linear-gradient(135deg, #fefce8 0%, #fef08a 100%);
+  color: #ca8a04 !important;
+}
+
 .overview-container .activity-content {
   flex: 1;
 }
@@ -445,8 +630,138 @@
   animation-delay: 0.2s;
 }
 
-/* Responsive design */
+/* ============================================
+   LOADING & ERROR STATES
+   ============================================ */
+.overview-container .simple-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.overview-container .simple-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #e9691e;
+  border-right-color: #f08b4a;
+  border-radius: 50%;
+  animation: simpleSpin 0.8s linear infinite;
+}
+
+@keyframes simpleSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.overview-container .simple-loader p {
+  margin-top: 15px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+   
+.overview-container .error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+  text-align: center;
+}
+
+.overview-container .error-state i {
+  font-size: 3rem;
+  color: #ef4444;
+}
+
+.overview-container .error-state p {
+  color: #64748b;
+  margin: 0;
+}
+
+.overview-container .btn-retry {
+  background: linear-gradient(135deg, #e9691e, #f08b4a);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.overview-container .btn-retry:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 105, 30, 0.3);
+}
+
+/* ============================================
+   ANIMATION FOR VALUE UPDATE
+   ============================================ */
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.dashboard-grid .stat-value.changed {
+  animation: pulse 0.5s ease-in-out;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* Tablet Styles */
 @media (max-width: 768px) {
+  .overview-container {
+    padding: 15px;
+  }
+
+  .overview-container .overview-welcome {
+    height: 40vh;
+  }
+
+  .overview-welcome .row h2 {
+    font-size: 1.8rem;
+  }
+
+  .overview-welcome .row p {
+    font-size: 0.95rem;
+  }
+
+  .dashboard-grid .stat-item {
+    padding: 0.8rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .dashboard-grid .stat-left {
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .dashboard-grid .stat {
+    margin-right: 0;
+  }
+
+  .dashboard-grid .stat-value {
+    font-size: 1.3rem;
+  }
+
   .overview-container .chart-card {
     padding: 1rem;
     border-radius: 16px;
@@ -465,5 +780,160 @@
 
   .overview-container .activity-content p {
     font-size: 0.9rem;
+  }
+
+  .dashboard-grid .content-metrics {
+    gap: 8px;
+  }
+
+  .dashboard-grid .metric {
+    padding: 8px;
+  }
+
+  .dashboard-grid .metric-value {
+    font-size: 0.95rem;
+  }
+}
+
+/* Mobile Styles */
+@media (max-width: 480px) {
+  .overview-container {
+    padding: 10px;
+  }
+
+  .overview-container .overview-welcome {
+    height: 30vh;
+    margin-bottom: 20px;
+  }
+
+  .overview-welcome .row {
+    padding: 15px;
+  }
+
+  .overview-welcome .row h2 {
+    font-size: 1.4rem;
+  }
+
+  .overview-welcome .row p {
+    font-size: 0.85rem;
+  }
+
+  .overview-container .stat-card {
+    padding: 8px;
+  }
+
+  .overview-container .stat-icon {
+    width: 45px;
+    height: 45px;
+    margin-right: 10px;
+  }
+
+  .overview-container .stat-icon .bi {
+    font-size: 1.3rem;
+  }
+
+  .overview-container .stat-content h3 {
+    font-size: 1.3rem;
+  }
+
+  .overview-container .stat-content p {
+    font-size: 0.8rem;
+  }
+
+  .dashboard-grid .state-card {
+    padding: 15px;
+  }
+
+  .dashboard-grid .stat-title {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .dashboard-grid .stat {
+    font-size: 1.2rem;
+    width: 30px;
+    height: 30px;
+  }
+
+  .dashboard-grid .stat-label {
+    font-size: 0.85rem;
+  }
+
+  .dashboard-grid .stat-value {
+    font-size: 1.1rem;
+  }
+
+  .dashboard-grid .top-course-item {
+    font-size: 0.75rem;
+  }
+
+  .dashboard-grid .gender-item {
+    font-size: 0.75rem;
+  }
+
+  .dashboard-grid .content-metrics {
+    gap: 6px;
+  }
+
+  .dashboard-grid .metric-value {
+    font-size: 0.85rem;
+  }
+
+  .dashboard-grid .metric-label {
+    font-size: 0.65rem;
+  }
+
+  .overview-container .chart-card h4 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .overview-container .activity-item {
+    padding: 0.6rem;
+    gap: 0.6rem;
+  }
+
+  .overview-container .activity-item i {
+    font-size: 1rem;
+    min-width: 30px;
+    height: 30px;
+    padding: 0.3rem;
+  }
+
+  .overview-container .activity-content p {
+    font-size: 0.8rem;
+  }
+
+  .overview-container .activity-content small {
+    font-size: 0.7rem;
+  }
+
+  .state-card .circle {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+/* Extra Small Devices */
+@media (max-width: 360px) {
+  .dashboard-grid .content-metrics {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .dashboard-grid .metric {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+  }
+
+  .dashboard-grid .metric-value {
+    font-size: 0.9rem;
+  }
+
+  .dashboard-grid .metric-label {
+    font-size: 0.7rem;
+    margin-top: 0;
   }
 }
