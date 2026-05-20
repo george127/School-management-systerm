@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -13,6 +13,9 @@ import logoImage from "../components/Header/appcode.png";
 import Header from "../components/Header/HeaderPage";
 import Navigation from "../components/Navigation/NavPage";
 import Footer from "../components/footer/Footer";
+
+// Import the settings helper
+import { getSetting } from "../../lib/settings";
 
 const SignUpPage = () => {
   const router = useRouter();
@@ -38,6 +41,31 @@ const SignUpPage = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Add state for registrations allowed
+  const [registrationsAllowed, setRegistrationsAllowed] = useState<boolean>(true);
+  const [checkingRegistrations, setCheckingRegistrations] = useState<boolean>(true);
+
+  /* =====================
+     CHECK REGISTRATION STATUS
+  ===================== */
+
+  useEffect(() => {
+    const checkRegistrationStatus = async () => {
+      try {
+        const status = await getSetting("allow_registrations");
+        setRegistrationsAllowed(status === "true");
+      } catch (error) {
+        console.error("Error checking registration status:", error);
+        // Default to false if error (safe side - block registrations)
+        setRegistrationsAllowed(false);
+      } finally {
+        setCheckingRegistrations(false);
+      }
+    };
+    
+    checkRegistrationStatus();
+  }, []);
 
   /* =====================
      VALIDATIONS
@@ -152,6 +180,65 @@ const SignUpPage = () => {
 
     setLoading(false);
   };
+
+  // Show loading while checking registration status
+  if (checkingRegistrations) {
+    return (
+      <>
+        <Header />
+        <Navigation />
+        <div className="container navigate">
+          <div className="items">
+            <Link href="/">Home</Link>
+            <span className="material-symbols-outlined">arrow_and_edge</span>
+          </div>
+          <span>Sign Up</span>
+        </div>
+        <div className="signup-container container">
+          <div className="signup-wrapper">
+            <div className="signup-card">
+              <div className="loading-spinner-container">
+                <div className="loading-spinner"></div>
+                <p>Loading...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  // Show registration closed message if registrations are not allowed
+  if (!registrationsAllowed) {
+    return (
+      <>
+        <Header />
+        <Navigation />
+        <div className="container navigate">
+          <div className="items">
+            <Link href="/">Home</Link>
+            <span className="material-symbols-outlined">arrow_and_edge</span>
+          </div>
+          <span>Sign Up</span>
+        </div>
+        <div className="signup-container container">
+          <div className="registrations-closed-wrapper">
+            <div className="signup-card registrations-closed-card">
+              <div className="closed-icon">📝</div>
+              <h2>Registration is Currently Closed</h2>
+              <p>New student registrations are not available at this time.</p>
+              <p>Please check back when registrations open for the next semester.</p>
+              <Link href="/" className="back-to-home">
+                ← Back to Home
+              </Link>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   /* ===================== */
 

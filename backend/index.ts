@@ -20,8 +20,10 @@ import assignmentRoutes from "./routes/assignments";
 import studentManagementRoutes from "./routes/studentManagement";
 import adminPaymentsRoutes from "./routes/adminPayments";
 import adminCoursesRoutes from "./routes/adminCourses";
-import dashboardRoutes from "./routes/dashboardOverview";
+import dashboardOverviewRoutes from "./routes/dashboardOverview";
 import reportsRoutes from "./routes/reports";
+import settingsRoutes from "./routes/settings";
+
 
 
 const app = express();
@@ -37,7 +39,7 @@ const allowedOrigins = [
   "http://localhost:5000",
   "http://localhost:3000",
 ];
-
+ 
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -126,7 +128,7 @@ app.get("/api/db-tables", async (req, res) => {
       error: errorMessage
     });
   }
-});
+}); 
 
 app.get("/api/delete-all-data", async (req, res) => {
   try {
@@ -173,8 +175,9 @@ app.use("/api/video-progress", videoProgressRoutes);
 app.use("/api/assignments", assignmentRoutes);
 app.use("/api/student-management", studentManagementRoutes); 
 app.use("/api/admin/courses", adminCoursesRoutes);
-app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/dashboard", dashboardOverviewRoutes);
 app.use("/api/reports", reportsRoutes);
+app.use("/api/settings", settingsRoutes);
 
 
 // Error handling middleware

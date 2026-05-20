@@ -949,3 +949,225 @@
     font-size: 20px;
   }
 }
+
+
+/* ============================================
+   MAINTENANCE PAGE STYLES
+   Matches your dashboard color scheme
+   ============================================ */
+
+/* Maintenance Page Container */
+.maintenance-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fb 0%, #e2e8f0 100%);
+  margin: 0;
+  padding: 20px;
+}
+
+/* Maintenance Card */
+.maintenance-content {
+  text-align: center;
+  background: #ffffff;
+  padding: 48px 40px;
+  border-radius: 28px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  max-width: 520px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* Top accent bar */
+.maintenance-content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #e9691e, #f08b4a, #f59e0b);
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Icon Container */
+.maintenance-icon {
+  width: 90px;
+  height: 90px;
+  background: linear-gradient(135deg, #fef3c7, #fed7aa);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  font-size: 48px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(233, 105, 30, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 20px rgba(233, 105, 30, 0);
+  }
+}
+
+/* Title */
+.maintenance-content h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.5px;
+}
+
+/* Description text */
+.maintenance-content p {
+  font-size: 15px;
+  color: #64748b;
+  margin: 0 0 8px 0;
+  line-height: 1.6;
+}
+
+/* Admin notice */
+.maintenance-content small {
+  display: block;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+  color: #e9691e;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+
+.maintenance-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #f5f7fb;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #e9691e;
+  border-right-color: #f08b4a;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.maintenance-loading p {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 640px) {
+  .maintenance-content {
+    padding: 32px 24px;
+  }
+  
+  .maintenance-icon {
+    width: 70px;
+    height: 70px;
+    font-size: 36px;
+    margin-bottom: 20px;
+  }
+  
+  .maintenance-content h1 {
+    font-size: 24px;
+  }
+  
+  .maintenance-content p {
+    font-size: 14px;
+  }
+  
+  .maintenance-content small {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .maintenance-page {
+    padding: 16px;
+  }
+  
+  .maintenance-content {
+    padding: 24px 20px;
+  }
+  
+  .maintenance-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 30px;
+    margin-bottom: 16px;
+  }
+  
+  .maintenance-content h1 {
+    font-size: 20px;
+  }
+  
+  .maintenance-content p {
+    font-size: 13px;
+  }
+}
+
+/* Loading Spinner */
+.loading-spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #ffe0cf;
+  border-top-color: #e9691e;
+  border-right-color: #f08b4a;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

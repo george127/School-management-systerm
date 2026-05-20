@@ -95,14 +95,14 @@
   color: #fff;
   background-color: #e9691e;
   padding: 10px 13px;
-    border-radius: 12px;
+  border-radius: 12px;
 }
 
 .dashboard-section .welcome-banner .text-container p {
- font-size: 1rem;
-  color: #64748b; 
-   line-height: 1.6;
-   font-weight: 500;
+  font-size: 1rem;
+  color: #64748b;
+  line-height: 1.6;
+  font-weight: 500;
 }
 
 /* Student Dashboard */
@@ -123,13 +123,13 @@
 }
 
 .dashboard-section .dashboard-tile:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  transform: scale(1.02);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .dashboard-section .dashboard-tile i {
   margin-bottom: 15px;
-   padding: 1.1rem;
+  padding: 1.1rem;
   border-radius: 12px;
   font-size: 1.3rem;
   display: flex;
@@ -137,170 +137,521 @@
   justify-content: center;
 }
 
-.dashboard-section .dashboard-tile .bi-lightning-fill {
-  color: #f59e0b;
-  background: #fde5a9ff;
-}
-
-.dashboard-section .dashboard-tile .bi-emoji-smile {
-  color: #10b981;
-  background: #a8ffc8ff;
-}
-
-.dashboard-section .dashboard-tile .bi-calendar3 {
-  color: #8b5cf6;
-  background: #d5a9ffff;
-}
-
+/* Consistent Orange Theme for All Icons */
+.dashboard-section .dashboard-tile .bi-book-half,
+.dashboard-section .dashboard-tile .bi-journal-bookmark-fill,
+.dashboard-section .dashboard-tile .bi-emoji-smile,
 .dashboard-section .dashboard-tile .bi-bar-chart-fill {
-  color: #ef4444;
-  background:  #ffa8a8ff;
+  color: #e9691e;
+  background: #ffe0cf;
 }
 
-.dashboard-section .dashboard-tile:hover .bi-lightning-fill {
-  transform: translateY(-3px) scale(1.1);
-  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+/* ============================================
+   YOUR PROGRESS SECTION
+   ============================================ */
+
+.dashboard-section .dashboard-tile.progress-tracker {
+  background: linear-gradient(135deg, #ffffff 0%, #fef9f5 100%);
+  border: 1px solid rgba(233, 105, 30, 0.15);
+  position: relative;
+  overflow: hidden;
 }
 
-.dashboard-section .dashboard-tile:hover .bi-emoji-smile {
-  transform: translateY(-3px) scale(1.1);
-  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+.dashboard-section .dashboard-tile.progress-tracker::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #e9691e, #f08b4a, #f59e0b);
 }
 
-.dashboard-section .dashboard-tile:hover .bi-calendar3 {
-  transform: translateY(-3px) scale(1.1);
-  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+.dashboard-section .progress-tracker .progress {
+  background-color: #f1f5f9;
+  border-radius: 12px;
+  height: 12px;
+  margin: 15px 0 10px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.dashboard-section .dashboard-tile:hover .bi-bar-chart-fill {
-  transform: translateY(-3px) scale(1.1);
-  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+.dashboard-section .progress-tracker .progress-bar {
+  background: linear-gradient(135deg, #e9691e, #f08b4a);
+  border-radius: 12px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
 }
 
-/* Optional: Add pulse animations for active states */
-.dashboard-section .dashboard-tile.active .bi-lightning-fill {
-  animation: pulse-orange 2s infinite;
+.dashboard-section .progress-tracker .progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 2s infinite;
 }
 
-.dashboard-section .dashboard-tile.active .bi-emoji-smile {
-  animation: pulse-green 2s infinite;
-}
-
-.dashboard-section .dashboard-tile.active .bi-calendar3 {
-  animation: pulse-purple 2s infinite;
-}
-
-.dashboard-section .dashboard-tile.active .bi-bar-chart-fill {
-  animation: pulse-red 2s infinite;
-}
-
-@keyframes pulse-orange {
-  0% { box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
-  50% { box-shadow: 0 4px 25px rgba(245, 158, 11, 0.6); }
-  100% { box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
-}
-
-@keyframes pulse-green {
-  0% { box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
-  50% { box-shadow: 0 4px 25px rgba(16, 185, 129, 0.6); }
-  100% { box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
-}
-
-@keyframes pulse-purple {
-  0% { box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
-  50% { box-shadow: 0 4px 25px rgba(139, 92, 246, 0.6); }
-  100% { box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
-}
-
-@keyframes pulse-red {
-  0% { box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
-  50% { box-shadow: 0 4px 25px rgba(239, 68, 68, 0.6); }
-  100% { box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .dashboard-tile .bi-lightning-fill,
-  .dashboard-tile .bi-emoji-smile,
-  .dashboard-tile .bi-calendar3,
-  .dashboard-tile .bi-bar-chart-fill {
-    padding: 10px;
-    width: 42px;
-    height: 42px;
-    font-size: 1.3rem;
-    border-radius: 14px;
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
   }
 }
 
-.dashboard-section .dashboard-tile h4 {
-font-size: 1.1rem;
-  font-weight: 700;
-  color: #1e293b;
-}
-
-.dashboard-section .dashboard-tile .title {
+.dashboard-section .progress-stats {
+  margin-top: 15px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
-.dashboard-section .dashboard-tile p{
-   font-size: 1rem;
+.dashboard-section .progress-stats p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dashboard-section .progress-stats p:first-child {
+  background: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  color: #e9691e;
+}
+
+.dashboard-section .progress-stats p:last-child {
+  background: #dcfce7;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  color: #166534;
+}
+
+/* ============================================
+   CURRENT MODULE SECTION
+   ============================================ */
+
+.dashboard-section .dashboard-tile.daily-schedule {
+  background: linear-gradient(135deg, #ffffff 0%, #fef9f5 100%);
+  border: 1px solid rgba(233, 105, 30, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-section .dashboard-tile.daily-schedule::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #e9691e, #f08b4a, #f59e0b);
+}
+
+.dashboard-section .module-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 12px 0 8px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.dashboard-section .module-desc {
+  font-size: 0.85rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.dashboard-section .module-progress {
+  margin: 12px 0;
+  padding: 10px;
+  background: #f8fafc;
+  border-radius: 12px;
+}
+
+.dashboard-section .module-progress .progress {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  margin-bottom: 8px;
+}
+
+.dashboard-section .module-progress .progress-bar {
+  background: linear-gradient(90deg, #e9691e, #f08b4a);
+  border-radius: 3px;
+}
+
+.dashboard-section .module-progress small {
+  font-size: 0.7rem;
   color: #64748b;
 }
 
-.dashboard-section .dashboard-tile .progress {
-  background-color: #e0e0e0;
-  overflow: hidden;
-  margin: 10px 0;
-  height: 10px;
+.dashboard-section .concepts-list {
+  margin: 12px 0;
+  padding: 10px;
+  background: #f8fafc;
+  border-radius: 12px;
 }
 
-.dashboard-section .dashboard-tile .progress-bar {
-  height: 100%;
-  background: linear-gradient(135deg, #e9691e, #ffec9f);
-  transition: width 0.5s ease;
+.dashboard-section .concepts-list strong {
+  display: block;
+  font-size: 0.8rem;
+  color: #e9691e;
+  margin-bottom: 8px;
 }
 
-.dashboard-section .dashboard-tile ul {
+.dashboard-section .concepts-list ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.dashboard-section .daily-schedule ul li {
-  margin: 5px 0;
- font-size: 1rem;
-  color: #64748b}
+.dashboard-section .concepts-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 0.8rem;
+  color: #475569;
+  border-bottom: 1px solid #e2e8f0;
+}
 
-.dashboard-section .motivation p {
+.dashboard-section .concepts-list li:last-child {
+  border-bottom: none;
+}
+
+.dashboard-section .next-module {
+  margin-top: 12px;
+  padding: 10px;
+  background: #fef9f5;
+  border-radius: 12px;
+  border-left: 3px solid #e9691e;
+}
+
+.dashboard-section .next-module strong {
+  font-size: 0.75rem;
+  color: #e9691e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dashboard-section .next-module p {
+  margin: 5px 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* ============================================
+   MOTIVATIONAL QUOTE SECTION
+   ============================================ */
+
+.dashboard-section .dashboard-tile.motivation {
+  background: linear-gradient(135deg, #e9691e 0%, #f08b4a 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-section .dashboard-tile.motivation .title {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.dashboard-section .dashboard-tile.motivation .title h4 {
+  color: white;
+}
+
+.dashboard-section .dashboard-tile.motivation .bi-emoji-smile {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.dashboard-section .quote-content {
+  margin-top: 15px;
+}
+
+.dashboard-section .quote-text {
   font-size: 1rem;
+  line-height: 1.5;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 10px;
+}
+
+.dashboard-section .quote-author {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+.dashboard-section .quote-refresh {
+  display: block;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* ============================================
+   ACADEMIC UPDATES SECTION
+   ============================================ */
+
+.dashboard-section .dashboard-tile.quick-actions {
+  background: linear-gradient(135deg, #ffffff 0%, #fef9f5 100%);
+  border: 1px solid rgba(233, 105, 30, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-section .dashboard-tile.quick-actions::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #e9691e, #f08b4a, #f59e0b);
+}
+
+.dashboard-section .academic-section {
+  margin-bottom: 20px;
+}
+
+.dashboard-section .academic-section h5 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dashboard-section .grade-list,
+.dashboard-section .assignment-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dashboard-section .grade-list li,
+.dashboard-section .assignment-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.dashboard-section .grade-list li:last-child,
+.dashboard-section .assignment-list li:last-child {
+  border-bottom: none;
+}
+
+.dashboard-section .grade-title {
+  font-size: 0.85rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.dashboard-section .grade-score {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #10b981;
+  background: #dcfce7;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.dashboard-section .pending-badge {
+  font-size: 0.7rem;
+  color: #e9691e;
+  background: #ffe0cf;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.dashboard-section .academic-section p {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  text-align: center;
+  padding: 15px 0;
+  margin: 0;
+}
+
+/* ============================================
+   ANNOUNCEMENTS SECTION
+   ============================================ */
+
+.dashboard-section .announcement-date {
+  display: flex;
+  gap: 20px;
+  grid-column: 1/3;
+}
+
+.dashboard-section .announcement-date .announcement-banner {
+  background: #ffffff;
+  border-left: 6px solid #e9691e;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.6s ease-in-out;
+  width: 100%;
+}
+
+.dashboard-section .announcement-header h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard-section .announcement-section {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.dashboard-section .announcement-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.dashboard-section .announcement-section h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e9691e;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-section .announcement-date .announcement-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dashboard-section .announcement-date .announcement-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 15px;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border-radius: 14px;
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.dashboard-section .announcement-date .announcement-list li:hover {
+  transform: translateX(5px);
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #e9691e;
+}
+
+.dashboard-section .announcement-date .announcement-list li .icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.dashboard-section .announcement-date .announcement-list li div {
+  flex: 1;
+}
+
+.dashboard-section .announcement-date .announcement-list li strong {
+  color: #1e293b;
+  font-size: 0.85rem;
+}
+
+.dashboard-section .announcement-date .announcement-list li .Text {
   color: #64748b;
+  font-size: 0.85rem;
+}
+
+.dashboard-section .announcement-date .announcement-list li .highlight {
+  background-color: #ffe0cf;
+  color: #e9691e;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 5px;
+}
+
+.dashboard-section .announcement-date .announcement-list li .feedback {
+  display: block;
+  font-size: 0.75rem;
+  color: #e9691e;
+  margin-top: 6px;
   font-style: italic;
 }
 
-.dashboard-section .quick-actions .actions {
-  display: flex;
-  flex-direction: column;
+.dashboard-section .announcement-date .announcement-list li .course-date {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-top: 6px;
 }
 
-.dashboard-section .quick-actions .actions .btn {
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  height: 35px;
-  width: 80%;
-  border-radius: 5px;
+.dashboard-section .announcement-footer {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px dashed #e2e8f0;
+  text-align: center;
 }
 
-.dashboard-section .quick-actions .actions .btn .material-symbols-outlined {
-  font-size: 1.3rem;
+.dashboard-section .announcement-footer p {
   margin: 0;
-  font-weight: bold;
+  font-size: 0.85rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
+.dashboard-section .announcement-footer p::before {
+  content: "🔔";
+  font-size: 1rem;
+}
+
+/* Profile Card */
 .dashboard-section .profile-card {
-  width: 350px;
+  width: 100%;
   background-color: #fff;
   border-radius: 12px;
   box-shadow: 0px 6px 6px rgba(102, 124, 150, 0.2);
@@ -310,14 +661,14 @@ font-size: 1.1rem;
   transition: transform 0.3s;
 }
 
-.dashboard-section .profile-card .profile-card:hover {
-  transform: translateY(-10px);
+.dashboard-section .profile-card:hover {
+  transform: translateY(-5px);
 }
 
 .dashboard-section .profile-card .profile-header {
   text-align: center;
   padding: 20px;
-  background-color: #966c55;
+  background: linear-gradient(135deg, #e9691e, #f08b4a);
   color: #fff;
   display: flex;
   align-items: center;
@@ -329,7 +680,7 @@ font-size: 1.1rem;
   height: 100px;
   border: 4px solid #fff;
   object-fit: cover;
-  margin-bottom: 10px;
+  border-radius: 50%;
 }
 
 .dashboard-section .profile-card .student-profile-header .student-name {
@@ -339,6 +690,7 @@ font-size: 1.1rem;
   display: flex;
   align-items: center;
   gap: 10px;
+  margin: 0 0 5px;
 }
 
 .dashboard-section .profile-card .student-profile-header .student-id {
@@ -361,56 +713,6 @@ font-size: 1.1rem;
   padding: 20px;
 }
 
-.dashboard-section .profile-admission {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 25px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.dashboard-section .status-label {
-  padding: 6px 16px;
-  font-size: 0.8rem;
-  border-radius: 5px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: #fff;
-  animation: fadeIn 0.6s ease-in-out;
-}
-
-.dashboard-section .status-label.review {
-  background: #ffe7c0ff;
-  color: #e67e22;
-  border: 1px solid #e67e22;
-}
-
-.dashboard-section .status-label.accepted {
-  background: #c3ffdcff;
-  color: #27ae60;
-  border: 1px solid #27ae60;
-}
-
-.dashboard-section .status-label.rejected {
-  background: #ffc8c2ff;
-  color: #c0392b;
-  border: 1px solid #c0392b;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
 .dashboard-section .profile-body .detail-item {
   display: flex;
   gap: 15px;
@@ -431,146 +733,31 @@ font-size: 1.1rem;
 .dashboard-section .profile-body .icon-wrapper {
   width: 35px;
   height: 35px;
-  background: #fff;
-  border-radius: 5px;
+  background: #ffe0cf;
+  border-radius: 8px;
   color: #e9691e;
   font-size: 1.1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 8px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .dashboard-section .profile-body .info-text strong {
   display: block;
- font-size: 0.9rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  color: #1e293b;;
+  color: #1e293b;
 }
 
 .dashboard-section .profile-body .info-text p {
   margin: 0;
-   font-size: 0.8rem;
-  color: #64748b
-}
-
-/* Animation */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(219, 152, 52, 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(219, 127, 52, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(219, 52, 52, 0);
-  }
-}
-
-.dashboard-section .announcement-date {
-  display: flex;
-  gap: 20px;
-  grid-column: 1/3;
-}
-
-.dashboard-section .announcement-date .announcement-banner {
-  background: #fff;
-  border-left: 6px solid #e9691e;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
-  animation: fadeIn 0.6s ease-in-out;
-  width: 100%;
-}
-
-.dashboard-section .announcement-date .announcement-header h3 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.dashboard-section .announcement-date .announcement-content {
-  padding-left: 8px;
-}
-
-.dashboard-section .announcement-date .announcement-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.dashboard-section .announcement-date .announcement-list li {
-  display: flex;
-  align-items: center;
-  gap: 1px;
-  margin-bottom: 20px;
-  font-size: 0.9rem;
-  color: #34495e;
-  background: rgba(255, 255, 255, 0.7);
-  padding: 12px 16px;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease;
-}
-
-.dashboard-section .announcement-date .announcement-list li div {
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.dashboard-section .announcement-date .announcement-list li div .Text{
-   font-size: 0.9rem;
-  color: #64748b;
-  font-weight: 500;
-}
-
-.dashboard-section .announcement-date .announcement-list li:hover {
-  transform: translateY(-3px);
-  background-color: #f0faff;
-}
-
-.dashboard-section .announcement-date .icon {
-  font-size: 1.5rem;
-  margin-top: 2px;
-}
-
-.dashboard-section .announcement-date .highlight {
-  background-color: #ffeaa7;
-  border-radius: 12px;
-  color: #2d3436;
-  padding: 0.4rem;
-  font-weight: 600;
   font-size: 0.8rem;
-  border: 1px solid #ffeaa7
+  color: #64748b;
 }
 
-.dashboard-section .announcement-date .announcement-footer {
-  margin-top: 20px;
-  border-top: 1px dashed #ccc;
-  padding-top: 10px;
-  text-align: center;
-  font-size: 0.95rem;
-  color: #666;
-}
-
+/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -579,5 +766,91 @@ font-size: 1.1rem;
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .dashboard-section .welcome-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-section .welcome-banner {
+    grid-column: 1;
+    height: auto;
+    flex-direction: column;
+  }
+  
+  .dashboard-section .announcement-date {
+    grid-column: 1;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-section {
+    padding: 15px;
+  }
+  
+  .dashboard-section .dashboard-sections {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-section .progress-stats {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .dashboard-section .grade-list li,
+  .dashboard-section .assignment-list li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .dashboard-section .announcement-date .announcement-list li {
+    flex-direction: column;
+  }
+  
+  .dashboard-section .announcement-date .announcement-list li .icon {
+    font-size: 1.5rem;
+  }
+  
+  .dashboard-section .welcome-banner .text-container {
+    padding: 20px;
+  }
+  
+  .dashboard-section .welcome-banner .text-container h1 {
+    font-size: 1.2rem;
+    margin: 20px 0;
+  }
+  
+  .dashboard-section .profile-card .profile-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .dashboard-section .student-profile-header .student-name,
+  .dashboard-section .student-profile-header .student-id {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-section .dashboard-tile {
+    padding: 15px;
+  }
+  
+  .dashboard-section .welcome-banner .banner-item::before {
+    font-size: 2rem;
+    padding: 8px 10px;
+  }
+  
+  .dashboard-section .module-title {
+    font-size: 1rem;
+  }
+  
+  .dashboard-section .quote-text {
+    font-size: 0.9rem;
   }
 }

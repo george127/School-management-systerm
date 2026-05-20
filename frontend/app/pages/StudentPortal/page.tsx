@@ -15,6 +15,7 @@ import CourseAssignment from "./CourseAssignment";
 import CourseGrade from "./CourseGrade";
 import CourseQuiz from "./CourseQuiz";
 import Settings from "./Settings";
+import { getSetting } from "../../../lib/settings"; // Add this import
 
 // Define interfaces for type safety
 interface StudentData {
@@ -617,93 +618,99 @@ const ProfileModal = ({
     }
   };
 
-const handlePasswordUpdate = async () => {
-  if (!userEmail) {
-    setMessage("User email not found. Please log in again.");
-    return;
-  }
-
-  if (!currentPassword || !newPassword || !confirmPassword) {
-    setMessage("Please fill in all password fields");
-    return;
-  }
-
-  if (newPassword !== confirmPassword) {
-    setMessage("New passwords do not match");
-    return;
-  }
-
-  if (newPassword.length < 6) {
-    setMessage("Password must be at least 6 characters");
-    return;
-  }
-
-  try {
-    setLoading(true);
-    setMessage("");
-    
-    // Get the access token from localStorage
-    const accessToken = localStorage.getItem("accessToken");
-    
-    if (!accessToken) {
-      setMessage("Session expired. Please log in again.");
+  const handlePasswordUpdate = async () => {
+    if (!userEmail) {
+      setMessage("User email not found. Please log in again.");
       return;
     }
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-    const response = await fetch(`${API_URL}/api/profile/password/${userEmail}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ 
-        currentPassword, 
-        newPassword,
-        accessToken  // 👈 Send access token to backend
-      }),
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      setEditPassword(false);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setMessage("Password updated successfully! Please login again with your new password.");
-      
-      // Clear stored tokens and redirect to login after 3 seconds
-      setTimeout(() => {
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("tokenExpiry");
-        localStorage.removeItem("userEmail");
-        localStorage.removeItem("userData");
-        localStorage.removeItem("studentData");
-        window.location.href = "/login";
-      }, 3000);
-    } else {
-      setMessage(data.message || "Failed to update password");
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setMessage("Please fill in all password fields");
+      return;
     }
-  } catch (error) {
-    console.error("Error updating password:", error);
 
-    if (error instanceof Error) {
-      if (error.message === "Failed to fetch") {
-        setMessage(
-          "Cannot connect to server. Please make sure the backend is running.",
-        );
-      } else {
-        setMessage("Failed to update password: " + error.message);
+    if (newPassword !== confirmPassword) {
+      setMessage("New passwords do not match");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setMessage("Password must be at least 6 characters");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setMessage("");
+
+      // Get the access token from localStorage
+      const accessToken = localStorage.getItem("accessToken");
+
+      if (!accessToken) {
+        setMessage("Session expired. Please log in again.");
+        return;
       }
-    } else {
-      setMessage("An unknown error occurred");
+
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const response = await fetch(
+        `${API_URL}/api/profile/password/${userEmail}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            currentPassword,
+            newPassword,
+            accessToken, // 👈 Send access token to backend
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        setEditPassword(false);
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setMessage(
+          "Password updated successfully! Please login again with your new password.",
+        );
+
+        // Clear stored tokens and redirect to login after 3 seconds
+        setTimeout(() => {
+          localStorage.removeItem("user");
+          localStorage.removeItem("token");
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("tokenExpiry");
+          localStorage.removeItem("userEmail");
+          localStorage.removeItem("userData");
+          localStorage.removeItem("studentData");
+          window.location.href = "/login";
+        }, 3000);
+      } else {
+        setMessage(data.message || "Failed to update password");
+      }
+    } catch (error) {
+      console.error("Error updating password:", error);
+
+      if (error instanceof Error) {
+        if (error.message === "Failed to fetch") {
+          setMessage(
+            "Cannot connect to server. Please make sure the backend is running.",
+          );
+        } else {
+          setMessage("Failed to update password: " + error.message);
+        }
+      } else {
+        setMessage("An unknown error occurred");
+      }
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const cancelEdit = (field: string) => {
     switch (field) {
@@ -1100,11 +1107,16 @@ const StudentPortal = () => {
   const [studentData, setStudentData] = useState<StudentData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
-  const [isPaymentDropdownOpen, setIsPaymentDropdownOpen] = useState<boolean>(false);
-  const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] = useState<boolean>(false);
+  const [isPaymentDropdownOpen, setIsPaymentDropdownOpen] =
+    useState<boolean>(false);
+  const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] =
+    useState<boolean>(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState<boolean>(true);
+  const [maintenanceMode, setMaintenanceMode] = useState<boolean>(false);
+  const [checkingMaintenance, setCheckingMaintenance] = useState<boolean>(true);
+  const [sessionExpired, setSessionExpired] = useState<boolean>(false);
 
   const toggleSearch = (): void => {
     setIsSearchVisible(!isSearchVisible);
@@ -1167,13 +1179,92 @@ const StudentPortal = () => {
     }
   };
 
+  // Check session expiry on component mount
+useEffect(() => {
+  const checkSessionExpiry = () => {
+    const sessionExpiry = localStorage.getItem("sessionExpiry");
+    const sessionLifetimeHours = localStorage.getItem("sessionLifetimeHours");
+    
+    if (sessionExpiry) {
+      const expiryTime = parseInt(sessionExpiry);
+      const now = new Date().getTime();
+      
+      console.log(`Session expiry check: Now=${now}, Expiry=${expiryTime}, Hours=${sessionLifetimeHours || 'unknown'}`);
+      
+      if (now > expiryTime) {
+        // Session expired, logout
+        console.log("Session expired! Logging out...");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("sessionExpiry");
+        localStorage.removeItem("sessionLifetimeHours");
+        localStorage.removeItem("loginTime");
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("userEmail");
+        localStorage.removeItem("userData");
+        localStorage.removeItem("studentData");
+        setSessionExpired(true);
+        router.push("/login?expired=true");
+        return false;
+      }
+    }
+    return true;
+  };
+  
+  // Only check if not already checking maintenance
+  if (!checkingMaintenance) {
+    checkSessionExpiry();
+  }
+}, [checkingMaintenance, router]);
+
+// Also add a periodic check every minute to catch expiry while user is active
+useEffect(() => {
+  const interval = setInterval(() => {
+    const sessionExpiry = localStorage.getItem("sessionExpiry");
+    if (sessionExpiry) {
+      const expiryTime = parseInt(sessionExpiry);
+      const now = new Date().getTime();
+      
+      if (now > expiryTime) {
+        console.log("Session expired during active session!");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("sessionExpiry");
+        localStorage.removeItem("sessionLifetimeHours");
+        localStorage.removeItem("loginTime");
+        router.push("/login?expired=true");
+      }
+    }
+  }, 60000); // Check every minute
+  
+  return () => clearInterval(interval);
+}, [router]);
+
+  useEffect(() => {
+    const checkMaintenanceMode = async () => {
+      try {
+        const mode = await getSetting("maintenance_mode");
+        setMaintenanceMode(mode === "true");
+      } catch (error) {
+        console.error("Error checking maintenance mode:", error);
+        setMaintenanceMode(false);
+      } finally {
+        setCheckingMaintenance(false);
+      }
+    };
+    checkMaintenanceMode();
+  }, []);
+
   // Close dropdowns when clicking outside (for collapsed mode)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent): void => {
-      if (!isSidebarExpanded && (isPaymentDropdownOpen || isCoursesDropdownOpen)) {
-        const sidebar = document.querySelector('.sidebar');
+      if (
+        !isSidebarExpanded &&
+        (isPaymentDropdownOpen || isCoursesDropdownOpen)
+      ) {
+        const sidebar = document.querySelector(".sidebar");
         const target = event.target as Node;
-        
+
         // Check if click is outside sidebar
         if (sidebar && !sidebar.contains(target)) {
           setIsPaymentDropdownOpen(false);
@@ -1182,9 +1273,9 @@ const StudentPortal = () => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isSidebarExpanded, isPaymentDropdownOpen, isCoursesDropdownOpen]);
 
@@ -1193,35 +1284,39 @@ const StudentPortal = () => {
     if (!user?.email) return;
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const token = localStorage.getItem("token");
-      
+
       console.log("Fetching profile image for:", user.email);
-      
+
       // Fetch profile image directly
       let profileImage: string | null = null;
-      const imageResponse = await fetch(`${API_URL}/api/profile/profile-image/${user.email}`, {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
+      const imageResponse = await fetch(
+        `${API_URL}/api/profile/profile-image/${user.email}`,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
         },
-      });
+      );
       const imageData: ProfileImageResponse = await imageResponse.json();
       console.log("Profile image response:", imageData);
-      
+
       if (imageData.success && imageData.profileImage) {
         profileImage = imageData.profileImage;
       }
-      
+
       setStudentData({
         id: user.id || "",
         name: user.name || "",
         email: user.email,
         profileImage: profileImage,
       });
-      
     } catch (err: unknown) {
       console.error("Error fetching student data:", err);
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch student data";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch student data";
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -1260,12 +1355,31 @@ const StudentPortal = () => {
     router.push("/login");
   };
 
-  if (loading)
+  if (!checkingMaintenance && maintenanceMode) {
     return (
-      <div className="d-flex justify-content-center align-items-center vh-100">
-        <p>Loading...</p>
+      <div className="maintenance-page">
+        <div className="maintenance-content">
+          <div className="maintenance-icon">🔧</div>
+          <h1>System Under Maintenance</h1>
+          <p>We're currently updating our system to serve you better.</p>
+          <p>Please check back in a few minutes.</p>
+          <small>Thank you for your patience.</small>
+        </div>
       </div>
     );
+  }
+
+  // Update the loading return section (around line ~550)
+if (loading || checkingMaintenance) {
+  return (
+    <div className="d-flex justify-content-center align-items-center vh-100">
+      <div className="loading-spinner-container">
+        <div className="loading-spinner"></div>
+        <p>Loading...</p>
+      </div>
+    </div>
+  );
+}
   if (error)
     return (
       <div className="d-flex justify-content-center align-items-center vh-100">
@@ -1276,12 +1390,16 @@ const StudentPortal = () => {
   return (
     <div className="d-flex">
       {/* Sidebar */}
-      <div className={`sidebar ${isSidebarExpanded ? "expanded" : "collapsed"}`}>
+      <div
+        className={`sidebar ${isSidebarExpanded ? "expanded" : "collapsed"}`}
+      >
         {/* Toggle Button */}
         <button className="sidebar-toggle" onClick={toggleSidebar}>
-          <i className={`bi ${isSidebarExpanded ? "bi-chevron-left" : "bi-chevron-right"}`}></i>
+          <i
+            className={`bi ${isSidebarExpanded ? "bi-chevron-left" : "bi-chevron-right"}`}
+          ></i>
         </button>
-        
+
         <div className="p-container">
           <div
             className="sidebar-profile"
@@ -1302,7 +1420,7 @@ const StudentPortal = () => {
           </div>
           {isSidebarExpanded && <p className="name">{user?.name}</p>}
         </div>
-        
+
         <ul className="p-3 nav flex-column">
           <li className="mb-3 nav-item">
             <button
@@ -1313,11 +1431,11 @@ const StudentPortal = () => {
               {isSidebarExpanded && "Dashboard"}
             </button>
           </li>
-          
+
           <li className="mb-3 nav-item">
             <div className="sidebar-item">
-              <div 
-                className={`dropdown-header ${isPaymentDropdownOpen ? "active" : ""}`} 
+              <div
+                className={`dropdown-header ${isPaymentDropdownOpen ? "active" : ""}`}
                 onClick={togglePaymentDropdown}
               >
                 <button
@@ -1326,7 +1444,9 @@ const StudentPortal = () => {
                   <i className="bi bi-card-list me-2"></i>
                   {isSidebarExpanded && "Payment Info"}
                   {isSidebarExpanded && (
-                    <span className={`arrow-icon ${isPaymentDropdownOpen ? "open" : ""}`}>
+                    <span
+                      className={`arrow-icon ${isPaymentDropdownOpen ? "open" : ""}`}
+                    >
                       &#9662;
                     </span>
                   )}
@@ -1380,11 +1500,11 @@ const StudentPortal = () => {
               )}
             </div>
           </li>
-          
+
           <li className="mb-3 nav-item">
             <div className="sidebar-item">
-              <div 
-                className={`dropdown-header ${isCoursesDropdownOpen ? "active" : ""}`} 
+              <div
+                className={`dropdown-header ${isCoursesDropdownOpen ? "active" : ""}`}
                 onClick={toggleCoursesDropdown}
               >
                 <button
@@ -1393,7 +1513,9 @@ const StudentPortal = () => {
                   <i className="bi bi-book me-2"></i>
                   {isSidebarExpanded && "Courses"}
                   {isSidebarExpanded && (
-                    <span className={`arrow-icon ${isCoursesDropdownOpen ? "open" : ""}`}>
+                    <span
+                      className={`arrow-icon ${isCoursesDropdownOpen ? "open" : ""}`}
+                    >
                       &#9662;
                     </span>
                   )}
@@ -1511,7 +1633,7 @@ const StudentPortal = () => {
               {isSidebarExpanded && "Settings"}
             </button>
           </li>
-          
+
           <li className="mb-3 nav-item">
             <button
               className={`nav-link ${activeSection === "logout" ? "active" : ""}`}
@@ -1541,7 +1663,9 @@ const StudentPortal = () => {
               {/* Notification Bell */}
               <div className="notification-container">
                 <div className="notification-button">
-                  <span className="material-symbols-outlined">notifications</span>
+                  <span className="material-symbols-outlined">
+                    notifications
+                  </span>
                   <span className="notification-badge"></span>
                 </div>
               </div>
@@ -1560,7 +1684,10 @@ const StudentPortal = () => {
                       placeholder="Search..."
                       className="search-input"
                     />
-                    <button className="close-icon-button" onClick={toggleSearch}>
+                    <button
+                      className="close-icon-button"
+                      onClick={toggleSearch}
+                    >
                       <span className="material-symbols-outlined">close</span>
                     </button>
                   </div>
@@ -1569,7 +1696,7 @@ const StudentPortal = () => {
             </div>
           </div>
         </div>
-        
+
         {activeSection === "dashboard" && (
           <div className="md-4">
             <Dashboard />
@@ -1613,7 +1740,7 @@ const StudentPortal = () => {
             <Settings />
           </div>
         )}
-        
+
         {/* Footer */}
         <div className="footer">
           <p>

@@ -19,7 +19,14 @@ const COGNITO_CONFIG = {
   userPoolId: process.env.COGNITO_USER_POOL_ID!,
 };
 
-// Sign Up Route
+// Helper function to get settings from database
+async function getSettings() {
+  const settings = await prisma.systemSetting.findMany();
+  const result: Record<string, string> = {};
+  settings.forEach(s => { result[s.key] = s.value; });
+  return result;
+}
+
 // Sign Up Route
 router.post("/auth/signup", async (req, res) => {
   try {
@@ -41,14 +48,9 @@ router.post("/auth/signup", async (req, res) => {
 
     // Check if Cognito config is properly loaded
     if (!COGNITO_CONFIG.clientId) {
-      console.error("Cognito clientId is missing. Environment variables:", {
-        COGNITO_CLIENT_ID: process.env.COGNITO_CLIENT_ID,
-        COGNITO_USER_POOL_ID: process.env.COGNITO_USER_POOL_ID,
-        AWS_REGION: process.env.AWS_REGION,
-      });
+      console.error("Cognito clientId is missing");
       return res.status(500).json({
-        message:
-          "Server configuration error: Cognito credentials not properly configured",
+        message: "Server configuration error: Cognito credentials not properly configured",
       });
     }
 
@@ -58,65 +60,48 @@ router.post("/auth/signup", async (req, res) => {
       Username: email,
       Password: password,
       UserAttributes: [
-        {
-          Name: "email",
-          Value: email,
-        },
-        {
-          Name: "name",
-          Value: name,
-        },
+        { Name: "email", Value: email },
+        { Name: "name", Value: name },
       ],
     };
 
-    console.log("SignUp params:", { ...signUpParams, Password: "[REDACTED]" });
-
     const cognitoResponse = await cognito.signUp(signUpParams).promise();
 
-    // Generate a student ID (customize this logic as needed)
+    // Generate a student ID
     const generateStudentId = () => {
-      // Example: STU + year + random number
       const year = new Date().getFullYear();
-      const randomNum = Math.floor(Math.random() * 10000)
-        .toString()
-        .padStart(4, "0");
+      const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
       return `STU${year}${randomNum}`;
     };
 
-    // Save user to database with Cognito sub ID and generated studentId
+    // Save user to database
     const newUser = await prisma.user.create({
       data: {
         cognitoId: cognitoResponse.UserSub!,
         name: name.trim(),
         email: email.toLowerCase(),
         role: "student",
-        studentId: generateStudentId(), // Auto-generate student ID
+        studentId: generateStudentId(),
+        failedLoginAttempts: 0, // Initialize failed attempts
       },
     });
 
     res.status(201).json({
-      message:
-        "User registered successfully. Please check your email for verification code.",
+      message: "User registered successfully. Please check your email for verification code.",
       userId: newUser.id,
       studentId: newUser.studentId,
     });
   } catch (error: any) {
     console.error("Signup error:", error);
 
-    // Handle specific Cognito errors
     if (error.code === "UsernameExistsException") {
-      return res
-        .status(400)
-        .json({ message: "User already exists in Cognito" });
+      return res.status(400).json({ message: "User already exists in Cognito" });
     }
-
     if (error.code === "InvalidPasswordException") {
       return res.status(400).json({
-        message:
-          "Password does not meet Cognito requirements. Must be at least 8 characters with uppercase, lowercase, numbers, and special characters.",
+        message: "Password does not meet requirements. Must be at least 8 characters with uppercase, lowercase, numbers, and special characters.",
       });
     }
-
     if (error.code === "InvalidParameterException") {
       return res.status(400).json({ message: "Invalid email format" });
     }
@@ -131,20 +116,15 @@ router.put("/auth/confirm", async (req, res) => {
     const { email, code } = req.body;
 
     if (!email || !code) {
-      return res
-        .status(400)
-        .json({ message: "Email and verification code are required" });
+      return res.status(400).json({ message: "Email and verification code are required" });
     }
 
-    // Check if Cognito config is properly loaded
     if (!COGNITO_CONFIG.clientId) {
       return res.status(500).json({
-        message:
-          "Server configuration error: Cognito credentials not properly configured",
+        message: "Server configuration error: Cognito credentials not properly configured",
       });
     }
 
-    // Confirm user in Cognito
     const confirmParams = {
       ClientId: COGNITO_CONFIG.clientId,
       Username: email,
@@ -153,7 +133,6 @@ router.put("/auth/confirm", async (req, res) => {
 
     await cognito.confirmSignUp(confirmParams).promise();
 
-    // Get user from database
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
     });
@@ -187,36 +166,19 @@ router.put("/auth/confirm", async (req, res) => {
   }
 });
 
-// Login Route
+// Login Route with Security Settings
 router.post("/auth/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, sessionLifetimeHours } = req.body;
 
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
+      return res.status(400).json({ message: "Email and password are required" });
     }
 
-    // Check if Cognito config is properly loaded
-    if (!COGNITO_CONFIG.clientId) {
-      return res.status(500).json({
-        message:
-          "Server configuration error: Cognito credentials not properly configured",
-      });
-    }
-
-    // Authenticate with Cognito
-    const authParams = {
-      AuthFlow: "USER_PASSWORD_AUTH",
-      ClientId: COGNITO_CONFIG.clientId,
-      AuthParameters: {
-        USERNAME: email,
-        PASSWORD: password,
-      },
-    };
-
-    const authResponse = await cognito.initiateAuth(authParams).promise();
+    // Get security settings from database
+    const settings = await getSettings();
+    const maxLoginAttempts = parseInt(settings.max_login_attempts) || 5;
+    const lockDurationMinutes = parseInt(settings.account_lock_duration_minutes) || 30;
 
     // Get user from database
     const user = await prisma.user.findUnique({
@@ -224,10 +186,99 @@ router.post("/auth/login", async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Generate your own JWT
+    // Check if account is locked
+    if (user.lockedUntil && new Date(user.lockedUntil) > new Date()) {
+      const remainingMinutes = Math.ceil(
+        (new Date(user.lockedUntil).getTime() - Date.now()) / (1000 * 60)
+      );
+      return res.status(401).json({
+        message: `Account locked. Please try again in ${remainingMinutes} minutes.`,
+        locked: true,
+        remainingMinutes,
+      });
+    }
+
+    // Check if Cognito config is properly loaded
+    if (!COGNITO_CONFIG.clientId) {
+      return res.status(500).json({
+        message: "Server configuration error: Cognito credentials not properly configured",
+      });
+    }
+
+    // Attempt to authenticate with Cognito
+    let authResponse;
+    let cognitoSuccess = false;
+    let cognitoError = null;
+
+    try {
+      const authParams = {
+        AuthFlow: "USER_PASSWORD_AUTH",
+        ClientId: COGNITO_CONFIG.clientId,
+        AuthParameters: {
+          USERNAME: email,
+          PASSWORD: password,
+        },
+      };
+      authResponse = await cognito.initiateAuth(authParams).promise();
+      cognitoSuccess = true;
+    } catch (error: any) {
+      cognitoError = error;
+      console.error("Cognito auth error:", error.code);
+    }
+
+    // If authentication failed
+    if (!cognitoSuccess) {
+      // Increment failed login attempts
+      const newAttempts = (user.failedLoginAttempts || 0) + 1;
+      let lockUntil = null;
+      let lockMessage = "";
+
+      // Check if max attempts reached
+      if (newAttempts >= maxLoginAttempts) {
+        lockUntil = new Date(Date.now() + lockDurationMinutes * 60 * 1000);
+        lockMessage = ` Too many failed attempts. Account locked for ${lockDurationMinutes} minutes.`;
+      }
+
+      // Update user's failed attempts and lock status
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          failedLoginAttempts: newAttempts,
+          lockedUntil: lockUntil,
+        },
+      });
+
+      const attemptsLeft = maxLoginAttempts - newAttempts;
+      
+      if (lockUntil) {
+        return res.status(401).json({
+          message: `Invalid credentials.${lockMessage}`,
+          attemptsLeft: 0,
+          locked: true,
+          remainingMinutes: lockDurationMinutes,
+        });
+      } else {
+        return res.status(401).json({
+          message: `Invalid credentials. ${attemptsLeft} attempt(s) remaining before account lock.`,
+          attemptsLeft,
+          locked: false,
+        });
+      }
+    }
+
+    // Authentication successful - reset failed attempts
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        failedLoginAttempts: 0,
+        lockedUntil: null,
+      },
+    });
+
+    // Generate JWT token
     const token = jwt.sign(
       {
         id: user.id,
@@ -236,7 +287,7 @@ router.post("/auth/login", async (req, res) => {
         cognitoId: user.cognitoId,
       },
       process.env.JWT_SECRET || "your-secret-key",
-      { expiresIn: "7d" },
+      { expiresIn: `${sessionLifetimeHours || 24}h` },
     );
 
     res.json({
@@ -254,16 +305,11 @@ router.post("/auth/login", async (req, res) => {
   } catch (error: any) {
     console.error("Login error:", error);
 
-    if (error.code === "NotAuthorizedException") {
-      return res.status(401).json({ message: "Invalid email or password" });
-    }
     if (error.code === "UserNotConfirmedException") {
-      return res
-        .status(401)
-        .json({ message: "Please verify your email first" });
+      return res.status(401).json({ message: "Please verify your email first" });
     }
     if (error.code === "UserNotFoundException") {
-      return res.status(401).json({ message: "User does not exist" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
     res.status(500).json({ message: error.message || "Login failed" });
@@ -279,11 +325,9 @@ router.post("/auth/resend-code", async (req, res) => {
       return res.status(400).json({ message: "Email is required" });
     }
 
-    // Check if Cognito config is properly loaded
     if (!COGNITO_CONFIG.clientId) {
       return res.status(500).json({
-        message:
-          "Server configuration error: Cognito credentials not properly configured",
+        message: "Server configuration error: Cognito credentials not properly configured",
       });
     }
 
@@ -318,20 +362,14 @@ router.post("/auth/logout", async (req, res) => {
       return res.status(400).json({ message: "Access token is required" });
     }
 
-    await cognito
-      .globalSignOut({
-        AccessToken: accessToken,
-      })
-      .promise();
+    await cognito.globalSignOut({ AccessToken: accessToken }).promise();
 
     res.json({ message: "Logged out successfully" });
   } catch (error: any) {
     console.error("Logout error:", error);
 
     if (error.code === "NotAuthorizedException") {
-      return res
-        .status(401)
-        .json({ message: "Invalid or expired access token" });
+      return res.status(401).json({ message: "Invalid or expired access token" });
     }
 
     res.status(500).json({ message: error.message || "Logout failed" });
@@ -347,11 +385,9 @@ router.post("/auth/forgot-password", async (req, res) => {
       return res.status(400).json({ message: "Email is required" });
     }
 
-    // Check if Cognito config is properly loaded
     if (!COGNITO_CONFIG.clientId) {
       return res.status(500).json({
-        message:
-          "Server configuration error: Cognito credentials not properly configured",
+        message: "Server configuration error: Cognito credentials not properly configured",
       });
     }
 
@@ -373,9 +409,7 @@ router.post("/auth/forgot-password", async (req, res) => {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
-    res
-      .status(500)
-      .json({ message: error.message || "Failed to initiate password reset" });
+    res.status(500).json({ message: error.message || "Failed to initiate password reset" });
   }
 });
 
@@ -385,16 +419,12 @@ router.post("/auth/reset-password", async (req, res) => {
     const { email, code, newPassword } = req.body;
 
     if (!email || !code || !newPassword) {
-      return res
-        .status(400)
-        .json({ message: "Email, code, and new password are required" });
+      return res.status(400).json({ message: "Email, code, and new password are required" });
     }
 
-    // Check if Cognito config is properly loaded
     if (!COGNITO_CONFIG.clientId) {
       return res.status(500).json({
-        message:
-          "Server configuration error: Cognito credentials not properly configured",
+        message: "Server configuration error: Cognito credentials not properly configured",
       });
     }
 
@@ -408,8 +438,7 @@ router.post("/auth/reset-password", async (req, res) => {
     await cognito.confirmForgotPassword(confirmForgotPasswordParams).promise();
 
     res.json({
-      message:
-        "Password reset successfully. You can now login with your new password.",
+      message: "Password reset successfully. You can now login with your new password.",
     });
   } catch (error: any) {
     console.error("Reset password error:", error);
@@ -422,29 +451,24 @@ router.post("/auth/reset-password", async (req, res) => {
     }
     if (error.code === "InvalidPasswordException") {
       return res.status(400).json({
-        message:
-          "Password does not meet requirements. Must be at least 8 characters with uppercase, lowercase, numbers, and special characters.",
+        message: "Password does not meet requirements.",
       });
     }
     if (error.code === "UserNotFoundException") {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res
-      .status(500)
-      .json({ message: error.message || "Failed to reset password" });
+    res.status(500).json({ message: error.message || "Failed to reset password" });
   }
 });
 
-// Backend route
-// Check Auth Route - Verify user session
+// Check Auth Route
 router.post("/auth/check-auth", async (req, res) => {
   try {
     const { email } = req.body;
     const authHeader = req.headers.authorization;
     const token = authHeader?.split(" ")[1];
 
-    // Validate token presence
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -452,13 +476,9 @@ router.post("/auth/check-auth", async (req, res) => {
       });
     }
 
-    // Verify JWT token
     let decodedToken;
     try {
-      decodedToken = jwt.verify(
-        token,
-        process.env.JWT_SECRET || "your-secret-key",
-      );
+      decodedToken = jwt.verify(token, process.env.JWT_SECRET || "your-secret-key");
     } catch (jwtError) {
       console.error("JWT verification failed:", jwtError);
       return res.status(401).json({
@@ -467,7 +487,6 @@ router.post("/auth/check-auth", async (req, res) => {
       });
     }
 
-    // Fetch user from database using Prisma
     const user = await prisma.user.findUnique({
       where: {
         email: email?.toLowerCase() || decodedToken.email?.toLowerCase(),
@@ -481,29 +500,6 @@ router.post("/auth/check-auth", async (req, res) => {
       });
     }
 
-    // Optional: Verify Cognito token with AWS if you want additional validation
-    // This is optional and adds an extra layer of security
-    let cognitoValid = true;
-    if (process.env.VERIFY_COGNITO_TOKEN === "true") {
-      try {
-        const cognitoParams = {
-          AccessToken: token,
-        };
-        await cognito.getUser(cognitoParams).promise();
-      } catch (cognitoError) {
-        console.error("Cognito token validation failed:", cognitoError);
-        cognitoValid = false;
-      }
-    }
-
-    if (!cognitoValid) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid Cognito session",
-      });
-    }
-
-    // Return user data
     return res.json({
       success: true,
       user: {

@@ -52,6 +52,9 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  failedLoginAttempts Int      @default(0)
+  lockedUntil         DateTime?
+  
   studentProfile Student?
   payments      Payment[]  // Now this will work since Payment has userId
   courses       Course[]   // Courses created by admin/instructor
@@ -341,4 +344,18 @@ model AssignmentNotification {
   @@index([adminId])
   @@index([read])
   @@index([createdAt])
+}
+
+
+model SystemSetting {
+  id          Int      @id @default(autoincrement())
+  category    String   // "system", "security"
+  key         String   @unique
+  value       String
+  description String?
+  isSensitive Boolean  @default(false)  // For passwords/keys (hide in UI)
+  updatedAt   DateTime @updatedAt
+  
+  @@index([category])
+  @@index([key])
 }

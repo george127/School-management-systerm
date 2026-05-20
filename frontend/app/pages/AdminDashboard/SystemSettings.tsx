@@ -1,343 +1,373 @@
-import React, { useState } from 'react';
-import "./style/SystemSettings.css"
+"use client";
+
+import React, { useEffect, useState } from "react";
+import "./style/SystemSettings.css";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+interface SystemSettings {
+  maintenance_mode: string;
+  allow_registrations: string;
+  session_lifetime_hours: string;
+}
+
+interface SecuritySettings {
+  max_login_attempts: string;
+  account_lock_duration_minutes: string;
+}
+
+interface Notification {
+  id: number;
+  type: "success" | "error" | "info";
+  title: string;
+  message: string;
+}
 
 const SystemSettings = () => {
-  const [generalSettings, setGeneralSettings] = useState({
-    instituteName: "AppCode Academy",
-    adminEmail: "admin@appcode.com",
-    instituteAddress: "123 Education Street, Knowledge City",
-    timezone: "UTC-5 (Eastern Time)"
+  const [systemSettings, setSystemSettings] = useState<SystemSettings>({
+    maintenance_mode: "false",
+    allow_registrations: "true",
+    session_lifetime_hours: "24",
   });
-
-  const [paymentSettings, setPaymentSettings] = useState({
-    currency: "USD ($)",
-    taxRate: 8.5,
-    paymentMethods: {
-      creditCard: true,
-      paypal: true,
-      bankTransfer: true
-    },
-    enablePayments: true
+  
+  const [securitySettings, setSecuritySettings] = useState<SecuritySettings>({
+    max_login_attempts: "5",
+    account_lock_duration_minutes: "30",
   });
+  
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  const [saveStatus, setSaveStatus] = useState({});
-
-  const handleSave = (section) => {
-    setSaveStatus(prev => ({ ...prev, [section]: 'saving' }));
-    
+  // Add notification
+  const addNotification = (type: Notification["type"], title: string, message: string) => {
+    const id = Date.now();
+    setNotifications(prev => [...prev, { id, type, title, message }]);
     setTimeout(() => {
-      setSaveStatus(prev => ({ ...prev, [section]: 'saved' }));
-      setTimeout(() => setSaveStatus(prev => ({ ...prev, [section]: '' })), 2000);
-    }, 1000);
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    }, 5000);
   };
 
-  return (
-    <div className="management-container system-settings">
-      <header className="management-header">
-        <div>
-          <h3 className="title">System Settings</h3>
-          <p className="subtitle">Configure system preferences and application settings</p>
-        </div>
+  const removeNotification = (id: number) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
+
+  // Fetch settings
+  const fetchSettings = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      
+      const response = await fetch(`${API_URL}/api/settings`, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch settings");
+
+      const result = await response.json();
+      if (result.success) {
+        setSystemSettings({
+          maintenance_mode: result.data.system.maintenance_mode || "false",
+          allow_registrations: result.data.system.allow_registrations || "true",
+          session_lifetime_hours: result.data.system.session_lifetime_hours || "24",
+        });
         
-        <div className="settings-actions">
-          <button className="btn btn-secondary">
-            <span className="material-symbols-outlined">backup</span>
-            Backup Config
-          </button>
-          <button className="btn btn-primary">
-            <span className="material-symbols-outlined">refresh</span>
-            Restart System
+        setSecuritySettings({
+          max_login_attempts: result.data.security.max_login_attempts || "5",
+          account_lock_duration_minutes: result.data.security.account_lock_duration_minutes || "30",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+      addNotification("error", "Error", "Failed to load settings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Save settings
+  const handleSaveAll = async () => {
+    try {
+      setSaving(true);
+      const token = localStorage.getItem("token");
+      
+      const response = await fetch(`${API_URL}/api/settings`, {
+        method: "PUT",
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          system: systemSettings,
+          security: securitySettings,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to save settings");
+
+      const result = await response.json();
+      if (result.success) {
+        addNotification("success", "Saved!", "Settings have been updated successfully");
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      addNotification("error", "Save Failed", "Could not save settings");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="settings-container">
+        <div className="loading-state">
+          <div className="spinner"></div>
+          <p>Loading settings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="settings-container">
+      {/* Notifications */}
+      <div className="notification-container">
+        {notifications.map(notification => (
+          <div
+            key={notification.id}
+            className={`notification notification-${notification.type}`}
+            onClick={() => removeNotification(notification.id)}
+          >
+            <div className="notification-content">
+              <div className="notification-icon">
+                {notification.type === "success" && "✓"}
+                {notification.type === "error" && "✗"}
+                {notification.type === "info" && "ℹ"}
+              </div>
+              <div className="notification-text">
+                <div className="notification-title">{notification.title}</div>
+                <div className="notification-message">{notification.message}</div>
+              </div>
+              <button className="notification-close">×</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Header */}
+      <header className="settings-header">
+        <div>
+          <h1 className="settings-title">System Settings</h1>
+          <p className="settings-subtitle">Configure system preferences and security controls</p>
+        </div>
+        <div className="header-actions">
+          <button className="btn-save-all" onClick={handleSaveAll} disabled={saving}>
+            {saving ? (
+              <>
+                <div className="save-spinner-small"></div>
+                Saving...
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-outlined">save</span>
+                Save All Settings
+              </>
+            )}
           </button>
         </div>
       </header>
 
       <div className="settings-grid">
+        {/* System Settings Card */}
         <div className="settings-card">
           <div className="card-header">
             <div className="card-icon">
               <span className="material-symbols-outlined">settings</span>
             </div>
-            <h4 className="card-title">General Settings</h4>
+            <div>
+              <h3 className="card-title">System Settings</h3>
+              <p className="card-desc">Control system behavior and access</p>
+            </div>
           </div>
           
           <div className="settings-form">
-            <div className="form-group">
-              <label className="form-label">
-                <span className="material-symbol-outlined">business</span>
-                Institute Name
-              </label>
-              <input 
-                type="text" 
-                className="form-input" 
-                value={generalSettings.instituteName}
-                onChange={(e) => setGeneralSettings(prev => ({ ...prev, instituteName: e.target.value }))}
-              />
+            {/* Maintenance Mode */}
+            <div className="setting-item">
+              <div className="setting-info">
+                <label className="setting-label">
+                  <span className="material-symbols-outlined">build</span>
+                  Maintenance Mode
+                </label>
+                <p className="setting-description">Shows maintenance page to everyone except admins</p>
+              </div>
+              <div className="setting-control">
+                <label className="toggle-switch">
+                  <input 
+                    type="checkbox"
+                    checked={systemSettings.maintenance_mode === "true"}
+                    onChange={(e) => setSystemSettings(prev => ({ 
+                      ...prev, 
+                      maintenance_mode: e.target.checked ? "true" : "false" 
+                    }))}
+                  />
+                  <span className="toggle-slider"></span>
+                </label>
+                <span className="toggle-label">
+                  {systemSettings.maintenance_mode === "true" ? "ON" : "OFF"}
+                </span>
+              </div>
             </div>
-            
-            <div className="form-group">
-              <label className="form-label">
-                <span className="material-symbol-outlined">email</span>
-                Admin Email
-              </label>
-              <input 
-                type="email" 
-                className="form-input" 
-                value={generalSettings.adminEmail}
-                onChange={(e) => setGeneralSettings(prev => ({ ...prev, adminEmail: e.target.value }))}
-              />
+
+            {/* Allow Registrations */}
+            <div className="setting-item">
+              <div className="setting-info">
+                <label className="setting-label">
+                  <span className="material-symbols-outlined">person_add</span>
+                  Allow Registrations
+                </label>
+                <p className="setting-description">Prevents new student signups when OFF</p>
+              </div>
+              <div className="setting-control">
+                <label className="toggle-switch">
+                  <input 
+                    type="checkbox"
+                    checked={systemSettings.allow_registrations === "true"}
+                    onChange={(e) => setSystemSettings(prev => ({ 
+                      ...prev, 
+                      allow_registrations: e.target.checked ? "true" : "false" 
+                    }))}
+                  />
+                  <span className="toggle-slider"></span>
+                </label>
+                <span className="toggle-label">
+                  {systemSettings.allow_registrations === "true" ? "Open" : "Closed"}
+                </span>
+              </div>
             </div>
-            
-            <div className="form-group">
-              <label className="form-label">
-                <span className="material-symbol-outlined">location_on</span>
-                Institute Address
-              </label>
-              <textarea 
-                className="form-textarea" 
-                rows="3" 
-                value={generalSettings.instituteAddress}
-                onChange={(e) => setGeneralSettings(prev => ({ ...prev, instituteAddress: e.target.value }))}
-              />
-            </div>
-            
-            <div className="form-group">
-              <label className="form-label">
-                <span className="material-symbol-outlined">schedule</span>
-                Timezone
-              </label>
-              <select 
-                className="form-select"
-                value={generalSettings.timezone}
-                onChange={(e) => setGeneralSettings(prev => ({ ...prev, timezone: e.target.value }))}
-              >
-                <option>UTC-5 (Eastern Time)</option>
-                <option>UTC-8 (Pacific Time)</option>
-                <option>UTC+0 (Greenwich Mean Time)</option>
-                <option>UTC+1 (Central European Time)</option>
-              </select>
-            </div>
-            
-            <div className="form-actions">
-              <button 
-                className={`btn btn-save ${saveStatus.general || ''}`}
-                onClick={() => handleSave('general')}
-              >
-                {saveStatus.general === 'saving' ? (
-                  <>
-                    <div className="save-spinner"></div>
-                    Saving...
-                  </>
-                ) : saveStatus.general === 'saved' ? (
-                  <>
-                    <span className="material-symbols-outlined">check</span>
-                    Saved!
-                  </>
-                ) : (
-                  <>
-                    <span className="material-symbols-outlined">save</span>
-                    Save General Settings
-                  </>
-                )}
-              </button>
+
+            {/* Session Lifetime */}
+            <div className="setting-item">
+              <div className="setting-info">
+                <label className="setting-label">
+                  <span className="material-symbols-outlined">schedule</span>
+                  Session Lifetime
+                </label>
+                <p className="setting-description">How long before auto-logout</p>
+              </div>
+              <div className="setting-control">
+                <select 
+                  className="setting-select"
+                  value={systemSettings.session_lifetime_hours}
+                  onChange={(e) => setSystemSettings(prev => ({ 
+                    ...prev, 
+                    session_lifetime_hours: e.target.value 
+                  }))}
+                >
+                  <option value="12">12 hours</option>
+                  <option value="24">24 hours</option>
+                  <option value="48">48 hours</option>
+                  <option value="72">72 hours</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
 
+        {/* Security Settings Card */}
         <div className="settings-card">
           <div className="card-header">
             <div className="card-icon">
-              <span className="material-symbols-outlined">payments</span>
+              <span className="material-symbols-outlined">security</span>
             </div>
-            <h4 className="card-title">Payment Settings</h4>
+            <div>
+              <h3 className="card-title">Security & Access Control</h3>
+              <p className="card-desc">Protect your system from unauthorized access</p>
+            </div>
           </div>
           
           <div className="settings-form">
-            <div className="form-group">
-              <label className="form-label">
-                <span className="material-symbol-outlined">currency_exchange</span>
-                Currency
-              </label>
-              <select 
-                className="form-select"
-                value={paymentSettings.currency}
-                onChange={(e) => setPaymentSettings(prev => ({ ...prev, currency: e.target.value }))}
-              >
-                <option>USD ($)</option>
-                <option>EUR (€)</option>
-                <option>GBP (£)</option>
-                <option>INR (₹)</option>
-                <option>CAD (C$)</option>
-              </select>
-            </div>
-            
-            <div className="form-group">
-              <label className="form-label">
-                <span className="material-symbol-outlined">percent</span>
-                Tax Rate (%)
-              </label>
-              <input 
-                type="number" 
-                className="form-input" 
-                value={paymentSettings.taxRate}
-                onChange={(e) => setPaymentSettings(prev => ({ ...prev, taxRate: parseFloat(e.target.value) }))}
-                min="0"
-                max="100"
-                step="0.1"
-              />
-            </div>
-            
-            <div className="form-group">
-              <label className="form-label">
-                <span className="material-symbol-outlined">payment</span>
-                Payment Methods
-              </label>
-              <div className="checkbox-group">
-                <label className="checkbox-item">
-                  <input 
-                    type="checkbox" 
-                    checked={paymentSettings.paymentMethods.creditCard}
-                    onChange={(e) => setPaymentSettings(prev => ({
-                      ...prev, 
-                      paymentMethods: { ...prev.paymentMethods, creditCard: e.target.checked }
-                    }))}
-                  />
-                  <span className="checkmark"></span>
-                  <span className="checkbox-label">Credit/Debit Card</span>
+            {/* Max Login Attempts */}
+            <div className="setting-item">
+              <div className="setting-info">
+                <label className="setting-label">
+                  <span className="material-symbols-outlined">lock</span>
+                  Max Login Attempts
                 </label>
-                
-                <label className="checkbox-item">
-                  <input 
-                    type="checkbox" 
-                    checked={paymentSettings.paymentMethods.paypal}
-                    onChange={(e) => setPaymentSettings(prev => ({
-                      ...prev, 
-                      paymentMethods: { ...prev.paymentMethods, paypal: e.target.checked }
-                    }))}
-                  />
-                  <span className="checkmark"></span>
-                  <span className="checkbox-label">PayPal</span>
-                </label>
-                
-                <label className="checkbox-item">
-                  <input 
-                    type="checkbox" 
-                    checked={paymentSettings.paymentMethods.bankTransfer}
-                    onChange={(e) => setPaymentSettings(prev => ({
-                      ...prev, 
-                      paymentMethods: { ...prev.paymentMethods, bankTransfer: e.target.checked }
-                    }))}
-                  />
-                  <span className="checkmark"></span>
-                  <span className="checkbox-label">Bank Transfer</span>
-                </label>
+                <p className="setting-description">Locks account after X wrong passwords</p>
+              </div>
+              <div className="setting-control">
+                <select 
+                  className="setting-select"
+                  value={securitySettings.max_login_attempts}
+                  onChange={(e) => setSecuritySettings(prev => ({ 
+                    ...prev, 
+                    max_login_attempts: e.target.value 
+                  }))}
+                >
+                  <option value="3">3 attempts</option>
+                  <option value="5">5 attempts</option>
+                </select>
               </div>
             </div>
-            
-            <div className="form-group">
-              <label className="checkbox-item large">
-                <input 
-                  type="checkbox" 
-                  checked={paymentSettings.enablePayments}
-                  onChange={(e) => setPaymentSettings(prev => ({ ...prev, enablePayments: e.target.checked }))}
-                />
-                <span className="checkmark"></span>
-                <span className="checkbox-label">
-                  <span className="material-symbol-outlined">toggle_on</span>
-                  Enable Online Payments
-                </span>
-              </label>
-            </div>
-            
-            <div className="form-actions">
-              <button 
-                className={`btn btn-save ${saveStatus.payment || ''}`}
-                onClick={() => handleSave('payment')}
-              >
-                {saveStatus.payment === 'saving' ? (
-                  <>
-                    <div className="save-spinner"></div>
-                    Saving...
-                  </>
-                ) : saveStatus.payment === 'saved' ? (
-                  <>
-                    <span className="material-symbols-outlined">check</span>
-                    Saved!
-                  </>
-                ) : (
-                  <>
-                    <span className="material-symbols-outlined">save</span>
-                    Save Payment Settings
-                  </>
-                )}
-              </button>
+
+            {/* Account Lock Duration */}
+            <div className="setting-item">
+              <div className="setting-info">
+                <label className="setting-label">
+                  <span className="material-symbols-outlined">hourglass_top</span>
+                  Account Lock Duration
+                </label>
+                <p className="setting-description">How long account stays locked before retry</p>
+              </div>
+              <div className="setting-control">
+                <select 
+                  className="setting-select"
+                  value={securitySettings.account_lock_duration_minutes}
+                  onChange={(e) => setSecuritySettings(prev => ({ 
+                    ...prev, 
+                    account_lock_duration_minutes: e.target.value 
+                  }))}
+                >
+                  <option value="15">15 minutes</option>
+                  <option value="30">30 minutes</option>
+                  <option value="60">60 minutes</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="settings-card full-width">
-          <div className="card-header">
-            <div className="card-icon">
-              <span className="material-symbols-outlined">monitoring</span>
-            </div>
-            <h4 className="card-title">System Information</h4>
+      {/* Information Card */}
+      <div className="info-card">
+        <div className="info-header">
+          <span className="material-symbols-outlined">info</span>
+          <h4>About These Settings</h4>
+        </div>
+        <div className="info-grid">
+          <div className="info-item">
+            <strong>Maintenance Mode</strong>
+            <p>When enabled, students see maintenance page. Admins can still access normally.</p>
           </div>
-          
-          <div className="system-info-grid">
-            <div className="info-section">
-              <div className="info-item">
-                <span className="info-label">Version</span>
-                <span className="info-value">2.1.0</span>
-                <span className="info-badge update">Latest</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Last Updated</span>
-                <span className="info-value">October 15, 2023</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Database</span>
-                <span className="info-value">MongoDB 5.0</span>
-              </div>
-            </div>
-            
-            <div className="info-section">
-              <div className="info-item">
-                <span className="info-label">Server Status</span>
-                <span className="info-value status-online">
-                  <span className="status-dot"></span>
-                  Online
-                </span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Uptime</span>
-                <span className="info-value">99.8%</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Storage</span>
-                <div className="storage-info">
-                  <span className="info-value">15.2GB/100GB used</span>
-                  <div className="storage-bar">
-                    <div className="storage-fill" style={{width: '15.2%'}}></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="info-section">
-              <div className="system-actions">
-                <button className="btn btn-system">
-                  <span className="material-symbols-outlined">system_update</span>
-                  Check for Updates
-                </button>
-                <button className="btn btn-system">
-                  <span className="material-symbols-outlined">bug_report</span>
-                  Run Diagnostics
-                </button>
-                <button className="btn btn-system">
-                  <span className="material-symbols-outlined">security</span>
-                  Security Scan
-                </button>
-              </div>
-            </div>
+          <div className="info-item">
+            <strong>Allow Registrations</strong>
+            <p>Control whether new students can sign up. Great for managing semester intakes.</p>
+          </div>
+          <div className="info-item">
+            <strong>Session Lifetime</strong>
+            <p>Students stay logged in for selected hours. After that, they must login again.</p>
+          </div>
+          <div className="info-item">
+            <strong>Security Lockout</strong>
+            <p>After max failed attempts, account locks for selected duration to prevent brute force attacks.</p>
           </div>
         </div>
       </div>
