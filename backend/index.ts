@@ -23,6 +23,7 @@ import adminCoursesRoutes from "./routes/adminCourses";
 import dashboardOverviewRoutes from "./routes/dashboardOverview";
 import reportsRoutes from "./routes/reports";
 import settingsRoutes from "./routes/settings";
+import coursePerformanceRoutes from "./routes/coursePerformance";
 
 
 
@@ -178,6 +179,7 @@ app.use("/api/admin/courses", adminCoursesRoutes);
 app.use("/api/dashboard", dashboardOverviewRoutes);
 app.use("/api/reports", reportsRoutes);
 app.use("/api/settings", settingsRoutes);
+app.use("/api/course-performance", coursePerformanceRoutes);
 
 
 // Error handling middleware
